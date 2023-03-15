@@ -13,5 +13,12 @@ def login():
         print(employee_form)
     return render_template("admin/login.html")
 
+@app.route("/admin")
+def admin():
+    return "Admin Page"
+
+@app.route("/admin/user")
+def user():
+    return render_template('admin/user.html')
 if __name__=='__main__':
     app.run(debug=True)
