@@ -13,5 +13,10 @@ def login():
         print(employee_form)
     return render_template("admin/login.html")
 
+@app.route("/volunteer", methods = ['GET','POST'])
+def volunteer():
+    return render_template("admin/volunteer.html")
+    
+
 if __name__=='__main__':
     app.run(debug=True)
