@@ -15,10 +15,17 @@ def login():
 
 @app.route("/admin")
 def admin():
-    return "Admin Page"
+    return render_template("admin/dashboard.html")
 
-@app.route("/admin/user")
+@app.route("/admin/user",methods=['POST','GET'])
 def user():
+    if(request.method=='POST'):
+        print(request.json)
+        form_data=request.json
+        if(form_data['signal']=='search'):
+            print("this is search query")
+        elif(form_data['signal']=='edit'):
+            print("this is edit query")       
     return render_template('admin/user.html')
 if __name__=='__main__':
     app.run(debug=True)
