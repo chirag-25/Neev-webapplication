@@ -24,8 +24,11 @@ def user():
         form_data=request.json
         if(form_data['signal']=='search'):
             print("this is search query")
-        elif(form_data['signal']=='edit'):
-            print("this is edit query")       
+        elif(form_data['signal']=='editUser'):
+            print("this is edit query")  
+        elif(form_data['signal']=='addUser'):
+            print("add new data")     
     return render_template('admin/user.html')
+
 if __name__=='__main__':
     app.run(debug=True)

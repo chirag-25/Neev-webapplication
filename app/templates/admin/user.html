@@ -1,40 +1,11 @@
 {% extends 'layout.html'%}
 {% block content %}
 <div class="container">
-    <!-- aadhar 
-    name 
-    dob
-    gender 
-    martial status 
-    education
-    photo 
-    employed  -->
-
-    <!-- <div class="card" style="width: 18rem">
-        <ul class="list-group list-group-flush">
-            <li class="list-group-item">Name : Sandeep Desai</li>
-            <li class="list-group-item">Aadhar Id: 123456789011</li>
-            <li class="list-group-item">DOB: 05/02/2002</li>
-            <li class="list-group-item">Gender : Male</li>
-            <li class="list-group-item">Employed: No</li>
-            <li class="list-group-item">Martial Status: No</li>
-            <li class="list-group-item">Education: B.Tech</li>
-        </ul>
-    </div>
-    <div class="card" style="width: 18rem">
-        <ul class="list-group list-group-flush">
-            <li class="list-group-item">Name : Sandeep Desai</li>
-            <li class="list-group-item">Aadhar Id: 123456789011</li>
-            <li class="list-group-item">DOB: 05/02/2002</li>
-            <li class="list-group-item">Gender : Male</li>
-            <li class="list-group-item">Employed: No</li>
-            <li class="list-group-item">Martial Status: No</li>
-            <li class="list-group-item">Education: B.Tech</li>
-        </ul>
-    </div> -->
+  
     <h1>Benficairy Page</h1>
     <div class="container">
         <form name="searchForm">
+          <input type="hidden" name="signal" value="search">
           <div class="form-group">
             <label for="name" >Name:</label>
             <input type="text" class="form-control" id="name" name="name">
@@ -47,13 +18,18 @@
             <label for="dob">DOB:</label>
             <input type="date" class="form-control" id="dob" name="dob">
           </div>
-          <button type="button"  class="btn btn-primary" onclick="postData(this)">Search</button>
+          <button type="submit"  class="btn btn-primary" onclick="" value="">Search</button>
         </form>
+        
       </div>
       
-       
+       <div class="container">
+        <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#addModal" onclick="">Add New Beneficiary</button>
+
+       </div>
 
    <table class="table">
+    
      <thead>
     <tr>
       <th scope="col">Aadhar ID </th>
@@ -69,44 +45,19 @@
   <!-- dummy data -->
   <tbody>
     <tr>
-      <th scope="row">1</th>
-      <td>Mark</td>
-      <td>10/10/2000</td>
-      <td>Male</td>
-      <td>B.Tech</td>
-      <td>Not Married</td>
-      <td>No</td>
+      <th scope="row" headers="aadhar">555589892314</th>
+      <td  headers="name">Mark Sharma</td>
+      <td  headers="dob">2000-10-10</td>
+      <td headers="gender">Male</td>
+      <td headers="education">B.Tech</td>
+      <td headers="martial">Not Married</td>
+      <td headers="employed">No</td>
       <td>
         <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editModal" onclick="addUserToForm(this)">Edit</button>
         <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#deleteModal">Delete</button>
       </td>
     </tr>
-    <tr>
-        <th scope="row">2</th>
-        <td>Marky</td>
-        <td>10/10/2000</td>
-        <td>Female</td>
-        <td>B.Com</td>
-        <td>Married</td>
-        <td>Yes</td>
-      <td>
-        <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editModal">Edit</button>
-        <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#deleteModal">Delete</button>
-      </td>
-    </tr>
-    <tr>
-        <th scope="row">3</th>
-        <td>Tom</td>
-        <td>10/12/1990</td>
-        <td>Male</td>
-        <td>12th</td>
-        <td>Married</td>
-        <td>No</td>
-      <td>
-        <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editModal">Edit</button>
-        <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#deleteModal">Delete</button>
-      </td>
-    </tr>
+    
   </tbody>
 </table>
 
@@ -124,7 +75,7 @@
         <div class="modal-body">
           <form name="editedDetails">
 
-
+            <input type="hidden"  value="editUser" name="signal">
             <div class="form-group">
               <label for="name">Name</label>
               <input type="text" class="form-control" id="name" name="name">
@@ -147,14 +98,29 @@
                 <label for="education">Education</label>
                 <input type="text" class="form-control" id="education" name="education">
               </div>
-
-
+             
+              <div class="form-group">
+                <label for="genderSelect">Martial Status</label>
+                <select class="form-control" id="genderSelect" name="martial">
+                  <option value="Married">Married</option>
+                  <option value="Not Married">Not Married</option>
+                 
+                </select>
+              </div>
               <div class="form-group">
                 <label for="genderSelect">Gender</label>
                 <select class="form-control" id="genderSelect" name="gender">
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
                   <option value="other">Other</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="genderSelect">Employed</label>
+                <select class="form-control" id="genderSelect" name="employed">
+                  <option value="Yes">Yes</option>
+                  <option value="No">No</option>
+                 
                 </select>
               </div>
               <div class="modal-footer">
@@ -167,6 +133,81 @@
       </div>
     </div>
   </div>
+
+
+<!-- add modal -->
+
+<div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editModalLabel">Add New User</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form name="addDetails">
+          <input type="hidden" name="search" value="addUser">
+
+          <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" class="form-control" id="name" name="name">
+          </div>
+
+
+          <div class="form-group">
+            <label for="aadhar">Aadhar Id</label>
+            <input type="number" class="form-control" id="email" name="aadhar" min="100000000000" max="999999999999">
+          </div>
+
+
+          <div class="form-group">
+              <label for="dob">DOB</label>
+              <input type="date" class="form-control" id="dob" name="dob">
+            </div>
+
+
+            <div class="form-group">
+              <label for="education">Education</label>
+              <input type="text" class="form-control" id="education" name="education">
+            </div>
+
+            <div class="form-group">
+              <label for="genderSelect">Martial Status</label>
+              <select class="form-control" id="genderSelect" name="martial">
+                <option value="Not Married">Not Married</option>
+                <option value="Married">Married</option>
+               
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="genderSelect">Gender</label>
+              <select class="form-control" id="genderSelect" name="gender">
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="genderSelect">Employed</label>
+              <select class="form-control" id="genderSelect" name="employed">
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+               
+              </select>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+              <input type="submit" class="btn btn-primary" id="saveChangesButton" value="Add User">
+            </div>
+        </form>
+      </div>
+     
+    </div>
+  </div>
+</div>
+
 
 
 <!-- delete modal  -->
@@ -197,35 +238,53 @@
 function addUserToForm(e)
 {
     
-    print(e.parentNode.parentNode)
+    console.log(e.parentNode.parentNode);
+    let p=e.parentNode.parentNode;
+    let name=p.querySelector("td[headers='name']").innerHTML;
+    let aadhar=p.querySelector('th[headers="aadhar"]').innerHTML;
+    let dob=p.querySelector('td[headers="dob"]').innerHTML;
+    let education=p.querySelector('td[headers="education"]').innerHTML;
+    let martial=p.querySelector('td[headers="martial"]').innerHTML;
+    let gender=p.querySelector('td[headers="gender"]').innerHTML;
+    let employed=p.querySelector('td[headers="employed"]').innerHTML;
+    console.log(name,aadhar,dob,education,martial,gender);
+    let form=document.querySelector("form[name='editedDetails']");
+
+    form.querySelector("input[name='name']").value=name;
+    form.querySelector("input[name='aadhar']").value=aadhar;
+    form.querySelector("input[name='dob']").value=dob;
+    form.querySelector("input[name='education']").value=education;
+    form.querySelector("select[name='martial']").value=martial;
+    form.querySelector("select[name='gender']").value=gender;
+    form.querySelector("select[name='employed']").value=employed;
 }
 
-function postData(e)
-{
-    console.log(e.parentNode)
-    let p=e.parentNode;
-    // let  p=document.getElementById("");
-    let name=p.querySelector("input[name='name']").value;
-    let aadhar=p.querySelector("input[name='aadhar']").value;
-    let dob=p.querySelector("input[name='dob']").value;
-    console.log(name,aadhar,dob)
-    // p.submit();
-    let f= new FormData(p);
-    console.log(f);
-    fetch("http://127.0.0.1:5000/admin/user", {
-  method: "POST",
-  body: JSON.stringify({
-    "signal": "search",
-    "name":name,
-    "aadhar": aadhar,
-    "dob":dob 
+// function postData(e)
+// {
+//     console.log(e.parentNode)
+//     let p=e.parentNode;
+//     // let  p=document.getElementById("");
+//     let name=p.querySelector("input[name='name']").value;
+//     let aadhar=p.querySelector("input[name='aadhar']").value;
+//     let dob=p.querySelector("input[name='dob']").value;
+//     console.log(name,aadhar,dob)
+//     // p.submit();
+//     let f= new FormData(p);
+//     console.log(f);
+//     fetch("http://127.0.0.1:5000/admin/user", {
+//   method: "POST",
+//   body: JSON.stringify({
+//     "signal": "search",
+//     "name":name,
+//     "aadhar": aadhar,
+//     "dob":dob 
 
 
-  }),
-  headers: {
-    "Content-type": "application/json; charset=UTF-8"
-  }
-});
-}
+//   }),
+//   headers: {
+//     "Content-type": "application/json; charset=UTF-8"
+//   }
+// });
+// }
 </script>
 {% endblock content %}
