@@ -1,69 +1,78 @@
 {% extends 'layout.html'%}
 {% block content %}
 <div class="container">
-  
-    <h1>Benficairy Page</h1>
-    <div class="container">
-        <form name="searchForm">
-          <input type="hidden" name="signal" value="search">
-          <div class="form-group">
-            <label for="name" >Name:</label>
-            <input type="text" class="form-control" id="name" name="name">
-          </div>
-          <div class="form-group">
-            <label for="id">Aadhar ID:</label>
-            <input type="text" class="form-control" id="id" name="aadhar">
-          </div>
-          <div class="form-group">
-            <label for="dob">DOB:</label>
-            <input type="date" class="form-control" id="dob" name="dob">
-          </div>
-          <button type="submit"  class="btn btn-primary" onclick="" value="">Search</button>
-        </form>
-        
+
+  <h1>Benficairy Page</h1>
+  <div class="container">
+    <form name="searchForm">
+      <input type="hidden" name="signal" value="search">
+      <div class="form-group">
+        <label for="name">Name:</label>
+        <input type="text" class="form-control" id="name" name="name">
       </div>
-      
-       <div class="container">
-        <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#addModal" onclick="">Add New Beneficiary</button>
+      <div class="form-group">
+        <label for="id">Aadhar ID:</label>
+        <input type="text" class="form-control" id="id" name="aadhar">
+      </div>
+      <div class="form-group">
+        <label for="dob">DOB:</label>
+        <input type="date" class="form-control" id="dob" name="dob">
+      </div>
+      <button type="submit" class="btn btn-primary" onclick="" value="">Search</button>
+    </form>
 
-       </div>
+  </div>
 
-   <table class="table">
-    
-     <thead>
-    <tr>
-      <th scope="col">Aadhar ID </th>
-      <th scope="col">Name</th>
-      <th scope="col">DOB </th>
-      <th scope="col">Gender </th>
-      <th scope="col">Education</th>
-      <th scope="col">Martial Status</th>
-      <th scope="col">Employed</th>
-     <th scope="col">Actions</th>
-    </tr>
-  </thead>
-  <!-- dummy data -->
-  <tbody>
-    <tr>
-      <th scope="row" headers="aadhar">555589892314</th>
-      <td  headers="name">Mark Sharma</td>
-      <td  headers="dob">2000-10-10</td>
-      <td headers="gender">Male</td>
-      <td headers="education">B.Tech</td>
-      <td headers="martial">Not Married</td>
-      <td headers="employed">No</td>
-      <td>
-        <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editModal" onclick="addUserToForm(this)">Edit</button>
-        <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#deleteModal">Delete</button>
-      </td>
-    </tr>
-    
-  </tbody>
-</table>
+  <div class="container">
+    <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#addModal" onclick="">Add New
+      Beneficiary</button>
+
+  </div>
+
+  <!-- Rendering Table -->
+  <table class="table">
+
+    <thead>
+      <tr>
+        <th scope="col">Aadhar ID </th>
+        <th scope="col">Name</th>
+        <th scope="col">DOB </th>
+        <th scope="col">Gender </th>
+        <th scope="col">Education</th>
+        <th scope="col">Martial Status</th>
+        <th scope="col">Employed</th>
+        <th scope="col">Actions</th>
+      </tr>
+    </thead>
+    <!-- dummy data -->
+    <tbody>
+      {% for user in userDetails %}
+      <!-- print(userDetails) -->
+      <tr>
+
+        <th scope="row" headers="aadhar">{{user[0]}}</th>
+        <td headers="name">{{user[1]}}</td>
+        <td headers="dob">{{user[2]}}</td>
+        <td headers="gender">{{user[3]}}</td>
+        <td headers="education">{{user[5]}}</td>
+        <td headers="martial">{{user[4]}}</td>
+        <td headers="employed">{{user[7]}}</td>
+        <td>
+          <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editModal"
+            onclick="addUserToForm(this)">Edit</button>
+          <button type="button" class="btn btn-danger btn-sm" data-toggle="modal"
+            data-target="#deleteModal">Delete</button>
+        </td>
+      </tr>
+      {% endfor %}
+
+    </tbody>
+  </table>
 
 
-<!-- edit modal  -->
-<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+  <!-- edit modal  -->
+  <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
@@ -75,7 +84,7 @@
         <div class="modal-body">
           <form name="editedDetails">
 
-            <input type="hidden"  value="editUser" name="signal">
+            <input type="hidden" value="editUser" name="signal">
             <div class="form-group">
               <label for="name">Name</label>
               <input type="text" class="form-control" id="name" name="name">
@@ -89,80 +98,80 @@
 
 
             <div class="form-group">
-                <label for="dob">DOB</label>
-                <input type="date" class="form-control" id="dob" name="dob">
-              </div>
+              <label for="dob">DOB</label>
+              <input type="date" class="form-control" id="dob" name="dob">
+            </div>
 
 
-              <div class="form-group">
-                <label for="education">Education</label>
-                <input type="text" class="form-control" id="education" name="education">
-              </div>
-             
-              <div class="form-group">
-                <label for="genderSelect">Martial Status</label>
-                <select class="form-control" id="genderSelect" name="martial">
-                  <option value="Married">Married</option>
-                  <option value="Not Married">Not Married</option>
-                 
-                </select>
-              </div>
-              <div class="form-group">
-                <label for="genderSelect">Gender</label>
-                <select class="form-control" id="genderSelect" name="gender">
-                  <option value="Male">Male</option>
-                  <option value="Female">Female</option>
-                  <option value="other">Other</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label for="genderSelect">Employed</label>
-                <select class="form-control" id="genderSelect" name="employed">
-                  <option value="Yes">Yes</option>
-                  <option value="No">No</option>
-                 
-                </select>
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                <input type="submit" class="btn btn-primary" id="saveChangesButton" value="Save Changes">
-              </div>
+            <div class="form-group">
+              <label for="education">Education</label>
+              <input type="text" class="form-control" id="education" name="education">
+            </div>
+
+            <div class="form-group">
+              <label for="genderSelect">Martial Status</label>
+              <select class="form-control" id="genderSelect" name="martial">
+                <option value="Married">Married</option>
+                <option value="Not Married">Not Married</option>
+
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="genderSelect">Gender</label>
+              <select class="form-control" id="genderSelect" name="gender">
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="genderSelect">Employed</label>
+              <select class="form-control" id="genderSelect" name="employed">
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+
+              </select>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+              <input type="submit" class="btn btn-primary" id="saveChangesButton" value="Save Changes">
+            </div>
           </form>
         </div>
-       
+
       </div>
     </div>
   </div>
 
 
-<!-- add modal -->
+  <!-- add modal -->
 
-<div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="editModalLabel">Add New User</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <form name="addDetails">
-          <input type="hidden" name="search" value="addUser">
+  <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editModalLabel">Add New User</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form name="addDetails" action="{{url_for("insert")}}" method="POST">
+            <input type="hidden" name="search" value="addUser">
 
-          <div class="form-group">
-            <label for="name">Name</label>
-            <input type="text" class="form-control" id="name" name="name">
-          </div>
-
-
-          <div class="form-group">
-            <label for="aadhar">Aadhar Id</label>
-            <input type="number" class="form-control" id="email" name="aadhar" min="100000000000" max="999999999999">
-          </div>
+            <div class="form-group">
+              <label for="name">Name</label>
+              <input type="text" class="form-control" id="name" name="name">
+            </div>
 
 
-          <div class="form-group">
+            <div class="form-group">
+              <label for="aadhar">Aadhar Id</label>
+              <input type="number" class="form-control" id="email" name="aadhar" min="100000000000" max="999999999999">
+            </div>
+
+
+            <div class="form-group">
               <label for="dob">DOB</label>
               <input type="date" class="form-control" id="dob" name="dob">
             </div>
@@ -178,7 +187,7 @@
               <select class="form-control" id="genderSelect" name="martial">
                 <option value="Not Married">Not Married</option>
                 <option value="Married">Married</option>
-               
+
               </select>
             </div>
             <div class="form-group">
@@ -194,25 +203,26 @@
               <select class="form-control" id="genderSelect" name="employed">
                 <option value="Yes">Yes</option>
                 <option value="No">No</option>
-               
+
               </select>
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
               <input type="submit" class="btn btn-primary" id="saveChangesButton" value="Add User">
             </div>
-        </form>
+          </form>
+        </div>
+
       </div>
-     
     </div>
   </div>
-</div>
 
 
 
-<!-- delete modal  -->
+  <!-- delete modal  -->
 
-<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
@@ -231,33 +241,36 @@
       </div>
     </div>
   </div>
-  
+
 
 </div>
 <script>
-function addUserToForm(e)
-{
-    
+  function addUserToForm(e) {
+    console.log("Here1")
     console.log(e.parentNode.parentNode);
-    let p=e.parentNode.parentNode;
-    let name=p.querySelector("td[headers='name']").innerHTML;
-    let aadhar=p.querySelector('th[headers="aadhar"]').innerHTML;
-    let dob=p.querySelector('td[headers="dob"]').innerHTML;
-    let education=p.querySelector('td[headers="education"]').innerHTML;
-    let martial=p.querySelector('td[headers="martial"]').innerHTML;
-    let gender=p.querySelector('td[headers="gender"]').innerHTML;
-    let employed=p.querySelector('td[headers="employed"]').innerHTML;
-    console.log(name,aadhar,dob,education,martial,gender);
-    let form=document.querySelector("form[name='editedDetails']");
+    console.log("Here2")
+    let p = e.parentNode.parentNode;
+    let name = p.querySelector("td[headers='name']").innerHTML;
+    let aadhar = p.querySelector('th[headers="aadhar"]').innerHTML;
+    let dob = p.querySelector('td[headers="dob"]').innerHTML;
+    let education = p.querySelector('td[headers="education"]').innerHTML;
+    let martial = p.querySelector('td[headers="martial"]').innerHTML;
+    let gender = p.querySelector('td[headers="gender"]').innerHTML;
+    let employed = p.querySelector('td[headers="employed"]').innerHTML;
+    console.log("here3")
+    console.log(name, aadhar, dob, education, martial, gender);
+    console.log("here4")
+    let form = document.querySelector("form[name='editedDetails']");
 
-    form.querySelector("input[name='name']").value=name;
-    form.querySelector("input[name='aadhar']").value=aadhar;
-    form.querySelector("input[name='dob']").value=dob;
-    form.querySelector("input[name='education']").value=education;
-    form.querySelector("select[name='martial']").value=martial;
-    form.querySelector("select[name='gender']").value=gender;
-    form.querySelector("select[name='employed']").value=employed;
-}
+
+    form.querySelector("input[name='name']").value = name;
+    form.querySelector("input[name='aadhar']").value = aadhar;
+    form.querySelector("input[name='dob']").value = dob;
+    form.querySelector("input[name='education']").value = education;
+    form.querySelector("select[name='martial']").value = martial;
+    form.querySelector("select[name='gender']").value = gender;
+    form.querySelector("select[name='employed']").value = employed;
+  }
 
 // function postData(e)
 // {
