@@ -3,9 +3,10 @@
 <div class="container">
   
     <h1>Benficairy Page</h1>
-    <div class="container">
-        <form name="searchForm">
-          <input type="hidden" name="signal" value="search">
+    <div class="container" style="width:60%">
+        <form name="searchForm" >
+          <div class="d-flex flex-wrap m-1 justify-content-between">
+            <input type="hidden" name="signal" value="search">
           <div class="form-group">
             <label for="name" >Name:</label>
             <input type="text" class="form-control" id="name" name="name">
@@ -18,13 +19,81 @@
             <label for="dob">DOB:</label>
             <input type="date" class="form-control" id="dob" name="dob">
           </div>
-          <button type="submit"  class="btn btn-primary" onclick="" value="">Search</button>
+
+
+
+          <div class="form-group">
+            <label for="education">Education</label>
+            <input type="text" class="form-control" id="education" name="education">
+          </div>
+         
+          <div class="form-group">
+            <label for="genderSelect">Martial Status</label>
+            <select class="form-control" id="genderSelect" name="martial">
+              <option value="Married">Married</option>
+              <option value="Not Married">Not Married</option>
+             
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="genderSelect">Gender</label>
+            <select class="form-control" id="genderSelect" name="gender">
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="genderSelect">Employed</label>
+            <select class="form-control" id="genderSelect" name="employed">
+              <option value="Yes">Yes</option>
+              <option value="No">No</option>
+             
+            </select>
+          </div>
+        
+          <div class="form-group">
+            <label for="genderSelect">Village</label>
+            <select class="form-control" id="genderSelect" name="village">
+              <option value="Basan">Basan </option>
+              <option value="Palaj">Palaj</option>
+             
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="genderSelect">Project</label>
+            <select class="form-control" id="genderSelect" name="project">
+              <option value="Project 1">Project 1</option>
+              <option value="Project 2">Project 2</option>
+             
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="id">Phone Number:</label>
+            <input type="number" class="form-control" id="id" name="phone_no">
+          </div>
+
+          <div class="form-group">
+            <label for="id">Age </label>
+            <input type="number" class="form-control" id="id" name="age">
+          </div>
+
+          </div>
+          
+
+          <div >
+            <button type="submit"  class="btn btn-primary" onclick="" value="">Search</button>
+          </div>
+          
+          
         </form>
         
       </div>
       
+      
        <div class="container">
-        <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#addModal" onclick="">Add New Beneficiary</button>
+        <button type="button" class="btn btn-success m-2" data-toggle="modal" data-target="#addModal" onclick="">Add New Beneficiary</button>
 
        </div>
 
@@ -55,6 +124,8 @@
       <td>
         <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editModal" onclick="addUserToForm(this)">Edit</button>
         <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#deleteModal">Delete</button>
+        <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#profileModal">Show Profile</button>
+
       </td>
     </tr>
     
@@ -78,13 +149,13 @@
             <input type="hidden"  value="editUser" name="signal">
             <div class="form-group">
               <label for="name">Name</label>
-              <input type="text" class="form-control" id="name" name="name">
+              <input type="text" class="form-control" id="name" name="name" required>
             </div>
 
 
             <div class="form-group">
               <label for="aadhar">Aadhar Id</label>
-              <input type="number" class="form-control" id="email" name="aadhar" min="100000000000" max="999999999999">
+              <input type="number" class="form-control" id="email" name="aadhar" min="100000000000" max="999999999999" required>
             </div>
 
 
@@ -123,6 +194,23 @@
                  
                 </select>
               </div>
+              <div class="form-group">
+                <label for="genderSelect">Enroll in New Event</label>
+                <select class="form-control" id="genderSelect" name="new_project">
+                  <option disabled selected value> -- select an option -- </option>
+                  <option value="project1">Project 1</option>
+                  <option value="project2">Project 2</option>
+                 
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="genderSelect">Village</label>
+                <select class="form-control" id="genderSelect" name="village">
+                  <option value="Basan">Basan</option>
+                  <option value="Palaj">Palaj</option>
+                 
+                </select>
+              </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                 <input type="submit" class="btn btn-primary" id="saveChangesButton" value="Save Changes">
@@ -141,7 +229,7 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="editModalLabel">Add New User</h5>
+        <h5 class="modal-title" id="editModalLabel">Add New Beneficiary</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -152,13 +240,13 @@
 
           <div class="form-group">
             <label for="name">Name</label>
-            <input type="text" class="form-control" id="name" name="name">
+            <input type="text" class="form-control" id="name" name="name" required>
           </div>
 
 
           <div class="form-group">
             <label for="aadhar">Aadhar Id</label>
-            <input type="number" class="form-control" id="email" name="aadhar" min="100000000000" max="999999999999">
+            <input type="number" class="form-control" id="email" name="aadhar" min="100000000000" max="999999999999" required>
           </div>
 
 
@@ -172,10 +260,14 @@
               <label for="education">Education</label>
               <input type="text" class="form-control" id="education" name="education">
             </div>
-
+            <div class="form-group">
+              <label for="phone_no">Phone No</label>
+              <input type="text" class="form-control" id="education" name="phone_no">
+            </div>
             <div class="form-group">
               <label for="genderSelect">Martial Status</label>
               <select class="form-control" id="genderSelect" name="martial">
+                <option disabled selected value> -- select an option -- </option>
                 <option value="Not Married">Not Married</option>
                 <option value="Married">Married</option>
                
@@ -184,16 +276,35 @@
             <div class="form-group">
               <label for="genderSelect">Gender</label>
               <select class="form-control" id="genderSelect" name="gender">
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-                <option value="other">Other</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
               </select>
             </div>
             <div class="form-group">
               <label for="genderSelect">Employed</label>
               <select class="form-control" id="genderSelect" name="employed">
+                <option disabled selected value> -- select an option -- </option>
                 <option value="Yes">Yes</option>
                 <option value="No">No</option>
+               
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="genderSelect">Enroll in Event</label>
+              <select class="form-control" id="genderSelect" name="new_project">
+                <option disabled selected value> -- select an option -- </option>
+                <option value="project1">Project 1</option>
+                <option value="project2">Project 2</option>
+               
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="genderSelect">Village</label>
+              <select class="form-control" id="genderSelect" name="village">
+                <option disabled selected value> -- select an option -- </option>
+                <option value="Basan">Basan</option>
+                <option value="Palaj">Palaj</option>
                
               </select>
             </div>
@@ -201,6 +312,7 @@
               <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
               <input type="submit" class="btn btn-primary" id="saveChangesButton" value="Add User">
             </div>
+            
         </form>
       </div>
      
@@ -232,6 +344,69 @@
     </div>
   </div>
   
+<!-- profile modal -->
+
+  <div class="modal fade" id="profileModal" tabindex="-1" role="dialog" aria-labelledby="profileModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="profileModalLabel">Profile</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          
+          <div class="row">
+         
+            <div class="col-md-8">
+              <h3>Ronaldo</h3>
+              <p>Email: example@example.com</p>
+              <p>Phone: 1234567890</p>
+              <p>Gender: Male</p>
+              <p>Martial-Status: Married</p>
+              <p>Education: B.Tech</p>
+              <p>Employed: Yes</p>
+              <p>DOB: 10/10/1998</p>
+              <p>Age: 25</p>
+              <p>Aadhar: 123456789012</p>
+              <div>
+                <p>Village Name: Basan</p>
+                <p>Pin Code: 190009</p>
+              </div>
+              <h4>Projects Enrolled</h4>
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th scope="col">Sr: No</th>
+                    
+                    <th scope="col">Event/Project</th>
+                    <th scope="col">Start Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">1</th>
+                    
+                    <td>Sewing Workshop</td>
+                    <td>2020-10-20</td>
+                  </tr>
+                  
+                </tbody>
+              </table>
+
+            </div>
+            <div class="col-md-4">
+              <img src="https://via.placeholder.com/150" class="img-fluid">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
 </div>
 <script>
