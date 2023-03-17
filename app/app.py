@@ -12,7 +12,6 @@ app.config['MYSQL_PASSWORD'] = db['mysql_password']
 app.config['MYSQL_DB'] = db['mysql_db']
 
 mysql = MySQL(app)
-# print("This is my db", mysql)
 
 @app.route("/")
 def home():    
@@ -35,14 +34,9 @@ def user():
     resultValue = cur.execute("SELECT * FROM Beneficiary")
     if (resultValue > 0):
         userDetails = cur.fetchall()
-    # print("this is result value", resultValue)
     if(request.method=='POST'):
-
-        # print("userdetails", userDetails)
-            
-        print("REQUEST", request.json)
+        
         form_data=request.json
-        print("form data is", form_data)
         
         if(form_data['signal']=='search'):
             print("this is search query")
@@ -50,42 +44,26 @@ def user():
             print("this is edit query")  
         elif(form_data['signal']=='addUser'):
             print("ADD DATA")
-            # return redirect(url_for('admin/user.html'))
-            print("add new data")     
     return render_template('admin/user.html', userDetails=userDetails)
-    # return render_template('admin/user.html')
 
 ### Add new user
 @app.route("/",methods=['POST'])
 def insert():
     if (request.method == 'POST'):
         aadhar = request.form['aadhar']
-        
         name = request.form['name']
-        print(name)
         dob = request.form['dob']
         education = request.form['education']
         martial = request.form['martial']
         gender = request.form['gender']
         employed = request.form['employed']
-        
-        print(dob)
-        print(education)
-        print(martial)
-        print(gender)
-        
-        print(employed)
-        # print("here", aadhar)
         cur = mysql.connection.cursor()
         
-        query = "INSERT INTO Beneficiary (aadhar_id, name, date_of_birth, gender, marital_status, education, employed) VALUES (%s %s %s %s %s %s %s)"
-        # cur.execute(, (aadhar, name, dob, education, maritalstatus,  gender, employment_status) )  
-        cur.execute(query, (aadhar, name, dob, gender, martial, education, employed))               
+        query = "INSERT INTO Beneficiary(aadhar_id, name, date_of_birth, gender, marital_status, education, photo, employed, photo_caption) VALUES (%s,%s, %s, %s, %s, %s, %s, %s, %s)"
+        cur.execute(query, (aadhar, name, dob, gender, martial, education, None, employed, None))               
         mysql.connection.commit()
         cur.close()
-        return redirect('/admin/user.html')
-    # return render_template('admin/user')
-    # return render_template('admin/user.html')
+        return redirect('user')
 
 if __name__=='__main__':
     app.run(debug=True)
