@@ -12,7 +12,7 @@ app.config['MYSQL_PASSWORD'] = db['mysql_password']
 app.config['MYSQL_DB'] = db['mysql_db']
 
 mysql = MySQL(app)
-print("This is my db", mysql)
+# print("This is my db", mysql)
 
 @app.route("/")
 def home():    
@@ -83,7 +83,9 @@ def insert():
         cur.execute(query, (aadhar, name, dob, gender, martial, education, employed))               
         mysql.connection.commit()
         cur.close()
-        # return redirect('/admin/user.html')
-    return render_template('admin/user')
+        return redirect('/admin/user.html')
+    # return render_template('admin/user')
+    # return render_template('admin/user.html')
+
 if __name__=='__main__':
     app.run(debug=True)
