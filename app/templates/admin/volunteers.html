@@ -88,18 +88,19 @@
 
         <!-- dummy data -->
         <tbody>
+            {%for user in userDetails%}
             <tr>
-                <td scope="row" headers="name">Mark Sharma</td>
-                <td headers="email">hr@iitgn.ac.in</td>
-                <td headers="age">26</td>
-                <td headers="gender">Male</td>
-                <td headers="phone">987456120</td>
+                <td scope="row" headers="name">{{user[1]}}</td>
+                <td headers="email">{{user[0]}}</td>
+                <td headers="DOB">{{user[3]}}</td>
+                <td headers="gender">{{user[4]}}</td>
+                <td headers="phone">{{user[2]}}</td>
                 <td>
                     <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editModal"
-                        onclick="addUserToForm(this)">
+                        onclick="edit(this)">
                         Edit
                     </button>
-                    <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#deleteModal">
+                    <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#deleteModal" onclick="delete_user(this)">
                         Delete
                     </button>
                     <button type="button" class="btn btn-success btn-sm" data-toggle="modal"
@@ -108,6 +109,7 @@
                     </button>
                 </td>
             </tr>
+            {%endfor%}
         </tbody>
     </table>
 
@@ -123,7 +125,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form name="editedDetails">
+                    <form name="editedDetails" method="POST">
                         <input type="hidden" value="editUser" name="signal" />
 
                         <!-- volunteer name -->
@@ -132,16 +134,23 @@
                             <input type="text" class="form-control" id="volunteer_name_edit" name="volunteer_name"
                                 required />
                         </div>
+
                         <!-- email -->
                         <div class="form-group">
                             <label for="email_edit">Email</label>
-                            <input type="email" class="form-control" id="email_edit" name="email" required />
+                            <input type="email" class="form-control" id="email_edit" name="email" required readonly />
                         </div>
 
                         <!-- age -->
-                        <div class="form-group">
+                        <!-- <div class="form-group">
                             <label for="age_edit">Age</label>
                             <input type="number" class="form-control" id="age_edit" name="age" min="0" required />
+                        </div> -->
+
+                        <!-- age -->
+                        <div class="form-group">
+                            <label for="dob_add">DOB</label>
+                            <input type="date" class="form-control" id="dob_add" name="dob"  required />
                         </div>
 
                         <!-- Gender -->
@@ -199,8 +208,8 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form name="addDetails">
-                        <input type="hidden" name="search" value="addUser" />
+                    <form name="addDetails" method="POST">
+                        <input type="hidden" name="signal" value="addUser" >
                         <!-- volunteer name -->
                         <div class="form-group">
                             <label for="name_add">Volunteer Name</label>
@@ -253,8 +262,7 @@
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">
                                 Cancel
                             </button>
-                            <input type="submit" class="btn btn-primary" id="saveChangesButton"
-                                value="Add Benefactor" />
+                            <button type="submit" class="btn btn-primary" id="saveChangesButton">Add Volunteer</button>
                         </div>
                     </form>
                 </div>
@@ -277,12 +285,19 @@
                     Are you sure you want to delete this Volunteer?
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
-                        Cancel
-                    </button>
-                    <button type="button" class="btn btn-danger" id="deleteButton">
-                        Delete
-                    </button>
+                    <form name="deleteForm" method="POST">
+                        <div class="form-group">
+                            <input type="hidden" name="signal" value="delete">
+                            <label for="email">Email ID</label>
+                            <input type="text" class="form-control" id="email_edit" name="email" readonly>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                                Cancel
+                            </button>
+                            <button type="submit" class="btn btn-danger" id="deleteButton">
+                                Delete
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -349,25 +364,55 @@
 
 <script>
     //   js to add details to the edit form
-    function addUserToForm(e) {
-        console.log(e.parentNode.parentNode);
+    // function addUserToForm(e) {
+    //     console.log(e.parentNode.parentNode);
+    //     let p = e.parentNode.parentNode;
+    //     let name = p.querySelector("td[headers='name']").innerHTML;
+    //     let email= p.querySelector('td[headers="email"]').innerHTML;
+    //     let age = p.querySelector('td[headers="age"]').innerHTML;
+    //     let phone = p.querySelector('td[headers="phone"]').innerHTML;
+    //     let gender = p.querySelector('td[headers="gender"]').innerHTML;
+    //     console.log("chirag")
+    //     console.log(name, email, age, phone, gender);
+    //     let form = document.querySelector("form[name='editedDetails']");
+
+    //     form.querySelector("input[name='volunteer_name']").value = name;
+    //     form.querySelector("input[name='email']").value = email;
+    //     form.querySelector("input[name='age']").value = age;
+    //     form.querySelector("input[name='phone']").value = phone;
+    //     form.querySelector("input[name='gender']").value = gender;
+    // }
+
+    function edit(e) {
+        // console.log("Mahesh");
         let p = e.parentNode.parentNode;
         let name = p.querySelector("td[headers='name']").innerHTML;
-        let email= p.querySelector('td[headers="email"]').innerHTML;
-        let age = p.querySelector('td[headers="age"]').innerHTML;
-        let phone = p.querySelector('td[headers="phone"]').innerHTML;
+        // console.log(name);
+        let email = p.querySelector('td[headers="email"]').innerHTML;
+        // console.log(email);
+        let dob = p.querySelector('td[headers="DOB"]').innerHTML;
         let gender = p.querySelector('td[headers="gender"]').innerHTML;
-        console.log("chirag")
-        console.log(name, email, age, phone, gender);
+        let phone = p.querySelector('td[headers="phone"]').innerHTML;
+        console.log(phone);
+        // console.log("Mahesh");
+
         let form = document.querySelector("form[name='editedDetails']");
 
         form.querySelector("input[name='volunteer_name']").value = name;
         form.querySelector("input[name='email']").value = email;
-        form.querySelector("input[name='age']").value = age;
+        form.querySelector("input[name='dob']").value = dob;
+        form.querySelector("select[name='gender']").value = gender;
         form.querySelector("input[name='phone']").value = phone;
-        form.querySelector("input[name='gender']").value = gender;
-[]
-    }
+      }
+
+      function delete_user(e) {
+        let p = e.parentNode.parentNode;
+        let email = p.querySelector('td[headers="email"]').innerHTML;
+        console.log(email)
+        let form = document.querySelector("form[name='deleteForm']");
+
+        form.querySelector("input[name='email']").value = email;
+      }
 
 </script>
 {% endblock content %}
