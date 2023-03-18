@@ -17,6 +17,11 @@ def login():
 def admin():
     return render_template("admin/dashboard.html")
 
+@app.route("/admin/funding")
+def funding():
+    return render_template("admin/funding.html")
+
+
 @app.route("/admin/user",methods=['POST','GET'])
 def user():
     if(request.method=='POST'):
