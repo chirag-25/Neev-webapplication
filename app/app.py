@@ -5,6 +5,7 @@ app=Flask(__name__)
 @app.route("/")
 def home():
     return render_template("home.html")
+    # return render_template("admin/volunteers.html")
 
 @app.route("/login",methods=['GET','POST'])
 def login():
@@ -20,6 +21,10 @@ def admin():
 @app.route("/admin/funding")
 def funding():
     return render_template("admin/funding.html")
+
+@app.route("/admin/volunteers")
+def volunteers():
+    return render_template("admin/volunteers.html")
 
 
 @app.route("/admin/user",methods=['POST','GET'])
