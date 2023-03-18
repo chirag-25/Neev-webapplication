@@ -26,6 +26,9 @@ def funding():
 def volunteers():
     return render_template("admin/volunteers.html")
 
+@app.route("/admin/projects")
+def projects():
+    return render_template("admin/projects.html")
 
 @app.route("/admin/user",methods=['POST','GET'])
 def user():
