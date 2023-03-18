@@ -216,13 +216,34 @@ def user():
             martial = request.form['martial']
             gender = request.form['gender']
             employed = request.form['employed']
+            phone_number = request.form['phone_number']
+            village = request.form['village']
+            project = request.form['project']
 
             add_query = f"INSERT INTO Beneficiary (aadhar_id, name, date_of_birth, gender, marital_status, education, photo, employed, photo_caption) "
             add_query = add_query + f"VALUES ({aadhar}, \"{name}\", \'{dob}\', \'{gender}\', \'{martial}\', \'{education}\', NULL, \"{employed}\", NULL)"
-            print(add_query)
-
             exec_query = cur.execute(add_query)
             mysql.connection.commit()
+
+            # Add phone_number query
+            add_phone_query = f"INSERT INTO BeneficiaryPhoneEntity (aadhar_id, phone_number) "
+            add_phone_query = add_phone_query + f"VALUES ({aadhar}, \"{phone_number}\")"
+            exec_query = cur.execute(add_phone_query)
+            mysql.connection.commit()
+
+            # Add village query
+            add_village_query = f"INSERT INTO belongs (aadhar_id, pincode) "
+            add_village_query = add_village_query + f"VALUES ({aadhar}, (SELECT pincode FROM VillageProfile WHERE name = \"{village}\"))"
+            exec_query = cur.execute(add_village_query)
+            mysql.connection.commit()
+
+            # Add project query
+            add_project_query = f"INSERT INTO participants (aadhar_id, event_name, start_date) "
+            # assumption is taken here that beneficiary can only participate in current year's project
+            add_project_query = add_project_query + f"VALUES ({aadhar}, \"{project}\", (SELECT start_date FROM Projects WHERE event_name = \"{project}\" AND YEAR(start_date) = YEAR(CURDATE())))"
+            exec_query = cur.execute(add_project_query)
+            mysql.connection.commit()
+
             return redirect('/admin/user')
 
         elif request.form['signal'] == 'edit':
