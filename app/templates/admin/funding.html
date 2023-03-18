@@ -3,10 +3,10 @@
     <h1>Funding Details</h1>
     <!-- search form -->
     <div class="container" style="width: 60%">
-        <form name="searchForm">
+        <form name="searchForm" method="POST">
             <div class="d-flex flex-wrap m-1 justify-content-between">
                 <!-- Hidden signal -->
-                <input type="hidden" name="signal" value="search" />
+                <input type="hidden" name="signal" value="search">
 
                 <!-- benefactor and emil -->
                 <div class="d-flex flex-row justify-content-between align-items-center" style="width: 100%">
@@ -59,6 +59,7 @@
     <table class="table">
         <thead>
             <tr>
+                <th scope="col">S.no.</th>
                 <th scope="col">Benefactor</th>
                 <th scope="col">Email</th>
                 <th scope="col">Amount</th>
@@ -69,25 +70,91 @@
 
         <!-- dummy data -->
         <tbody>
+            {% for user in profileDetails %}
+            
+            <!-- print(user) -->
+            <!-- print({{user['benefactor']}})
+            print({{user['email']}})
+            print({{user['amount']}})
+            print({{user['date']}}) -->
+            {{loop.index}}
             <tr>
-                <td scope="row" headers="benefactor">IIT</td>
-                <td headers="email">hr@iitgn.ac.in</td>
-                <td headers="amount">87999</td>
-                <td headers="funding_date">2000-10-10</td>
+                <td scope="row" headers="sno">{{loop.index}}</td>
+                <td scope="row" headers="benefactor">{{user['benefactor']}}</td>
+                <td headers="email">{{user['email']}}</td>
+                <td headers="amount">{{user['amount']}}</td>
+                <td headers="funding_date">{{user['date']}}</td>
                 <td>
                     <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editModal"
-                        onclick="addUserToForm(this)">
+                        onclick="edit(this)">
                         Edit
                     </button>
-                    <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#deleteModal">
+                    <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#deleteModal"
+                        onclick="delete_user(this)">
                         Delete
                     </button>
                     <button type="button" class="btn btn-success btn-sm" data-toggle="modal"
-                        data-target="#profileModal">
+                        data-target="#profileModal" onclick="addUserToModal(this)">
                         More Details
                     </button>
                 </td>
+                <td headers="projects" style="display:none;">
+                    <table class="table">
+                        <thead>
+                          <tr>
+                            <th scope="col">Sr: No</th>
+                            <th scope="col">Event/Project</th>
+                            <th scope="col"> Date</th>
+                            <th scope="col">Amount</th>
+                          </tr>
+                        </thead>
+                        <tbody id="">
+                            {% for project in user['projects'] %}
+                          <tr>
+                              
+                                <th scope="row">{{ loop.index }}</th>
+                                <td>{{project[1]}}</td>
+                                <td>{{project[2]}}</td>
+                                <td id="add_amount">{{project[0]}}</td>
+                              
+                          </tr>
+                          {% endfor %}
+                        </tbody>
+                  </table>
+                </td>
+                <td headers = "events" style="display:none;" >
+                    <table class="table">
+                        <thead>
+                          <tr>
+                            <th scope="col">Event Name</th>
+                            <th scope="col">Start date</th>
+                            <th scope="col"> Types</th>
+                            <th scope="col">Budget</th>
+                            <th scope="col">No. of participants</th>
+                            <th scope="col">Duration</th>
+                            <th scope="col">Collection</th>
+                            <th scope="col">Total Expense</th>
+                          </tr>
+                        </thead>
+                        <tbody id="">
+                            {% for event in user['events'] %}
+                          <tr>
+                                <td>{{event[0]}}</td>
+                                <td>{{event[1]}}</td>
+                                <td>{{event[2]}}</td>
+                                <td>{{event[3]}}</td>
+                                <td>{{event[4]}}</td>
+                                <td>{{event[5]}}</td>
+                                <td>{{event[6]}}</td>
+                                <td>{{event[7]}}</td>
+                          
+                          </tr>
+                          {% endfor %}
+                        </tbody>
+                  </table>
+                </td>
             </tr>
+            {%endfor%}
         </tbody>
     </table>
 
@@ -103,24 +170,25 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form name="editedDetails">
-                        <input type="hidden" value="editUser" name="signal" />
-                        
+                    <form name="editedDetails" method="POST">
+                        <input type="hidden" value="edit" name="signal">
+                        <!-- email -->
+                        <div class="form-group">
+                            <label for="email_edit">Email</label>
+                            <input type="email" class="form-control" id="email_edit" name="email" required readonly />
+                        </div>
                         <!-- benefactor name -->
                         <div class="form-group">
                             <label for="benefactor_edit">Benefactor</label>
                             <input type="text" class="form-control" id="benefactor_edit" name="benefactor" required />
                         </div>
-                        <!-- email -->
-                        <div class="form-group">
-                            <label for="email_edit">Email</label>
-                            <input type="email" class="form-control" id="email_edit" name="email" required />
-                        </div>
+
 
                         <!-- date -->
                         <div class="form-group">
                             <label for="funding_date_edit">Date</label>
-                            <input type="date" class="form-control" id="funding_date_edit" name="funding_date" required />
+                            <input type="date" class="form-control" id="funding_date_edit" name="funding_date"
+                                required />
                         </div>
 
                         <!-- Amount -->
@@ -132,14 +200,15 @@
                         <!-- project and year to fund to -->
                         <label for="project_name_eidt">Project</label>
                         <div class="form-group d-flex justify-content-between align-items-center">
-                            <select class="form-control flex-item" style="width: 48%;" id="project_name_eidt" name="project_name"
-                                placeholder="Project Name">
+                            <select class="form-control flex-item" style="width: 48%;" id="project_name_eidt"
+                                name="project_name" placeholder="Project Name">
                                 <option value="Sewing">Sewing</option>
                                 <option value="Cooking">Cooking</option>
                             </select>
-                            <input type="number" class="form-control flex-item" style="width: 48%;" name="year" placeholder="Year" min="2008" />
+                            <input type="number" class="form-control flex-item" style="width: 48%;" name="year"
+                                placeholder="Year" min="2008" />
                         </div>
-                          
+
 
                         <!-- cancel and save changes-->
                         <div class="modal-footer">
@@ -167,8 +236,8 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form name="addDetails">
-                        <input type="hidden" name="search" value="addUser" />
+                    <form name="addDetails" method="POST">
+                        <input type="hidden" name="signal" value="add">
                         <!-- new benefactor -->
                         <div class="form-group">
                             <label for="benefactor_add">Benefactor</label>
@@ -198,8 +267,9 @@
                             <label for="project_add">Funding to </label>
                             <select class="form-control" id="project_add" name="project">
                                 <option disabled selected value>-- select an option --</option>
-                                <option value="project1">Project 1</option>
-                                <option value="project2">Project 2</option>
+                                {% for project in calculate_events %}
+                                <option value="{{project[0]}}" id = "addProjectName">{{project[0]}}</option>
+                                {% endfor %}
                             </select>
                         </div>
 
@@ -233,13 +303,24 @@
                     Are you sure you want to delete this Benefactor?
                 </div>
                 <div class="modal-footer">
+                    <form name="deleteForm" method="POST">
+                        <div class="form-group">
+                            <input type="hidden" name="signal" value="delete">
+                            <label for="email">Email ID</label>
+                            <input type="email" class="form-control" id="email" name="email" readonly>
+                            <button type="button" class="btn btn-secondary my-3" data-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-danger" id="deleteButton">Delete</button>
+                        </div>
+                    </form>
+                </div>
+                <!-- <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">
                         Cancel
                     </button>
                     <button type="button" class="btn btn-danger" id="deleteButton">
                         Delete
                     </button>
-                </div>
+                </div> -->
             </div>
         </div>
     </div>
@@ -258,11 +339,18 @@
                 <div class="modal-body ">
                     <div class="row">
                         <div class="col-md-8">
-                            <h3>Ronaldo</h3>
-                            <p>Email: example@example.com</p>
-                            <h4>Projects Funded</h4>
+                            <h3 class = "name_modal">Ronaldo</h3>
+                            <!-- <p>Email: <span class="email_modal">ronaldo@gmail.com</span></p> -->
+                            <p class="email_modal">Email: ronaldo@gmail.com</p>
+                             <h4>Projects Funded</h4>
+                            <!-- <h4 id="projects-header">Projects Funded</h4> -->
+                            <!-- <form id="myForm" method="POST">
+                                <input type="hidden" name="signal" value="moreDetails">
+                                <input type="hidden" name="email" value="">
+                                <input type="hidden" name="benefactor" value="">
+                            </form> -->
                         </div>
-                        <table class="table mx-3" style="width: 100%;">
+                        <table class="table mx-3" style="width: 100%;" id = "profile_project_table">
                             <thead>
                                 <tr>
                                     <th scope="col">SrNo</th>
@@ -278,6 +366,7 @@
                                     <td>2020-10-20</td>
                                     <td>10000</td>
                                 </tr>
+                                
                             </tbody>
                             <tbody>
                                 <tr>
@@ -303,7 +392,7 @@
 
 <script>
     //   js to add details to the edit form
-    function addUserToForm(e) {
+    function edit(e) {
         console.log(e.parentNode.parentNode);
         let p = e.parentNode.parentNode;
         let benefactor = p.querySelector("td[headers='benefactor']").innerHTML;
@@ -318,6 +407,41 @@
         form.querySelector("input[name='amount']").value = amount;
         form.querySelector("input[name='funding_date']").value = funding_date;
 
+    }
+    function delete_user(e) {
+        let p = e.parentNode.parentNode;
+        // let email = p.querySelector('td[headers="email"]').innerHTML;
+        let email = p.querySelector('td[headers="email"]').innerHTML;
+        console.log(email)
+        let form = document.querySelector("form[name='deleteForm']");
+
+        form.querySelector("input[name='email']").value = email;
+    }
+    function addUserToModal(e) {
+        // e.preventDefault()
+        let p = e.parentNode.parentNode;
+        let email = p.querySelector('td[headers="email"]').innerHTML;
+        let benefactor = p.querySelector("td[headers='benefactor']").innerHTML;
+        let projects = p.querySelector('td[headers="projects"]').innerHTML;
+        let amount = p.querySelector('td[headers="amount"]').innerHTML;
+        console.log(email)
+        console.log(benefactor)
+
+        const nameModal = document.querySelector('.name_modal');
+        const emailModal = document.querySelector('.email_modal');
+        nameModal.innerHTML = benefactor;
+        emailModal.innerHTML = email;
+
+        // const addAmount = document.querySelector('#addAmount');
+        // addAmount.innerHTML = amount;
+        document.querySelector("#profile_project_table").innerHTML = projects;
+
+        // Submit a hidden form to get email and name on Flask server
+        // const form = document.querySelector('#myForm');
+        // console.log(form);
+        // form.querySelector("input[name='email']").value = email;
+        // form.querySelector("input[name='benefactor']").value = benefactor;
+        // form.submit();
     }
 
 </script>
