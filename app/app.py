@@ -37,14 +37,15 @@ def user():
     if result_value > 0:
         userDetails = cur.fetchall()
 
+
     # Generate the user profile details
     profile_details = []
     for user in userDetails:
         user_profile = {'aadhar':user[0], 'name':user[1], 'dob':user[2], 'gender':user[3], 'martial':user[4], 'education':user[5], 'photo':user[6], 'employed':user[7], 'photo_caption':user[8]}
-        calculate_age_query = f"SELECT TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) FROM Beneficiary WHERE aadhar_id = {user[0]}"
-        extract_village_query = f"SELECT pincode, name FROM VillageProfile WHERE pincode = (SELECT pincode FROM belongs WHERE aadhar_id = {user[0]})"
-        extract_enrolled_projects_query = f"SELECT * FROM participants WHERE aadhar_id = {user[0]}"
-        extract_phone_query = f"SELECT phone_number FROM BeneficiaryPhoneEntity WHERE aadhar_id = {user[0]}"
+        calculate_age_query = f"SELECT TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) FROM Beneficiary WHERE aadhar_id = \'{user[0]}\'"
+        extract_village_query = f"SELECT pincode, name FROM VillageProfile WHERE pincode = (SELECT pincode FROM belongs WHERE aadhar_id = \'{user[0]}\')"
+        extract_enrolled_projects_query = f"SELECT * FROM participants WHERE aadhar_id = \'{user[0]}\'"
+        extract_phone_query = f"SELECT phone_number FROM BeneficiaryPhoneEntity WHERE aadhar_id = \'{user[0]}\'"
 
         calculate_age = cur.execute(calculate_age_query)
         calculate_age = cur.fetchall()
@@ -80,15 +81,41 @@ def user():
         else:
             user_profile['phone'] = 'NA'
 
+
         profile_details.append(user_profile)
+
+    # Generate projects list
+    projects_query = f"SELECT event_name FROM Projects"
+    projects_query = cur.execute(projects_query)
+    projects = cur.fetchall()
+
+    # Generate village list
+    village_query = f"SELECT name FROM VillageProfile"
+    village_query = cur.execute(village_query)
+    villages = cur.fetchall()
+
+    # Generate education list
+    education_list_query = f"SELECT DISTINCT education FROM Beneficiary"
+    education_list_query_query = cur.execute(education_list_query)
+    education_list = cur.fetchall()
 
     if (request.method == 'POST'):
         if request.form['signal'] == 'search':
+            print(request.form)
             name = request.form['name']
             aadhar = request.form['aadhar']
             dob = request.form['dob']
+            age = request.form['age']
+            employed = request.form['employed']
+            gender = request.form['gender']
+            martial = request.form['martial']
+            education = request.form['education']
+            village = request.form['village']
+            project = request.form['project']
+            phone_number = request.form['phone_number']
 
-            where_query = f"SELECT * FROM Beneficiary "
+            # First extract all the beneficiaries from table Beneficiary
+            where_query = f"SELECT aadhar_id FROM Beneficiary "
             flag = False
             if name != '':
                 if flag == False:
@@ -111,11 +138,72 @@ def user():
                     where_query += f" AND date_of_birth = \'{dob}\'"
                 flag = True
 
+            if age != '':
+                if flag == False:
+                    where_query += f"WHERE TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) = \'{age}\'"
+                else:
+                    where_query += f" AND TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) = \'{age}\'"
+                flag = True
+
+            if employed != '':
+                if flag == False:
+                    where_query += f"WHERE employed = \'{employed}\'"
+                else:
+                    where_query += f" AND employed = \'{employed}\'"
+                flag = True
+
+            if gender != '':
+                if flag == False:
+                    where_query += f"WHERE gender = \'{gender}\'"
+                else:
+                    where_query += f" AND gender = \'{gender}\'"
+                flag = True
+
+            if martial != '':
+                if flag == False:
+                    where_query += f"WHERE marital_status = \'{martial}\'"
+                else:
+                    where_query += f" AND marital_status = \'{martial}\'"
+                flag = True
+
+            if education != '':
+                if flag == False:
+                    where_query += f"WHERE education = \'{education}\'"
+                else:
+                    where_query += f" AND education = \'{education}\'"
+                flag = True
+
+            # Combine the results of the above query with the results of the village and project search
+            if village != '':
+                if flag == False:
+                    where_query += f"WHERE aadhar_id IN (SELECT aadhar_id FROM belongs WHERE pincode = (SELECT pincode FROM VillageProfile WHERE name = \"{village}\"))"
+                else:
+                    where_query += f" AND aadhar_id IN (SELECT aadhar_id FROM belongs WHERE pincode = (SELECT pincode FROM VillageProfile WHERE name = \"{village}\"))"
+                flag = True
+            if project != '':
+                if flag == False:
+                    where_query += f"WHERE aadhar_id IN (SELECT aadhar_id FROM participants WHERE event_name = \"{project}\")"
+                else:
+                    where_query += f" AND aadhar_id IN (SELECT aadhar_id FROM participants WHERE event_name = \"{project}\")"
+                flag = True
+
+            # Combine the results of the above query with the results of the phone number search
+            if phone_number != '':
+                if flag == False:
+                    where_query += f"WHERE aadhar_id IN (SELECT aadhar_id FROM BeneficiaryPhoneEntity WHERE phone_number = \"{phone_number}\")"
+                else:
+                    where_query += f" AND aadhar_id IN (SELECT aadhar_id FROM BeneficiaryPhoneEntity WHERE phone_number = \"{phone_number}\")"
+                flag = True
+
             exec_query = cur.execute(where_query)
-            if exec_query > 0:
-                search_results = cur.fetchall()
-            mysql.connection.commit()
-            return render_template('admin/user.html', userDetails=userDetails, searchResults=search_results, profile_details=profile_details)
+            search_results = cur.fetchall()
+
+            updated_profile_details = []
+            for user in profile_details:
+                for result in search_results:
+                    if user['aadhar'] == result[0]:
+                        updated_profile_details.append(user)
+            profile_details = updated_profile_details
 
         elif request.form['signal'] == 'add':
             print(request.form)
@@ -154,7 +242,6 @@ def user():
             exec_query = cur.execute(edit_query)
             mysql.connection.commit()
             return redirect('/admin/user')
-            print("edit")
 
         elif request.form['signal'] == 'delete':
             print("delete filled!")
@@ -167,7 +254,7 @@ def user():
             mysql.connection.commit()
             return redirect('/admin/user')
 
-    return render_template('admin/user.html', searchResults=tuple(), profile_details=profile_details)
+    return render_template('admin/user.html', searchResults=tuple(), profile_details=profile_details, projects=projects, villages=villages, education_list=education_list)
     # return render_template('admin/user.html')
 
 

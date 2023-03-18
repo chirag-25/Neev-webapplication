@@ -3,8 +3,9 @@
 
 <div class="container">
   <h1>Beneficiary Page</h1>
-  <div class="container">
+  <div class="container" style="width:60%">
     <form name="searchForm" method="POST">
+        <div class="d-flex flex-wrap m-1 justify-content-between">
       <input type="hidden" name="signal" value="search">
       <div class="form-group">
         <label for="name">Name:</label>
@@ -18,7 +19,78 @@
         <label for="dob">DOB:</label>
         <input type="date" class="form-control" id="dob" name="dob">
       </div>
+
+        <div class="form-group">
+            <label for="id">Education</label>
+            <select class="form-control" id="id" name="education">
+                <option value="" selected>NA</option>
+                {% for education in education_list %}
+                    <option value="{{education[0]}}">{{education[0]}}</option>
+                {% endfor %}
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="genderSelect">Martial Status</label>
+            <select class="form-control" id="genderSelect" name="martial">
+                <option value="" selected>NA</option>
+              <option value="Married">Married</option>
+              <option value="Unmarried">Unmarried</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="genderSelect">Gender</label>
+            <select class="form-control" id="genderSelect" name="gender">
+                <option value="" selected>NA</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="genderSelect">Employed</label>
+            <select class="form-control" id="genderSelect" name="employed">
+                <option value="" selected>NA</option>
+              <option value="Yes">Yes</option>
+              <option value="No">No</option>
+
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="genderSelect">Village</label>
+            <select class="form-control" id="genderSelect" name="village">
+                <option value="" selected>NA</option>
+                {% for village in villages %}
+                    <option value="{{village[0]}}">{{village[0]}}</option>
+                {% endfor %}
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="genderSelect">Project</label>
+            <select class="form-control" id="genderSelect" name="project">
+                <option value="" selected>NA</option>
+                {% for project in projects %}
+                    <option value="{{project[0]}}">{{project[0]}}</option>
+                {% endfor %}
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="id">Phone Number:</label>
+            <input type="number" class="form-control" id="id" name="phone_number">
+          </div>
+
+          <div class="form-group">
+            <label for="id">Age </label>
+            <input type="number" class="form-control" id="id" name="age">
+          </div>
+
       <button type="submit" class="btn btn-primary">Search</button>
+            </div>
     </form>
 
       <!-- Rendering search results -->
