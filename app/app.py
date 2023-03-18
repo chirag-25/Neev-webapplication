@@ -35,5 +35,11 @@ def user():
             print("add new data")     
     return render_template('admin/user.html')
 
+
+@app.route("/admin/village_profile", methods=['POST','GET'])
+def village_profile():
+    return render_template('admin/village_profile.html')
+
+
 if __name__=='__main__':
     app.run(debug=True)
