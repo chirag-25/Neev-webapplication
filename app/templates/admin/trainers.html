@@ -31,9 +31,14 @@
               <option value="other">Other</option>
             </select>
           </div>
-          <div class="form-group">
-            <label for="age">Age:</label>
-            <input type="number" class="form-control" id="age" name="age" max="200">
+
+          <div class="form-group align-items-center">
+            <label >Age</label>
+            <div class="form-group d-flex">
+              <input type="number" class="form-control mr-3" id="min_age" name="min_age" max="200" placeholder="min">
+              <input type="number" class="form-control" id="max_age" name="max_age" max="200" placeholder="max">
+            </div>
+      
           </div>
 
           <div class="form-group">
@@ -50,10 +55,12 @@
             <input type="date" class="form-control" id="projectStartDate" name="projectStartDate">
           </div> -->
 
-          <div class="form-group d-flex flex-row justify-content-between align-items-center" style="width: 100%">
+          <div class="form-group align-items-center">
             <label >Fee</label>
-            <input type="number" class="form-control mx-3" id="min_fee" name="min_fee" min="0" placeholder="min">
+            <div class="form-group d-flex">
+            <input type="number" class="form-control mr-3" id="min_fee" name="min_fee" min="0" placeholder="min">
             <input type="number" class="form-control" id="max_fee" name="max_fee" min="0" placeholder="max">
+            </div>
           </div>
           
           
@@ -409,22 +416,22 @@ function addTrainerToForm(e)
     let fee=p.querySelector('td[headers="fee"]').innerHTML;
     let age=p.querySelector('td[headers="age"]').innerHTML;
     let gender=p.querySelector('td[headers="gender"]').innerHTML;
-    let projectEventName=p.querySelector('td[headers="projectEventName"]').innerHTML;
+    // let projectEventName=p.querySelector('td[headers="projectEventName"]').innerHTML;  
     // let projectStartDate=p.querySelector('td[headers="projectStartDate"]').innerHTML;
-    let beneficiaryAadharId=p.querySelector('td[headers="beneficiaryAadharId"]').innerHTML;
-    let beneficiaryName=p.querySelector('td[headers="beneficiaryName"]').innerHTML;
-    console.log(name,email_id,phoneNumber,fee,age,gender,projectEventName,beneficiaryAadharId,beneficiaryName);
+    // let beneficiaryAadharId=p.querySelector('td[headers="beneficiaryAadharId"]').innerHTML;
+    // let beneficiaryName=p.querySelector('td[headers="beneficiaryName"]').innerHTML;
+    console.log(name,email_id,phoneNumber,fee,age,gender);
     let form=document.querySelector("form[name='editedDetails']");
 
     form.querySelector("input[name='name']").value=name;
     form.querySelector("input[name='email_id']").value=email_id;
     form.querySelector("input[name='phoneNumber']").value=phoneNumber;
     form.querySelector("input[name='fee']").value=fee;
-    form.querySelector("select[name='age']").value=age;
+    form.querySelector("input[name='age']").value=age;
     form.querySelector("select[name='gender']").value=gender;
-    form.querySelector("select[name='beneficiaryAadharId']").value=beneficiaryAadharId;
-    form.querySelector("select[name='beneficiaryName']").value=beneficiaryName;
-    form.querySelector("select[name='projectEventName']").value=projectEventName;
+    // form.querySelector("select[name='beneficiaryAadharId']").value=beneficiaryAadharId;
+    // form.querySelector("select[name='beneficiaryName']").value=beneficiaryName;
+    // form.querySelector("select[name='projectEventName']").value=projectEventName;
     // form.querySelector("select[name='projectStartDate']").value=projectStartDate;
 }
 
