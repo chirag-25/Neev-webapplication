@@ -93,10 +93,11 @@
       <th scope="col">Event name </th>
       <th scope="col">Start date</th>
       <th scope="col">Budget </th>
-      <th scope="col">Number of participants </th>
-      <th scope="col">Duration (in hours)</th>
-      <th scope="col">Collection (in ₹)</th>
-      <th scope="col">Total expense (in ₹)</th>
+      <th scope="col">No. of participants </th>
+      <th scope="col">Duration</th>
+      <th scope="col">Collection</th>
+      <th scope="col">Expenses</th>
+      <th scope="col">Actions</th>
     </tr>
   </thead>
   <!-- dummy data -->
@@ -112,8 +113,7 @@
       <td>
         <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editModal" onclick="addProjectToForm(this)">Edit</button>
         <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#deleteModal">Delete</button>
-        <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#profileModal">Show Profile</button>
-
+        <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#profileModal">Details</button>
       </td>
     </tr>
     
@@ -334,7 +334,7 @@
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="profileModalLabel">Profile</h5>
+          <h5 class="modal-title" id="profileModalLabel">Project details</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
@@ -443,6 +443,54 @@
                 <th scope="row">1</th>
                 
                 <td>766773347</td>
+              </tr>
+              
+            </tbody>
+          </table> 
+          <h4>Goods</h4>
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">Sr: No</th>
+                
+                <th scope="col">Name</th>
+                <th scope="col">Quantity</th>
+                <th scope="col">Amount (in ₹)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">1</th>
+                <td>Sewing machine</td>
+                <td>1</td>
+                <td>500</td>
+              </tr>
+              
+            </tbody>
+          </table> 
+          
+          <h4>Expense details</h4>
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">Sr: No</th>
+                
+                <th scope="col">Amount (in ₹)</th>
+
+                <th scope="col">Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">1</th>
+                <td>500</td>
+                <td>sewing machine</td>
+              </tr>
+              
+              <tr>
+                <th scope="row">2</th>
+                <td>200</td>
+                <td>Travel</td>
               </tr>
               
             </tbody>
