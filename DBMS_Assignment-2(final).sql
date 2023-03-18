@@ -1,3 +1,5 @@
+show databases;
+-- drop database neev2;
 create database NEEV2;
 use NEEV2;
 
@@ -252,18 +254,22 @@ on update cascade
 #Adding dummy values to Beneficiary
 INSERT INTO Beneficiary (aadhar_id, name, date_of_birth, gender, marital_status, education, photo, employed, photo_caption)
 VALUES
-(123456789011, 'Asha Sharma', '1980-05-12', 'Female', 'Married', 'Master of Business Administration', 'https://example.com/photo1.jpg', 'Yes', 'Photo of Asha Sharma'),
-(234567890121, 'Rahul Singh', '1995-08-02', 'Male', 'Unmarried', 'Bachelor of Engineering', 'https://example.com/photo1.jpg', 'Yes', 'Photo of Rahul Singh'),
-(345678901231, 'Priya Patel', '1988-12-25', 'Female', 'Married', 'Doctor of Medicine', 'https://example.com/photo1.jpg', 'No', NULL),
-(456789012341, 'Rajesh Kumar', '1976-09-18', 'Male', 'Married', 'Bachelor of Science', 'https://example.com/photo1.jpg', 'Yes', 'Photo of Rajesh Kumar'),
-(567890123451, 'Sneha Gupta', '1992-04-01', 'Female', 'Unmarried', 'Master of Computer Applications', 'https://example.com/photo1.jpg', 'No', NULL),
-(678901234561, 'Vikram Singh', '1985-06-21', 'Male', 'Married', 'Bachelor of Commerce', 'https://example.com/photo1.jpg', 'Yes', 'Photo of Vikram Singh'),
-(789012345671, 'Anjali Reddy', '1990-03-15', 'Female', 'Unmarried', 'Bachelor of Arts', 'https://example.com/photo1.jpg', 'No', NULL),
-(890123456781, 'Amit Sharma', '1983-11-08', 'Male', 'Married', 'Master of Science', 'https://example.com/photo1.jpg', 'Yes', 'Photo of Amit Sharma'),
-(901234567891, 'Shalini Verma', '1987-07-14', 'Female', 'Married', 'Bachelor of Business Administration', NULL, 'No', NULL),
-(123450987651, 'Sanjay Kumar', '1979-01-31', 'Male', 'Married', 'Master of Arts', 'https://example.com/photo1.jpg', 'Yes', 'Photo of Sanjay Kumar');
+(123456789012, 'Asha Sharma', '1980-05-12', 'Female', 'Married', 'Master of Business Administration', NULL, 'Yes', 'Photo of Asha Sharma'),
+(234567890123, 'Rahul Singh', '1995-08-02', 'Male', 'Unmarried', 'Bachelor of Engineering', NULL, 'Yes', 'Photo of Rahul Singh'),
+(345678901234, 'Priya Patel', '1988-12-25', 'Female', 'Married', 'Doctor of Medicine', NULL, 'No', NULL),
+(456789012345, 'Rajesh Kumar', '1976-09-18', 'Male', 'Married', 'Bachelor of Science', NULL, 'Yes', 'Photo of Rajesh Kumar'),
+(567890123456, 'Sneha Gupta', '1992-04-01', 'Female', 'Unmarried', 'Master of Computer Applications', NULL, 'No', NULL),
+(678901234567, 'Vikram Singh', '1985-06-21', 'Male', 'Married', 'Bachelor of Commerce', NULL, 'Yes', 'Photo of Vikram Singh'),
+(789012345678, 'Anjali Reddy', '1990-03-15', 'Female', 'Unmarried', 'Bachelor of Arts', NULL, 'No', NULL),
+(890123456789, 'Amit Sharma', '1983-11-08', 'Male', 'Married', 'Master of Science', NULL, 'Yes', 'Photo of Amit Sharma'),
+(901234567890, 'Shalini Verma', '1987-07-14', 'Female', 'Married', 'Bachelor of Business Administration', NULL, 'No', NULL),
+(123450987654, 'Sanjay Kumar', '1979-01-31', 'Male', 'Married', 'Master of Arts', NULL, 'Yes', 'Photo of Sanjay Kumar');
 
- 
+#Imported other entries through .csv file in Beneficiary
+
+
+
+
 #Adding dummy values to Funding
 INSERT INTO Funding (email_id, amount, funder_name, date) VALUES
 ('abc@gmail.com', 50000, 'Rohit Sharma', '2022-02-01'),
