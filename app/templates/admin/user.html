@@ -92,61 +92,22 @@
       <button type="submit" class="btn btn-primary">Search</button>
             </div>
     </form>
-
-      <!-- Rendering search results -->
-  <table class="table">
-
-
-
-    <tbody>
-      {% if searchResults|length == 0 %}
-        No Search Results
-      {% else %}
-        <thead>
-          <tr>
-            <th scope="col">Aadhar ID </th>
-            <th scope="col">Name</th>
-            <th scope="col">DOB </th>
-            <th scope="col">Gender </th>
-            <th scope="col">Education</th>
-            <th scope="col">Martial Status</th>
-            <th scope="col">Employed</th>
-            <th scope="col">Actions</th>
-          </tr>
-        </thead>
-      {% endif %}
-
-      {% for user in searchResults %}
-      <tr>
-        <th scope="row" headers="aadhar">{{user[0]}}</th>
-        <td headers="name">{{user[1]}}</td>
-        <td headers="dob">{{user[2]}}</td>
-        <td headers="gender">{{user[3]}}</td>
-        <td headers="education">{{user[5]}}</td>
-        <td headers="martial">{{user[4]}}</td>
-        <td headers="employed">{{user[7]}}</td>
-        <td>
-          <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editModal"
-            onclick="edit(this)">Edit</button>
-          <button type="button" class="btn btn-danger btn-sm" data-toggle="modal"
-            onclick="delete_user(this)" data-target="#deleteModal">Delete</button>
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-
   </div>
 
   <div class="container">
     <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#addModal" onclick="">Add New
       Beneficiary</button>
-
   </div>
 
+<hr>
   <!-- Rendering Table -->
-  <table class="table">
+{% if profile_details|length == 0 %}
+        <div class="alert alert-primary" role="alert">
+  No Records!
+        </div>
+    {% else %}
 
+  <table class="table">
     <thead>
       <tr>
         <th scope="col">Aadhar ID </th>
@@ -208,6 +169,7 @@
 
     </tbody>
   </table>
+    {% endif %}
 
 
   <!-- edit modal  -->
