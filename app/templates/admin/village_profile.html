@@ -34,7 +34,7 @@
 
         <!-- transport text field -->
         <div class="form-group">
-          <label for="transport">Education</label>
+          <label for="transport">transport</label>
           <input type="text" class="form-control" id="transport" name="transport">
         </div>
 
@@ -49,7 +49,7 @@
 
 
         <div class="form-group">
-          <label for="technical_literacy">Major Occupation</label>
+          <label for="technical_literacy">Technical Literacy</label>
           <input type="text" class="form-control" id="technical_literacy" name="techninal_literacy">
         </div>
 
@@ -65,8 +65,6 @@
       <div>
         <button type="submit" class="btn btn-primary" onclick="" value="">Search</button>
       </div>
-
-
     </form>
 
   </div>
@@ -74,22 +72,20 @@
 
   <div class="container">
     <button type="button" class="btn btn-success m-2" data-toggle="modal" data-target="#addModal" onclick="">Add New
-      Beneficiary</button>
-
+      Village Profile</button>
   </div>
 
   <table class="table">
-
     <thead>
       <tr>
-        <th scope="col">Aadhar ID </th>
         <th scope="col">Name</th>
-        <th scope="col">DOB </th>
-        <th scope="col">Gender </th>
-        <th scope="col">Education</th>
-        <th scope="col">Martial Status</th>
-        <th scope="col">Employed</th>
-        <th scope="col">Actions</th>
+        <th scope="col">No of Beneficiaries</th>
+        <th scope="col">No of PHCs</th>
+        <th scope="col">Major Occupation</th>
+        <th scope="col">No of Schools</th>
+        <th scope="col">Transport</th>
+        <th scope="col">Technical Literacy</th>
+        <th scope="col">Year</th>
       </tr>
     </thead>
     <!-- dummy data -->
@@ -109,7 +105,6 @@
             data-target="#deleteModal">Delete</button>
           <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#profileModal">Show
             Profile</button>
-
         </td>
       </tr>
 
