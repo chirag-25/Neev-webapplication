@@ -1,5 +1,6 @@
 {% extends 'layout.html'%}
 {% block content %}
+
 <div class="container">
   <h1>Beneficiary Page</h1>
   <div class="container">
@@ -88,22 +89,47 @@
     </thead>
     <!-- dummy data -->
     <tbody>
-      {% for user in userDetails %}
+      {% for user in profile_details %}
       <!-- print(userDetails) -->
       <tr>
 
-        <th scope="row" headers="aadhar">{{user[0]}}</th>
-        <td headers="name">{{user[1]}}</td>
-        <td headers="dob">{{user[2]}}</td>
-        <td headers="gender">{{user[3]}}</td>
-        <td headers="education">{{user[5]}}</td>
-        <td headers="martial">{{user[4]}}</td>
-        <td headers="employed">{{user[7]}}</td>
+        <th scope="row" headers="aadhar">{{user['aadhar']}}</th>
+            <td headers="name">{{user['name']}}</td>
+            <td headers="dob">{{user['dob']}}</td>
+            <td headers="gender">{{user['gender']}}</td>
+            <td headers="education">{{user['education']}}</td>
+            <td headers="martial">{{user['martial']}}</td>
+            <td headers="employed">{{user['employed']}}</td>
+{#          these will be used for the profile page#}
+              <td headers="phone" style="display:none;">{{user['phone']}}</td>
+              <td headers="age" style="display:none;">{{user['age']}}</td>
+              <td headers="village" style="display:none;">{{user['village']}}</td>
+              <td headers="pincode" style="display:none;">{{user['pincode']}}</td>
+              <td headers="projects" style="display:none;">
+                  <table class="table">
+                        <thead>
+                          <tr>
+                            <th scope="col">Sr: No</th>
+                            <th scope="col">Event/Project</th>
+                            <th scope="col">Start Date</th>
+                          </tr>
+                        </thead>
+                        <tbody id="profile_table_body">
+                          <tr>
+                              {% for project in user['projects'] %}
+                                <th scope="row">{{ loop.index }}</th>
+                                <td>{{project[1]}}</td>
+                                <td>{{project[2]}}</td>
+                              {% endfor %}
+                          </tr>
+                        </tbody>
+                  </table>
+              </td>
+
         <td>
-          <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editModal"
-            onclick="edit(this)">Edit</button>
-          <button type="button" class="btn btn-danger btn-sm" data-toggle="modal"
-            onclick="delete_user(this)" data-target="#deleteModal">Delete</button>
+          <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editModal" onclick="edit(this)">Edit</button>
+          <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" onclick="delete_user(this)" data-target="#deleteModal">Delete</button>
+            <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#profileModal" onclick="show_profile(this)">Show Profile</button>
         </td>
       </tr>
       {% endfor %}
@@ -258,7 +284,6 @@
     </div>
   </div>
 
-
   <!-- delete modal  -->
   <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel"
     aria-hidden="true">
@@ -288,6 +313,52 @@
       </div>
     </div>
   </div>
+</div>
+
+    <!-- profile modal -->
+  <div class="modal show" id="profileModal" tabindex="-1" role="dialog" aria-labelledby="profileModalLabel" aria-hidden="false">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="profileModalLabel">Profile</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+
+          <div class="row">
+
+            <div class="col-md-8">
+              <h3 id="profile_name">Ronaldo</h3>
+              <p id="profile_phone">1234567890</p>
+              <p id="profile_gender">Gender: Male</p>
+              <p id="profile_martial">Martial-Status: Married</p>
+              <p id="profile_education">Education: B.Tech</p>
+              <p id="profile_employed">Employed: Yes</p>
+              <p id="profile_dob">DOB: 10/10/1998</p>
+              <p id="profile_age">Age: 25</p>
+              <p id="profile_aadhar">Aadhar: 123456789012</p>
+              <div>
+                <p id="profile_village">Village Name: Basan</p>
+                <p id="profile_pincode">Pin Code: 190009</p>
+              </div>
+              <h4>Projects Enrolled</h4>
+                <div id="profile_project_table"></div>
+
+            </div>
+            <div class="col-md-4">
+              <img src="https://via.placeholder.com/150" class="img-fluid">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 
@@ -323,6 +394,37 @@
         form.querySelector("input[name='aadhar']").value = aadhar;
       }
 
+      function show_profile(e) {
+        let p = e.parentNode.parentNode;
+        let name = p.querySelector("td[headers='name']").innerHTML;
+        let aadhar = p.querySelector('th[headers="aadhar"]').innerHTML;
+        let dob = p.querySelector('td[headers="dob"]').innerHTML;
+        let education = p.querySelector('td[headers="education"]').innerHTML;
+        let martial = p.querySelector('td[headers="martial"]').innerHTML;
+        let gender = p.querySelector('td[headers="gender"]').innerHTML;
+        let employed = p.querySelector('td[headers="employed"]').innerHTML;
+        let phone = p.querySelector('td[headers="phone"]').innerHTML;
+        let village = p.querySelector('td[headers="village"]').innerHTML;
+        let pincode = p.querySelector('td[headers="pincode"]').innerHTML;
+        let age = p.querySelector('td[headers="age"]').innerHTML;
+        let projects = p.querySelector('td[headers="projects"]').innerHTML;
+
+        document.querySelector("#profile_name").textContent = "Name: "+name;
+        document.querySelector("#profile_aadhar").textContent = "Aadhar Number: "+aadhar;
+        document.querySelector("#profile_dob").textContent = "DOB: "+dob;
+        document.querySelector("#profile_education").textContent = "Education: "+education;
+        document.querySelector("#profile_martial").textContent = "Martial: "+martial;
+        document.querySelector("#profile_gender").textContent = "Gender: "+gender;
+        document.querySelector("#profile_employed").textContent = "Employed: "+employed;
+        document.querySelector("#profile_phone").textContent = "Phone: "+phone;
+        document.querySelector("#profile_village").textContent = "Village: "+village;
+        document.querySelector("#profile_pincode").textContent = "Pincode: "+pincode;
+        document.querySelector("#profile_age").textContent = "Age: "+age;
+        document.querySelector("#profile_project_table").innerHTML = projects;
+      }
+
 
 </script>
+
+
 {% endblock content %}

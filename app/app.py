@@ -37,6 +37,51 @@ def user():
     if result_value > 0:
         userDetails = cur.fetchall()
 
+    # Generate the user profile details
+    profile_details = []
+    for user in userDetails:
+        user_profile = {'aadhar':user[0], 'name':user[1], 'dob':user[2], 'gender':user[3], 'martial':user[4], 'education':user[5], 'photo':user[6], 'employed':user[7], 'photo_caption':user[8]}
+        calculate_age_query = f"SELECT TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) FROM Beneficiary WHERE aadhar_id = {user[0]}"
+        extract_village_query = f"SELECT pincode, name FROM VillageProfile WHERE pincode = (SELECT pincode FROM belongs WHERE aadhar_id = {user[0]})"
+        extract_enrolled_projects_query = f"SELECT * FROM participants WHERE aadhar_id = {user[0]}"
+        extract_phone_query = f"SELECT phone_number FROM BeneficiaryPhoneEntity WHERE aadhar_id = {user[0]}"
+
+        calculate_age = cur.execute(calculate_age_query)
+        calculate_age = cur.fetchall()
+
+        extract_village = cur.execute(extract_village_query)
+        extract_village = cur.fetchall()
+
+        extract_enrolled_projects = cur.execute(extract_enrolled_projects_query)
+        extract_enrolled_projects = cur.fetchall()
+
+        extract_phone = cur.execute(extract_phone_query)
+        extract_phone = cur.fetchall()
+
+        if len(calculate_age) > 0:
+            user_profile['age'] = calculate_age[0][0]
+        else:
+            user_profile['age'] = 'NA'
+
+        if len(extract_village) > 0:
+            user_profile['village'] = extract_village[0][1]
+            user_profile['pincode'] = extract_village[0][0]
+        else:
+            user_profile['village'] = 'NA'
+            user_profile['pincode'] = 'NA'
+
+        if len(extract_enrolled_projects) > 0:
+            user_profile['projects'] = extract_enrolled_projects
+        else:
+            user_profile['projects'] = ()
+
+        if len(extract_phone) > 0:
+            user_profile['phone'] = extract_phone[0][0]
+        else:
+            user_profile['phone'] = 'NA'
+
+        profile_details.append(user_profile)
+
     if (request.method == 'POST'):
         if request.form['signal'] == 'search':
             name = request.form['name']
@@ -70,7 +115,7 @@ def user():
             if exec_query > 0:
                 search_results = cur.fetchall()
             mysql.connection.commit()
-            return render_template('admin/user.html', userDetails=userDetails, searchResults=search_results)
+            return render_template('admin/user.html', userDetails=userDetails, searchResults=search_results, profile_details=profile_details)
 
         elif request.form['signal'] == 'add':
             print(request.form)
@@ -91,6 +136,7 @@ def user():
             exec_query = cur.execute(add_query)
             mysql.connection.commit()
             return redirect('/admin/user')
+
         elif request.form['signal'] == 'edit':
             aadhar = request.form['aadhar']
             name = request.form['name']
@@ -120,7 +166,8 @@ def user():
             exec_query = cur.execute(delete_query)
             mysql.connection.commit()
             return redirect('/admin/user')
-    return render_template('admin/user.html', userDetails=userDetails, searchResults=tuple())
+
+    return render_template('admin/user.html', searchResults=tuple(), profile_details=profile_details)
     # return render_template('admin/user.html')
 
 
