@@ -89,7 +89,7 @@
             <input type="number" class="form-control" id="id" name="age">
           </div>
 
-      <button type="submit" class="btn btn-primary">Search</button>
+            <button type="submit" class="btn btn-primary">Search</button>
             </div>
     </form>
   </div>
@@ -148,13 +148,14 @@
                           </tr>
                         </thead>
                         <tbody id="profile_table_body">
-                          <tr>
+
                               {% for project in user['projects'] %}
-                                <th scope="row">{{ loop.index }}</th>
-                                <td>{{project[1]}}</td>
-                                <td>{{project[2]}}</td>
+                                  <tr>
+                                    <th scope="row">{{ loop.index }}</th>
+                                    <td>{{project[1]}}</td>
+                                    <td>{{project[2]}}</td>
+                                  </tr>
                               {% endfor %}
-                          </tr>
                         </tbody>
                   </table>
               </td>
@@ -192,18 +193,15 @@
               <input type="text" class="form-control" id="name" name="name">
             </div>
 
-
             <div class="form-group">
               <label for="aadhar">Aadhar Id</label>
-              <input type="number" class="form-control" id="email" name="aadhar" min="100000000000" max="999999999999">
+              <input type="number" class="form-control" id="email" name="aadhar" min="100000000000" max="999999999999" required>
             </div>
-
 
             <div class="form-group">
               <label for="dob">DOB</label>
               <input type="date" class="form-control" id="dob" name="dob">
             </div>
-
 
             <div class="form-group">
               <label for="education">Education</label>
@@ -218,6 +216,7 @@
 
               </select>
             </div>
+
             <div class="form-group">
               <label for="genderSelect">Gender</label>
               <select class="form-control" id="genderSelect" name="gender">
@@ -231,9 +230,34 @@
               <select class="form-control" id="genderSelect" name="employed">
                 <option value="Yes">Yes</option>
                 <option value="No">No</option>
-
               </select>
             </div>
+
+              <div class="form-group">
+              <label for="id">Enroll in New Event:</label>
+              <select class="form-control" id="od" name="project">
+                <option value="" selected>--Select New Event--</option>
+                {% for project in projects %}
+                    <option value="{{project[0]}}">{{project[0]}}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="genderSelect">Village</label>
+              <select class="form-control" id="genderSelect" name="village">
+                <option value="" selected>--Select New Village--</option>
+                {% for village in villages %}
+                    <option value="{{village[0]}}">{{village[0]}}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="phone_number">Add phone number</label>
+              <input type="text" class="form-control" id="education" name="phone_number">
+            </div>
+
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
               <input type="submit" class="btn btn-primary" id="saveChangesButton" value="Save Changes">
@@ -329,7 +353,6 @@
                 {% for village in villages %}
                     <option value="{{village[0]}}">{{village[0]}}</option>
                 {% endfor %}
-
               </select>
             </div>
 
@@ -428,7 +451,7 @@
       function edit(e) {
         let p = e.parentNode.parentNode;
         let name = p.querySelector("td[headers='name']").innerHTML;
-        let aadhar = p.querySelector('th[headers="aadhar"]').innerHTML;
+        let aadhar=p.querySelector('th[headers="aadhar"]').innerHTML;
         let dob = p.querySelector('td[headers="dob"]').innerHTML;
         let education = p.querySelector('td[headers="education"]').innerHTML;
         let martial = p.querySelector('td[headers="martial"]').innerHTML;
@@ -438,7 +461,7 @@
         let form = document.querySelector("form[name='editedDetails']");
 
         form.querySelector("input[name='name']").value = name;
-        form.querySelector("input[name='aadhar']").value = aadhar;
+        form.querySelector("input[name='aadhar']").value=aadhar;
         form.querySelector("input[name='dob']").value = dob;
         form.querySelector("input[name='education']").value = education;
         form.querySelector("select[name='martial']").value = martial;

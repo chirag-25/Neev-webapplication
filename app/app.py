@@ -101,7 +101,6 @@ def user():
 
     if (request.method == 'POST'):
         if request.form['signal'] == 'search':
-            print(request.form)
             name = request.form['name']
             aadhar = request.form['aadhar']
             dob = request.form['dob']
@@ -206,8 +205,6 @@ def user():
             profile_details = updated_profile_details
 
         elif request.form['signal'] == 'add':
-            print(request.form)
-            print("addDetails filled!")
 
             aadhar = request.form['aadhar']
             name = request.form['name']
@@ -254,22 +251,42 @@ def user():
             martial = request.form['martial']
             gender = request.form['gender']
             employed = request.form['employed']
+            phone_number = request.form['phone_number']
+            village = request.form['village']
+            project = request.form['project']
 
             edit_query = f"UPDATE Beneficiary "
             edit_query = edit_query + f"SET name = \'{name}\', date_of_birth = \'{dob}\', gender = \'{gender}\', marital_status = \'{martial}\', education = \'{education}\', photo = NULL, employed = \"{employed}\", photo_caption = NULL "
             edit_query = edit_query + f"WHERE aadhar_id = {aadhar}"
-            print(edit_query)
-
             exec_query = cur.execute(edit_query)
             mysql.connection.commit()
+
+            # Update phone_number, village and project if provided
+            if phone_number != '':
+                add_phone_query = f"INSERT INTO BeneficiaryPhoneEntity (aadhar_id, phone_number) "
+                add_phone_query = add_phone_query + f"VALUES ({aadhar}, \"{phone_number}\")"
+                exec_query = cur.execute(add_phone_query)
+                mysql.connection.commit()
+
+            if village != '':
+                edit_village_query = f"UPDATE belongs "
+                edit_village_query = edit_village_query + f"SET pincode = (SELECT pincode FROM VillageProfile WHERE name = \"{village}\") "
+                edit_village_query = edit_village_query + f"WHERE aadhar_id = {aadhar}"
+                exec_query = cur.execute(edit_village_query)
+                mysql.connection.commit()
+
+            if project != '':
+                add_project_query = f"INSERT INTO participants (aadhar_id, event_name, start_date) "
+                # assumption is taken here that beneficiary can only participate in current year's project
+                add_project_query = add_project_query + f"VALUES ({aadhar}, \"{project}\", (SELECT start_date FROM Projects WHERE event_name = \"{project}\" AND YEAR(start_date) = YEAR(CURDATE())))"
+                exec_query = cur.execute(add_project_query)
+                mysql.connection.commit()
+
             return redirect('/admin/user')
 
         elif request.form['signal'] == 'delete':
-            print("delete filled!")
             aadhar = request.form['aadhar']
             delete_query = f"DELETE FROM Beneficiary WHERE aadhar_id = {aadhar}"
-
-            print(delete_query)
 
             exec_query = cur.execute(delete_query)
             mysql.connection.commit()
