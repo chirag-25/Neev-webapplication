@@ -102,12 +102,23 @@ def funding():
                     where_query += f" AND amount BETWEEN \'{min_amount}\' AND \'{max_amount}\'"
                 flag = True
             
+            if funding_to != '':
+                if flag == False:
+                    where_query += f" WHERE email_id IN (SELECT email_id FROM Sponsors WHERE event_name = \'{funding_to}\')"
+                else:
+                    where_query += f" AND email_id IN (SELECT email_id FROM Sponsors WHERE event_name = \'{funding_to}\')"
+                flag = True
+                
+            
             if year != '':
                 if flag == False:
                     where_query += f" WHERE YEAR(date) = {year}"
                 else:
                     where_query += f" AND YEAR(date) = {year}"
                 flag = True
+                
+         
+                
             
 
             exec_query = cur.execute(where_query)
@@ -122,7 +133,7 @@ def funding():
                         updated_profile_details.append(user)
             profileDetails = updated_profile_details
             
-            return render_template('admin/funding.html', userDetails=userDetails, searchResults=(), profileDetails = profileDetails)
+            return render_template('admin/funding.html', userDetails=userDetails, profileDetails = profileDetails)
         elif request.form['signal'] == 'add':
             print(request.form)
             print("addDetails filled!")
@@ -145,7 +156,7 @@ def funding():
             
             add_project_query = f"INSERT INTO Sponsors (email_id, event_name, start_date) "
             # assumption is taken here that beneficiary can only participate in current year's project
-            add_project_query = add_project_query + f"VALUES (\"{email}\", \"{funding_to}\", (SELECT start_date FROM Projects WHERE event_name = \"{funding_to}\" AND YEAR(start_date) = YEAR(CURDATE())))"
+            add_project_query = add_project_query + f"VALUES (\"{email}\", \"{funding_to}\", (SELECT start_date FROM Projects WHERE event_name = \"{funding_to}\" AND YEAR(start_date) = YEAR(\'{date}\')))"
             exec_add_project_query = cur.execute(add_project_query)
             mysql.connection.commit()
 
