@@ -1,0 +1,442 @@
+{% extends 'layout.html'%} {% block content %}
+<div class="container">
+
+    <!-- search form -->
+    <div class="container" style="width: 60%">
+        <h1>Volunteers</h1>
+        <form name="searchForm">
+            <div class="d-flex flex-wrap m-1 justify-content-between">
+                <!-- Hidden signal -->
+                <input type="hidden" name="signal" value="search" />
+
+                <!-- name and email -->
+                <div class="d-flex flex-row justify-content-between align-items-center" style="width: 100%">
+                    <div class="form-group" style="width: 48%">
+                        <label for="name">Name</label>
+                        <input type="text" class="form-control" style="width: 100%" id="name" name="name" />
+                    </div>
+                    <div class="form-group" style="width: 48%">
+                        <label for="email">Email ID</label>
+                        <input type="text" class="form-control" style="width: 100%" id="email" name="email" />
+                    </div>
+                </div>
+
+                <!-- phone and age and gender-->
+                <div class="d-flex flex-row justify-content-between align-items-center" style="width: 100%">
+                    <!-- Phone -->
+                    <div class="form-group" style="width: 30%">
+                        <label for="phone">Phone No</label>
+                        <input type="tel" class="form-control" style="width: 100%" id="phone" name="phone" />
+                    </div>
+                    <!-- age -->
+                    <div class="form-group" style="width: 30%">
+                        <label for="age">Age</label>
+                        <input type="number" class="form-control" style="width: 100%" id="age" name="age" />
+                    </div>
+                    <!-- gender -->
+                    <div class="form-group" style="width: 30%;">
+                        <label for="genderSelect">Gender</label>
+                        <select class="form-control" id="genderSelect" name="gender">
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+
+
+                </div>
+
+                <!-- project and year -->
+                <div class="form-group d-flex flex-row justify-content-between align-items-center" style="width: 100%">
+                    <label for="project_name">Project</label>
+                    <select class="form-control mx-4" id="project_name" name="project_name" placeholder="Project Name">
+                        <option value="Sewing">Sewing</option>
+                        <option value="Cooking">Cooking</option>
+                    </select>
+                    <input type="number" class="form-control" id="year" placeholder="Year" min="2008" />
+                </div>
+            </div>
+
+            <!-- search -->
+            <div class="d-flex flex-row justify-content-end">
+                <button type="submit" class="btn btn-primary" onclick="" value="">
+                    Search
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- add button -->
+    <div class="container">
+        <button type="button" class="btn btn-success m-2" data-toggle="modal" data-target="#addModal" onclick="">
+            Add New Volunteer
+        </button>
+    </div>
+
+    <!-- display table -->
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Email</th>
+                <th scope="col">Age</th>
+                <th scope="col">Gender</th>
+                <th scope="col">Phone</th>
+                <th scope="col">Action</th>
+            </tr>
+        </thead>
+
+        <!-- dummy data -->
+        <tbody>
+            {%for user in profile_details%}
+            <tr>
+                <th scope="row" headers="name">{{user['name']}}</th>
+                <td headers="email">{{user['email_id']}}</td>
+                <td headers="DOB">{{user['date_of_birth']}}</td>
+                <td headers="gender">{{user['gender']}}</td>
+                <td headers="phone">{{user['phone_number']}}</td>
+
+                {#          these will be used for the profile page#}
+              <td headers="age" style="display:none;">{{user['age']}}</td>
+              <td headers="projects" style="display:none;">
+                  <table class="table">
+                        <thead>
+                          <tr>
+                            <th scope="col">Sr: No</th>
+                            <th scope="col">Event/Project</th>
+                            <th scope="col">Start Date</th>
+                          </tr>
+                        </thead>
+                        <tbody id="profile_table_body">
+
+                              {% for project in user['projects'] %}
+                                  <tr>
+                                    <th scope="row">{{ loop.index }}</th>
+                                    <td>{{project[1]}}</td>
+                                    <td>{{project[2]}}</td>
+                                  </tr>
+                              {% endfor %}
+                        </tbody>
+                  </table>
+              </td>
+
+                <td>
+                    <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editModal"
+                        onclick="edit(this)">
+                        Edit
+                    </button>
+                    <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#deleteModal" onclick="delete_user(this)">
+                        Delete
+                    </button>
+                    <button type="button" class="btn btn-success btn-sm" data-toggle="modal"
+                        data-target="#profileModal" onclick="show_profile(this)">
+                        More Details
+                    </button>
+                </td>
+            </tr>
+            {%endfor%}
+        </tbody>
+    </table>
+
+    <!-- edit modal  -->
+    <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel">Edit Benefactor </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form name="editedDetails" method="POST">
+                        <input type="hidden" value="editUser" name="signal" />
+
+                        <!-- volunteer name -->
+                        <div class="form-group">
+                            <label for="volunteer_name_edit">Name of Volunteer</label>
+                            <input type="text" class="form-control" id="volunteer_name_edit" name="volunteer_name"
+                                required />
+                        </div>
+
+                        <!-- email -->
+                        <div class="form-group">
+                            <label for="email_edit">Email</label>
+                            <input type="email" class="form-control" id="email_edit" name="email" required readonly />
+                        </div>
+
+                        <!-- age -->
+                        <!-- <div class="form-group">
+                            <label for="age_edit">Age</label>
+                            <input type="number" class="form-control" id="age_edit" name="age" min="0" required />
+                        </div> -->
+
+                        <!-- age -->
+                        <div class="form-group">
+                            <label for="dob_add">DOB</label>
+                            <input type="date" class="form-control" id="dob_add" name="dob"  required />
+                        </div>
+
+                        <!-- Gender -->
+                        <div class="form-group">
+                            <label for="gender_edit">Gender</label>
+                            <select class="form-control" id="gender_edit" name="gender" required>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+
+                        <!-- phone -->
+                        <div class="form-group">
+                            <label for="phone_edit">Phone</label>
+                            <input type="tel" class="form-control" id="phone_edit" name="phone" required />
+                        </div>
+
+                        <!-- project and year to fund to -->
+                        <label for="project_name_eidt">Project</label>
+                        <div class="form-group d-flex justify-content-between align-items-center">
+                            <select class="form-control flex-item" style="width: 48%;" id="project_name_eidt"
+                                name="project_name" placeholder="Project Name">
+                                <option value="Sewing">Sewing</option>
+                                <option value="Cooking">Cooking</option>
+                            </select>
+                            <input type="number" class="form-control flex-item" style="width: 48%;" name="year"
+                                placeholder="Year" min="2008" />
+                        </div>
+
+
+                        <!-- cancel and save changes-->
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                                Cancel
+                            </button>
+                            <input type="submit" class="btn btn-primary" id="saveChangesButton" value="Save Changes" />
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- add modal -->
+    <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel">Add New Volunteer</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form name="addDetails" method="POST">
+                        <input type="hidden" name="signal" value="addUser" >
+                        <!-- volunteer name -->
+                        <div class="form-group">
+                            <label for="name_add">Volunteer Name</label>
+                            <input type="text" class="form-control" id="name_add" name="name" required />
+                        </div>
+
+                        <!-- email -->
+                        <div class="form-group">
+                            <label for="email_add">Email</label>
+                            <input type="email" class="form-control" id="email_add" name="email" required />
+                        </div>
+
+                        <!-- age -->
+                        <div class="form-group">
+                            <label for="dob_add">DOB</label>
+                            <input type="date" class="form-control" id="dob_add" name="dob"  required />
+                        </div>
+
+                        <!-- Gender -->
+                        <div class="form-group">
+                            <label for="gender_add">Gender</label>
+                            <select class="form-control" id="gender_add" name="gender" required>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+
+                        <!-- phone -->
+                        <div class="form-group">
+                            <label for="phone_add">Phone</label>
+                            <input type="tel" class="form-control" id="phone_add" name="phone" required />
+                        </div>
+
+                        <!-- project and year to volunteer to -->
+                        <label for="project_name_eidt">Project</label>
+                        <div class="form-group d-flex justify-content-between align-items-center">
+                            <select class="form-control flex-item" style="width: 48%;" id="project_name_eidt"
+                                name="project_name" placeholder="Project Name">
+                                <option value="Sewing">Sewing</option>
+                                <option value="Cooking">Cooking</option>
+                            </select>
+                            <input type="number" class="form-control flex-item" style="width: 48%;" name="year"
+                                placeholder="Year" min="2008" />
+                        </div>
+
+
+                        <!-- cancel and save changes-->
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                                Cancel
+                            </button>
+                            <button type="submit" class="btn btn-primary" id="saveChangesButton">Add Volunteer</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- delete modal  -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Delete Benefactor</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete this Volunteer?
+                </div>
+                <div class="modal-footer">
+                    <form name="deleteForm" method="POST">
+                        <div class="form-group">
+                            <input type="hidden" name="signal" value="delete">
+                            <label for="email">Email ID</label>
+                            <input type="text" class="form-control" id="email_edit" name="email" readonly>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                                Cancel
+                            </button>
+                            <button type="submit" class="btn btn-danger" id="deleteButton">
+                                Delete
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!-- profile modal -->
+  <div class="modal show" id="profileModal" tabindex="-1" role="dialog" aria-labelledby="profileModalLabel" aria-hidden="false">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="profileModalLabel">Profile</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+
+          <div class="row">
+
+            <div class="col-md-8">
+              <h3 id="profile_name">Ronaldo</h3>
+                <p id="profile_email">abc@gmail.com</p>
+              <p id="profile_phone">1234567890</p>
+              <p id="profile_gender">Gender: Male</p>
+              <p id="profile_dob">DOB: 10/10/1998</p>
+              <p id="profile_age">Age: 25</p>
+              <h4>Projects Enrolled</h4>
+                <div id="profile_project_table"></div>
+
+            </div>
+            <div class="col-md-4">
+              <img src="https://via.placeholder.com/150" class="img-fluid">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+    //   js to add details to the edit form
+    // function addUserToForm(e) {
+    //     console.log(e.parentNode.parentNode);
+    //     let p = e.parentNode.parentNode;
+    //     let name = p.querySelector("td[headers='name']").innerHTML;
+    //     let email= p.querySelector('td[headers="email"]').innerHTML;
+    //     let age = p.querySelector('td[headers="age"]').innerHTML;
+    //     let phone = p.querySelector('td[headers="phone"]').innerHTML;
+    //     let gender = p.querySelector('td[headers="gender"]').innerHTML;
+    //     console.log("chirag")
+    //     console.log(name, email, age, phone, gender);
+    //     let form = document.querySelector("form[name='editedDetails']");
+
+    //     form.querySelector("input[name='volunteer_name']").value = name;
+    //     form.querySelector("input[name='email']").value = email;
+    //     form.querySelector("input[name='age']").value = age;
+    //     form.querySelector("input[name='phone']").value = phone;
+    //     form.querySelector("input[name='gender']").value = gender;
+    // }
+
+    function edit(e) {
+        // console.log("Mahesh");
+        let p = e.parentNode.parentNode;
+        let name = p.querySelector("th[headers='name']").innerHTML;
+        // console.log(name);
+        let email = p.querySelector('td[headers="email"]').innerHTML;
+        // console.log(email);
+        let dob = p.querySelector('td[headers="DOB"]').innerHTML;
+        let gender = p.querySelector('td[headers="gender"]').innerHTML;
+        let phone = p.querySelector('td[headers="phone"]').innerHTML;
+        console.log(phone);
+        // console.log("Mahesh");
+
+        let form = document.querySelector("form[name='editedDetails']");
+
+        form.querySelector("input[name='volunteer_name']").value = name;
+        form.querySelector("input[name='email']").value = email;
+        form.querySelector("input[name='dob']").value = dob;
+        form.querySelector("select[name='gender']").value = gender;
+        form.querySelector("input[name='phone']").value = phone;
+      }
+
+      function delete_user(e) {
+        let p = e.parentNode.parentNode;
+        let email = p.querySelector('td[headers="email"]').innerHTML;
+        console.log(email)
+        let form = document.querySelector("form[name='deleteForm']");
+
+        form.querySelector("input[name='email']").value = email;
+      }
+
+      function show_profile(e) {
+        let p = e.parentNode.parentNode;
+        let name = p.querySelector("th[headers='name']").innerHTML;
+        let email = p.querySelector('td[headers="email"]').innerHTML;
+        let dob = p.querySelector('td[headers="DOB"]').innerHTML;
+        let gender = p.querySelector('td[headers="gender"]').innerHTML;
+        let phone = p.querySelector('td[headers="phone"]').innerHTML;
+        let age = p.querySelector('td[headers="age"]').innerHTML;
+        let projects = p.querySelector('td[headers="projects"]').innerHTML;
+
+        document.querySelector("#profile_name").textContent = "Name: "+name;
+        document.querySelector("#profile_email").textContent = "Email: "+email;
+        document.querySelector("#profile_dob").textContent = "DOB: "+dob;
+        document.querySelector("#profile_gender").textContent = "Gender: "+gender;
+        document.querySelector("#profile_phone").textContent = "Phone: "+phone;
+        document.querySelector("#profile_age").textContent = "Age: "+age;
+        document.querySelector("#profile_project_table").innerHTML = projects;
+      }
+
+</script>
+{% endblock content %}

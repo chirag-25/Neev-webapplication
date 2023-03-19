@@ -295,6 +295,100 @@ def user():
     return render_template('admin/user.html', searchResults=tuple(), profile_details=profile_details, projects=projects, villages=villages, education_list=education_list)
     # return render_template('admin/user.html')
 
+@app.route("/admin/volunteers", methods = ['POST', 'GET'])
+def volunteers():
+    cur = mysql.connection.cursor()
+    result_value = cur.execute("SELECT * FROM Volunteers")
+
+    if result_value > 0:
+        userDetails = cur.fetchall()
+
+    # Generate the user profile details
+    profile_details = []
+    for user in userDetails:
+        # (email_id, name, phone_number, date_of_birth, gender)
+        # INSERT INTO volunteering(email_id, event_name, start_date)
+        user_profile = {'email_id': user[0], 'name': user[1], 'phone_number': user[2], 'date_of_birth': user[3], 'gender': user[4]}
+        calculate_age_query = f"SELECT TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) FROM Volunteers WHERE email_id = \'{user[0]}\'"
+        extract_enrolled_projects_query = f"SELECT * FROM volunteering WHERE email_id = \'{user[0]}\'"
+
+        calculate_age = cur.execute(calculate_age_query)
+        calculate_age = cur.fetchall()
+
+        extract_enrolled_projects = cur.execute(extract_enrolled_projects_query)
+        extract_enrolled_projects = cur.fetchall()
+
+        if len(calculate_age) > 0:
+            user_profile['age'] = calculate_age[0][0]
+        else:
+            user_profile['age'] = 'NA'
+
+        if len(extract_enrolled_projects) > 0:
+            user_profile['projects'] = extract_enrolled_projects
+        else:
+            user_profile['projects'] = ()
+
+        profile_details.append(user_profile)
+
+    # Generate projects list
+    projects_query = f"SELECT event_name FROM Projects"
+    projects_query = cur.execute(projects_query)
+    projects = cur.fetchall()
+
+    if (request.method == 'POST'):
+        if request.form['signal'] == 'addUser':
+            print(request.form)
+            print("addDetails filled!")
+
+            volunteers_name = request.form['name']
+            email = request.form['email']
+            date_of_birth = request.form['dob']
+            gender = request.form['gender']
+            phone = request.form['phone']
+
+            print(volunteers_name)
+
+
+            # project = request.form['']
+
+            add_query = f"INSERT INTO Volunteers (email_id, name, phone_number, date_of_birth, gender) "
+            add_query = add_query + f"VALUES (\'{email}\', \'{volunteers_name}\', \'{phone}\', \'{date_of_birth}\', \'{gender}\')"
+            print(add_query)
+
+            exec_query = cur.execute(add_query)
+            mysql.connection.commit()
+
+            return redirect('/admin/volunteers')
+
+        elif request.form['signal'] == 'editUser':
+            volunteers_name = request.form['volunteer_name']
+            email = request.form['email']
+            date_of_birth = request.form['dob']
+            gender = request.form['gender']
+            phone = request.form['phone']
+
+            edit_query = f"UPDATE Volunteers "
+            edit_query = edit_query + f"SET name = \'{volunteers_name}\', email_id = \'{email}\', date_of_birth = \'{date_of_birth}\', gender = \'{gender}\', phone_number = \'{phone}\'"
+            edit_query = edit_query + f"WHERE email_id = \'{email}\';"
+            print(edit_query)
+
+            exec_query = cur.execute(edit_query)
+            mysql.connection.commit()
+            return redirect('/admin/volunteers')
+            print("edit")
+
+        elif request.form['signal'] == 'delete':
+            print("delete filled!")
+            email = request.form['email']
+            delete_query = f"DELETE FROM Volunteers WHERE email_id = \'{email}\'"
+
+            print(delete_query)
+
+            exec_query = cur.execute(delete_query)
+            mysql.connection.commit()
+            return redirect('/admin/volunteers')
+
+    return render_template("admin/volunteers.html", profile_details=profile_details, projects=projects)
 
 ### Add new user
 @app.route("/", methods=['POST'])
