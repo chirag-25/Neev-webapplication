@@ -46,7 +46,7 @@
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="editModalLabel">Add New Benefactor</h5>
+                        <h5 class="modal-title" id="editModalLabel">Apply as Trainer</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -55,40 +55,50 @@
                         <form name="apply_trainer" method="POST" action="">
                             <input type="hidden" name="search" value="apply_trainer" />
                             
-                            <!-- Rahul change this -->
                             
-                            <!-- new benefactor -->
+                            <!-- new trainee -->
                             <div class="form-group">
-                                <label for="benefactor_add">Benefactor</label>
-                                <input type="text" class="form-control" id="benefactor_add" name="name" required />
+                                <label for="Trainee_add">Name</label>
+                                <input type="text" class="form-control" id="Trainee_add" name="V_name" required />
                             </div>
 
                             <!-- email -->
                             <div class="form-group">
                                 <label for="email_add">Email</label>
-                                <input type="email" class="form-control" id="email_add" name="email" required />
+                                <input type="email" class="form-control" id="email_add" name="add_email" required />
                             </div>
 
-                            <!-- date of funding -->
+                            <!-- Age -->
                             <div class="form-group">
-                                <label for="funding_date_add">Funding Date</label>
-                                <input type="date" class="form-control" id="funding_date_add" name="funding_date" />
+                                <label for="Age">Age</label>
+                                <input type="number" class="form-control" id="Age" name="age_add" min="0"
+                                required  />
                             </div>
 
-                            <!-- amount -->
-                            <div>
-                                <label for="amount_add">Amount</label>
-                                <input type="number" class="form-control" id="amount" name="amount_add" min="0"
+                            <!-- fee -->
+                            <div class="form-group">
+                                <label for="fee_add">Fee</label>
+                                <input type="number" class="form-control" id="fee_add" name="fee_add" min="0"
                                     required />
                             </div>
 
-                            <!-- project to be funded -->
+                            <!-- project which a trainee can take part -->
                             <div class="form-group">
-                                <label for="project_add">Funding to </label>
+                                <label for="project_add">Apply For Project </label>
                                 <select class="form-control" id="project_add" name="project">
                                     <option disabled selected value>-- select an option --</option>
                                     <option value="project1">Project 1</option>
                                     <option value="project2">Project 2</option>
+                                </select>
+                            </div>
+                            <!-- Gender-->
+                            <div class="form-group">
+                                <label for="Gender">Gender </label>
+                                <select class="form-control" id="Gender" name="Trainee_gender">
+                                    <option disabled selected value>-- select an option --</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Other">Other</option>
                                 </select>
                             </div>
 
@@ -99,7 +109,7 @@
                                     Cancel
                                 </button>
                                 <input type="submit" class="btn btn-primary" id="saveChangesButton"
-                                    value="Add Benefactor" />
+                                    value="Apply" />
                             </div>
                         </form>
                     </div>
@@ -124,10 +134,10 @@
                             
                             <!-- Rahul change this -->
                             
-                            <!-- new benefactor -->
+                            <!-- new volumteer -->
                             <div class="form-group">
-                                <label for="benefactor_add">Benefactor</label>
-                                <input type="text" class="form-control" id="benefactor_add" name="name" required />
+                                <label for="volunter_add">Name</label>
+                                <input type="text" class="form-control" id="volunter_add" name="name" required />
                             </div>
 
                             <!-- email -->
@@ -136,26 +146,26 @@
                                 <input type="email" class="form-control" id="email_add" name="email" required />
                             </div>
 
-                            <!-- date of funding -->
+                            <!-- date of birth -->
                             <div class="form-group">
-                                <label for="funding_date_add">Funding Date</label>
-                                <input type="date" class="form-control" id="funding_date_add" name="funding_date" />
+                                <label for="dob">DOB</label>
+                                <input type="date" class="form-control" id="dob" name="dob_date" />
                             </div>
 
                             <!-- amount -->
-                            <div>
-                                <label for="amount_add">Amount</label>
-                                <input type="number" class="form-control" id="amount" name="amount_add" min="0"
+                            <div class="form-group">
+                                <label for="phone_add">Phone No</label>
+                                <input type="number" class="form-control" id="phone_add" name="phone" min="1000000000" max="9999999999"
                                     required />
                             </div>
-
-                            <!-- project to be funded -->
+                            <!-- Gender -->
                             <div class="form-group">
-                                <label for="project_add">Funding to </label>
-                                <select class="form-control" id="project_add" name="project">
+                                <label for="Gender">Gender </label>
+                                <select class="form-control" id="Gender" name="volunteer_gender">
                                     <option disabled selected value>-- select an option --</option>
-                                    <option value="project1">Project 1</option>
-                                    <option value="project2">Project 2</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Other">Other</option>
                                 </select>
                             </div>
 
@@ -166,7 +176,7 @@
                                     Cancel
                                 </button>
                                 <input type="submit" class="btn btn-primary" id="saveChangesButton"
-                                    value="Add Benefactor" />
+                                    value="Apply" />
                             </div>
                         </form>
                     </div>
