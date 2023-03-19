@@ -8,8 +8,16 @@
             <div class="d-flex flex-wrap m-1 justify-content-between">
                 <input type="hidden" name="signal" value="search">
                 <div class="form-group">
-                    <label for=" event_name">Event name:</label>
-                    <input type="text" class="form-control" id="event_name" name="event_name">
+
+                    <label for="event_name">Event Name</label>
+                    <select class="form-control" id="event_name" name="event_name">
+                        <option value="" selected>NA</option>
+                        {% for project_name in project_names %}
+                            <option value="{{project_name[0]}}">{{project_name[0]}}</option>
+                        {% endfor %}
+                    </select>
+
+
                 </div>
                 <div class="form-group">
                     <label for="year">Year</label>
@@ -17,8 +25,16 @@
                 </div>
                 
                 <div class="form-group">
-                    <label for="type_event">Type of Event</label>
-                    <input type="text" class="form-control" id="type_event" name="type_event">
+                    <label for="type_event">Type of Events</label>
+                    <select class="form-control" id="type_event" name="type_event">
+
+                        <option value="" selected>NA</option>
+                        {% for event in event_names %}
+                            <option value="{{event[0]}}">{{event[0]}}</option>
+                        {% endfor %}
+                    </select>
+
+
                 </div>
 
                 <!-- amount  -->
@@ -29,61 +45,6 @@
                     <input type="number" class="form-control" name="max_budget" id="max_budget" placeholder="Max" />
                    
                 </div>
-                
-
-                 <!-- <div class="form-group">
-                    <label for="no of participants">Number of participants</label>
-                    <input type="number" class="form-control" id="no of participants" name="no of participants">
-                </div>
-
-                <div class="form-group">
-                    <label for="duration">Duration (in hours)</label>
-                    <input type="number" class="form-control" id="duration" name="duration">
-
-                </div>
-
-                <div class="form-group">
-                    <label for="collection">Collection (in ₹)</label>
-                    <input type="number" class="form-control" id="collection" name="collection">
-
-                </div>
-
-                <div class="form-group">
-                    <label for="expense">Total expense:</label>
-                    <input type="number" class="form-control" id="expense" name="expense">
-                </div>
-
-                <div class="form-group">
-                    <label for="venue_id">Venue ID</label>
-                    <input type="text" class="form-control" id="venue_id" name="venue_id">
-                </div>
-
-                <div class="form-group">
-                    <label for="aadhar">Beneficiary Aadhar Id</label>
-                    <input type="number" class="form-control" id="email" name="aadhar" min="100000000000"
-                        max="999999999999" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="volunteer_email_id">Volunteer email id</label>
-                    <input type="text" class="form-control" id="volunteer_email_id" name="volunteer_email_id" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="donor_email_id">Donor email id</label>
-                    <input type="text" class="form-control" id="donor_email_id" name="donor_email_id" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="trainer_email_id">Trainer email id</label>
-                    <input type="text" class="form-control" id="trainer_email_id" name="trainer_email_id" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="EmployID">Employee Id</label>
-                    <input type="number" class="form-control" id="email" name="EmployID" min="100000000000"
-                        max="999999999999" required>
-                </div> -->
                 <div>
                     <button type="submit" class="btn btn-primary" onclick="" value="">Search</button>
                 </div>
