@@ -419,8 +419,6 @@ def projects():
             print("Search query executed")
             search_results = cur.fetchall()
 
-            # print(search_results)
-
             updated_profile_details = []
             for user in project_details:
                 for result in search_results:
