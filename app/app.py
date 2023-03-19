@@ -345,16 +345,18 @@ def volunteers():
             gender = request.form['gender']
             phone = request.form['phone']
 
-            print(volunteers_name)
-
-
-            # project = request.form['']
+            projectEventName = request.form['project_name']
+            project_start_year = request.form['project_year']
+            print(projectEventName, project_start_year)
 
             add_query = f"INSERT INTO Volunteers (email_id, name, phone_number, date_of_birth, gender) "
             add_query = add_query + f"VALUES (\'{email}\', \'{volunteers_name}\', \'{phone}\', \'{date_of_birth}\', \'{gender}\')"
-            print(add_query)
-
             exec_query = cur.execute(add_query)
+            mysql.connection.commit()
+
+            add_project_query = f"INSERT INTO volunteering (email_id, event_name, start_date) "
+            add_project_query = add_project_query + f"VALUES (\'{email}\', \"{projectEventName}\", (SELECT start_date FROM Projects WHERE event_name = \"{projectEventName}\" AND YEAR(start_date) = \'{project_start_year}\'))"
+            exec_query = cur.execute(add_project_query)
             mysql.connection.commit()
 
             return redirect('/admin/volunteers')
@@ -366,15 +368,27 @@ def volunteers():
             gender = request.form['gender']
             phone = request.form['phone']
 
+            projectEventName = request.form['project_name']
+            project_start_year = request.form['project_year']
+
             edit_query = f"UPDATE Volunteers "
             edit_query = edit_query + f"SET name = \'{volunteers_name}\', email_id = \'{email}\', date_of_birth = \'{date_of_birth}\', gender = \'{gender}\', phone_number = \'{phone}\'"
             edit_query = edit_query + f"WHERE email_id = \'{email}\';"
-            print(edit_query)
-
             exec_query = cur.execute(edit_query)
             mysql.connection.commit()
+
+            # check if the email_id, project, date exists
+            check_query = f"SELECT * FROM volunteering WHERE email_id = \'{email}\' AND event_name = \"{projectEventName}\" AND start_date = (SELECT start_date FROM Projects WHERE event_name = \"{projectEventName}\" AND YEAR(start_date) = \'{project_start_year}\');"
+            exec_query = cur.execute(check_query)
+            check_result = cur.fetchall()
+            if len(check_result) == 0:
+                add_project_query = f"INSERT INTO volunteering (email_id, event_name, start_date) "
+                add_project_query = add_project_query + f"VALUES (\'{email}\', \"{projectEventName}\", (SELECT start_date FROM Projects WHERE event_name = \"{projectEventName}\" AND YEAR(start_date) = \'{project_start_year}\'))"
+                exec_query = cur.execute(add_project_query)
+                mysql.connection.commit()
+                print("Trainer added to project")
+
             return redirect('/admin/volunteers')
-            print("edit")
 
         elif request.form['signal'] == 'delete':
             print("delete filled!")
@@ -604,7 +618,7 @@ def trainers():
 
             return redirect('/admin/trainers')
 
-        # editing trainers (done)
+            # editing trainers (done)
         elif request.form['signal'] == 'editUser':
             name = request.form['name']
             email_id = request.form['email_id']
@@ -626,12 +640,23 @@ def trainers():
             exec_query = cur.execute(edit_query)
             mysql.connection.commit()
 
-            #update project on email_id
-            edit_project_query = f"UPDATE trains "
-            edit_project_query = edit_project_query + f"SET event_name = \"{projectEventName}\", start_date = (SELECT start_date FROM Projects WHERE event_name = \"{projectEventName}\" AND YEAR(start_date) = \'{project_start_year}\') WHERE email_id = \'{email_id}\';"
-            print(edit_project_query)
-            exec_query = cur.execute(edit_project_query)
-            mysql.connection.commit()
+            # check if the email_id, project, date exists
+            check_query = f"SELECT * FROM trains WHERE email_id = \'{email_id}\' AND event_name = \"{projectEventName}\" AND start_date = (SELECT start_date FROM Projects WHERE event_name = \"{projectEventName}\" AND YEAR(start_date) = \'{project_start_year}\');"
+            exec_query = cur.execute(check_query)
+            check_result = cur.fetchall()
+            if len(check_result) == 0:
+                add_project_query = f"INSERT INTO trains (email_id, event_name, start_date) "
+                add_project_query = add_project_query + f"VALUES (\'{email_id}\', \"{projectEventName}\", (SELECT start_date FROM Projects WHERE event_name = \"{projectEventName}\" AND YEAR(start_date) = \'{project_start_year}\'))"
+                exec_query = cur.execute(add_project_query)
+                mysql.connection.commit()
+                print("Trainer added to project")
+
+            # #update project on email_id
+            # edit_project_query = f"UPDATE trains "
+            # edit_project_query = edit_project_query + f"SET event_name = \"{projectEventName}\", start_date = (SELECT start_date FROM Projects WHERE event_name = \"{projectEventName}\" AND YEAR(start_date) = \'{project_start_year}\') WHERE email_id = \'{email_id}\';"
+            # print(edit_project_query)
+            # exec_query = cur.execute(edit_project_query)
+            # mysql.connection.commit()
 
             return redirect('/admin/trainers')
 

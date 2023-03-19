@@ -194,17 +194,18 @@
                             <input type="tel" class="form-control" id="phone_edit" name="phone" required />
                         </div>
 
-                        <!-- project and year to fund to -->
-                        <label for="project_name_eidt">Project</label>
-                        <div class="form-group d-flex justify-content-between align-items-center">
-                            <select class="form-control flex-item" style="width: 48%;" id="project_name_eidt"
-                                name="project_name" placeholder="Project Name">
-                                <option value="Sewing">Sewing</option>
-                                <option value="Cooking">Cooking</option>
+                        <div class="form-group">
+                        <!-- project and year -->
+                        <div class="form-group d-flex flex-row justify-content-between align-items-center" style="width: 100%">
+                            <label for="project_name">Project</label>
+                            <select class="form-control mx-4" id="project_name" name="project_name" placeholder="Project Name">
+                                {% for project in projects %}
+                                <option value="{{project[0]}}">{{project[0]}}</option>
+                                {% endfor %}
                             </select>
-                            <input type="number" class="form-control flex-item" style="width: 48%;" name="year"
-                                placeholder="Year" min="2008" />
+                            <input type="number" class="form-control" id="project_year" name="project_year" placeholder="Year" min="2008" />
                         </div>
+                      </div>
 
 
                         <!-- cancel and save changes-->
@@ -269,17 +270,18 @@
                             <input type="tel" class="form-control" id="phone_add" name="phone" required />
                         </div>
 
-                        <!-- project and year to volunteer to -->
-                        <label for="project_name_eidt">Project</label>
-                        <div class="form-group d-flex justify-content-between align-items-center">
-                            <select class="form-control flex-item" style="width: 48%;" id="project_name_eidt"
-                                name="project_name" placeholder="Project Name">
-                                <option value="Sewing">Sewing</option>
-                                <option value="Cooking">Cooking</option>
-                            </select>
-                            <input type="number" class="form-control flex-item" style="width: 48%;" name="year"
-                                placeholder="Year" min="2008" />
-                        </div>
+                        <div class="form-group">
+                        <!-- project and year -->
+                            <div class="form-group d-flex flex-row justify-content-between align-items-center" style="width: 100%">
+                                <label for="project_name">Project</label>
+                                <select class="form-control mx-4" id="project_name" name="project_name" placeholder="Project Name">
+                                    {% for project in projects %}
+                                    <option value="{{project[0]}}">{{project[0]}}</option>
+                                    {% endfor %}
+                                </select>
+                                <input type="number" class="form-control" id="project_year" name="project_year" placeholder="Year" min="2008" />
+                            </div>
+                      </div>
 
 
                         <!-- cancel and save changes-->
