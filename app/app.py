@@ -58,49 +58,71 @@ def funding():
             # user_profile['start_date'] = 'NA'
             user_profile['projects'] = ()
 
+        
+
         if(len(calculate_events) > 0):
             user_profile['events'] = calculate_events
         else:
             user_profile['events'] = ()
 
         # print(len(calculate_events))
-        print(user_profile['events'])
+        # print(user_profile['events'])
         profileDetails.append(user_profile)
     if (request.method == 'POST'):
         if request.form['signal'] == 'search':
-            pass
-            name = request.form['name']
-            aadhar = request.form['aadhar']
-            dob = request.form['dob']
+            # pass
+            benefactor = request.form['benefactor']
+            email = request.form['email']
+            amount = request.form['max_amount']
+            # date = request.form['funding_date']
+            year = request.form['year']
+            funding_to = request.form['project_name']
+            min_amount = request.form['min_amount']
+            max_amount = request.form['max_amount']
 
-            where_query = f"SELECT * FROM Beneficiary "
+            where_query = f" SELECT * FROM Funding"
             flag = False
-            if name != '':
+            
+            if benefactor != '':
                 if flag == False:
-                    where_query += f"WHERE name = \"{name}\""
+                    where_query +=  f" WHERE funder_name = \'{benefactor}\' "
                 else:
-                    where_query += f"name = \"{name}\""
+                    where_query += f"funder_name = \"{benefactor}\""
                 flag = True
-
-            if aadhar != '':
+            if email != '':
                 if flag == False:
-                    where_query += f"WHERE aadhar_id = \'{aadhar}\'"
+                    where_query += f" WHERE email_id = \'{email}\' "
                 else:
-                    where_query += f" AND aadhar_id = \'{aadhar}\'"
+                    where_query += f" AND email_id = \"{email}\""
                 flag = True
-
-            if dob != '':
+            if min_amount != '' and max_amount != '':
                 if flag == False:
-                    where_query += f"WHERE date_of_birth = \'{dob}\'"
+                    where_query += f" WHERE amount BETWEEN \'{min_amount}\' AND \'{max_amount}\'"
                 else:
-                    where_query += f" AND date_of_birth = \'{dob}\'"
+                    where_query += f" AND amount BETWEEN \'{min_amount}\' AND \'{max_amount}\'"
                 flag = True
+            
+            if year != '':
+                if flag == False:
+                    where_query += f" WHERE YEAR(date) = {year}"
+                else:
+                    where_query += f" AND YEAR(date) = {year}"
+                flag = True
+            
 
             exec_query = cur.execute(where_query)
-            if exec_query > 0:
-                search_results = cur.fetchall()
-            mysql.connection.commit()
-            return render_template('admin/user.html', userDetails=userDetails, searchResults=search_results)
+            search_results = cur.fetchall()
+            print(search_results)
+            
+            updated_profile_details = []
+            for user in profileDetails:
+                for result in search_results:
+                    print("email", result[0])
+                    if user['email'] == result[0]:
+                        updated_profile_details.append(user)
+            profileDetails = updated_profile_details
+            
+            return render_template('admin/funding.html', userDetails=userDetails, searchResults=(), profileDetails = profileDetails)
         elif request.form['signal'] == 'add':
             print(request.form)
             print("addDetails filled!")
@@ -109,6 +131,7 @@ def funding():
             amount = request.form['amount_add']
             email = request.form['email']
             date = request.form['funding_date']
+            
             funding_to = request.form['project']
             
             add_query = f"INSERT INTO Funding (email_id, amount, funder_name, date) "
@@ -144,7 +167,7 @@ def funding():
             mysql.connection.commit()
             return redirect('/admin/funding')
         # print(profileDetails)
-    return render_template('admin/funding.html', userDetails=userDetails, profileDetails = profileDetails, calculate_events = calculate_events)
+    return render_template('admin/funding.html', userDetails=userDetails, profileDetails = profileDetails, calculate_events = calculate_events,calculate_sponsors = calculate_sponsors)
 
 
 @app.route("/admin/volunteers")

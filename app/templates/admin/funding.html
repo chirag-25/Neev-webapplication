@@ -1,6 +1,7 @@
 {% extends 'layout.html'%} {% block content %}
 <div class="container">
     <h1>Funding Details</h1>
+
     <!-- search form -->
     <div class="container" style="width: 60%">
         <form name="searchForm" method="POST">
@@ -32,10 +33,11 @@
                 <div class="form-group d-flex flex-row justify-content-between align-items-center" style="width: 100%">
                     <label for="project_name">Project</label>
                     <select class="form-control mx-4" id="project_name" name="project_name" placeholder="Project Name">
-                        <option value="Sewing">Sewing</option>
-                        <option value="Cooking">Cooking</option>
+                        {% for project in calculate_events %}
+                        <option value="{{project[0]}}">{{project[0]}}</option>
+                        {% endfor %}
                     </select>
-                    <input type="number" class="form-control" id="year" placeholder="Year" min="2008" />
+                    <input type="number" class="form-control" id="year" placeholder="Year" min="2000" name="year" />
                 </div>
             </div>
 
@@ -71,7 +73,7 @@
         <!-- dummy data -->
         <tbody>
             {% for user in profileDetails %}
-            
+
             <!-- print(user) -->
             <!-- print({{user['benefactor']}})
             print({{user['email']}})
@@ -93,52 +95,52 @@
                         onclick="delete_user(this)">
                         Delete
                     </button>
-                    <button type="button" class="btn btn-success btn-sm" data-toggle="modal"
-                        data-target="#profileModal" onclick="addUserToModal(this)">
+                    <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#profileModal"
+                        onclick="addUserToModal(this)">
                         More Details
                     </button>
                 </td>
                 <td headers="projects" style="display:none;">
                     <table class="table">
                         <thead>
-                          <tr>
-                            <th scope="col">Sr: No</th>
-                            <th scope="col">Event/Project</th>
-                            <th scope="col"> Date</th>
-                            <th scope="col">Amount</th>
-                          </tr>
+                            <tr>
+                                <th scope="col">Sr: No</th>
+                                <th scope="col">Event/Project</th>
+                                <th scope="col"> Date</th>
+                                <th scope="col">Amount</th>
+                            </tr>
                         </thead>
                         <tbody id="">
                             {% for project in user['projects'] %}
-                          <tr>
-                              
+                            <tr>
+
                                 <th scope="row">{{ loop.index }}</th>
                                 <td>{{project[1]}}</td>
                                 <td>{{project[2]}}</td>
-                                <td id="add_amount">{{project[0]}}</td>
-                              
-                          </tr>
-                          {% endfor %}
+                                <td class="add_amount_table">10000</td>
+
+                            </tr>
+                            {% endfor %}
                         </tbody>
-                  </table>
+                    </table>
                 </td>
-                <td headers = "events" style="display:none;" >
+                <td headers="events" style="display:none;">
                     <table class="table">
                         <thead>
-                          <tr>
-                            <th scope="col">Event Name</th>
-                            <th scope="col">Start date</th>
-                            <th scope="col"> Types</th>
-                            <th scope="col">Budget</th>
-                            <th scope="col">No. of participants</th>
-                            <th scope="col">Duration</th>
-                            <th scope="col">Collection</th>
-                            <th scope="col">Total Expense</th>
-                          </tr>
+                            <tr>
+                                <th scope="col">Event Name</th>
+                                <th scope="col">Start date</th>
+                                <th scope="col"> Types</th>
+                                <th scope="col">Budget</th>
+                                <th scope="col">No. of participants</th>
+                                <th scope="col">Duration</th>
+                                <th scope="col">Collection</th>
+                                <th scope="col">Total Expense</th>
+                            </tr>
                         </thead>
                         <tbody id="">
                             {% for event in user['events'] %}
-                          <tr>
+                            <tr>
                                 <td>{{event[0]}}</td>
                                 <td>{{event[1]}}</td>
                                 <td>{{event[2]}}</td>
@@ -147,11 +149,11 @@
                                 <td>{{event[5]}}</td>
                                 <td>{{event[6]}}</td>
                                 <td>{{event[7]}}</td>
-                          
-                          </tr>
-                          {% endfor %}
+
+                            </tr>
+                            {% endfor %}
                         </tbody>
-                  </table>
+                    </table>
                 </td>
             </tr>
             {%endfor%}
@@ -268,7 +270,7 @@
                             <select class="form-control" id="project_add" name="project">
                                 <option disabled selected value>-- select an option --</option>
                                 {% for project in calculate_events %}
-                                <option value="{{project[0]}}" id = "addProjectName">{{project[0]}}</option>
+                                <option value="{{project[0]}}" id="addProjectName">{{project[0]}}</option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -339,10 +341,10 @@
                 <div class="modal-body ">
                     <div class="row">
                         <div class="col-md-8">
-                            <h3 class = "name_modal">Ronaldo</h3>
+                            <h3 class="name_modal">Ronaldo</h3>
                             <!-- <p>Email: <span class="email_modal">ronaldo@gmail.com</span></p> -->
                             <p class="email_modal">Email: ronaldo@gmail.com</p>
-                             <h4>Projects Funded</h4>
+                            <h4>Projects Funded</h4>
                             <!-- <h4 id="projects-header">Projects Funded</h4> -->
                             <!-- <form id="myForm" method="POST">
                                 <input type="hidden" name="signal" value="moreDetails">
@@ -350,7 +352,7 @@
                                 <input type="hidden" name="benefactor" value="">
                             </form> -->
                         </div>
-                        <table class="table mx-3" style="width: 100%;" id = "profile_project_table">
+                        <table class="table mx-3" style="width: 100%;" id="profile_project_table">
                             <thead>
                                 <tr>
                                     <th scope="col">SrNo</th>
@@ -360,13 +362,14 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                 
                                 <tr>
                                     <th scope="row">1</th>
                                     <td>Sewing Workshop</td>
                                     <td>2020-10-20</td>
                                     <td>10000</td>
                                 </tr>
-                                
+
                             </tbody>
                             <tbody>
                                 <tr>
@@ -424,6 +427,7 @@
         let benefactor = p.querySelector("td[headers='benefactor']").innerHTML;
         let projects = p.querySelector('td[headers="projects"]').innerHTML;
         let amount = p.querySelector('td[headers="amount"]').innerHTML;
+        console.log(amount)
         console.log(email)
         console.log(benefactor)
 
@@ -432,8 +436,11 @@
         nameModal.innerHTML = benefactor;
         emailModal.innerHTML = email;
 
-        // const addAmount = document.querySelector('#addAmount');
-        // addAmount.innerHTML = amount;
+        // Change the amount in the modal
+        // const Amount = document.querySelector('.add_amount_table');
+        // console.log(Amount)
+        // Amount.innerHTML = amount;
+
         document.querySelector("#profile_project_table").innerHTML = projects;
 
         // Submit a hidden form to get email and name on Flask server
