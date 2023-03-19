@@ -20,7 +20,7 @@ def home():
     return render_template("home.html")
     # return render_template("admin/volunteers.html")
 
-@app.route("/login",methods=['GET','POST'])
+@app.route("/login", methods=['GET','POST'])
 def login():
     if(request.method=='POST'):
         employee_form=request.form
@@ -34,6 +34,174 @@ def admin():
 @app.route("/admin/funding")
 def funding():
     return render_template("admin/funding.html")
+
+@app.route("/admin/trainers", methods=['GET','POST'])
+def trainers():
+    cur = mysql.connection.cursor()
+    result_value = cur.execute("SELECT * FROM Trainers")
+
+    if result_value > 0:
+        userDetails = cur.fetchall()
+
+    # Adding trainers (done)
+    if (request.method == 'POST'):
+        if request.form['signal'] == 'addUser':
+            print(request.form)
+            print("addDetails filled!")
+
+            name = request.form['name']
+            email_id = request.form['email_id']
+            phoneNumber = request.form['phoneNumber']
+            gender = request.form['gender']
+            age = request.form['age']
+            fee = request.form['fee']
+            projectEventName = request.form['projectEventName']
+            beneficiaryAadharId = request.form['beneficiaryAadharId']
+            beneficiaryName = request.form['beneficiaryName']
+
+            print(name)
+
+
+            # project = request.form['']
+
+            add_query = f"INSERT INTO Trainers (email_id, fee, name, age, gender) "
+            add_query = add_query + f"VALUES (\'{email_id}\', \'{fee}\', \'{name}\', \'{age}\', \'{gender}\');"
+            print(add_query)
+
+            exec_query = cur.execute(add_query)
+            mysql.connection.commit()
+
+            return redirect('/admin/trainers')
+
+
+        # editing trainers (done)
+        elif request.form['signal'] == 'editUser':
+            name = request.form['name']
+            email_id = request.form['email_id']
+            phoneNumber = request.form['phoneNumber']
+            gender = request.form['gender']
+            age = request.form['age']
+            fee = request.form['fee']
+            projectEventName = request.form['projectEventName']
+            beneficiaryAadharId = request.form['beneficiaryAadharId']
+            beneficiaryName = request.form['beneficiaryName']
+
+            # updated based on email_id
+            edit_query = f"UPDATE Trainers "
+            edit_query = edit_query + f"SET email_id = \'{email_id}\', fee = \'{fee}\', name = \'{name}\', age = \'{age}\', gender = \'{gender}\'"
+            edit_query = edit_query + f"WHERE email_id = \'{email_id}\';"
+            print(edit_query)
+
+            exec_query = cur.execute(edit_query)
+            mysql.connection.commit()
+            return redirect('/admin/trainers')
+            print("edit")
+
+        # delete the trainer (done)
+        elif request.form['signal'] == 'delete':
+            print("delete filled!")
+            email_id = request.form['email_id']
+
+            # delete operation considering event_name and start_date
+            delete_query = f"DELETE FROM Trainers WHERE email_id = \'{email_id}\';"
+
+            print(delete_query)
+
+            exec_query = cur.execute(delete_query)
+            mysql.connection.commit()
+            return redirect('/admin/trainers')
+
+
+    return render_template("admin/trainers.html", userDetails=userDetails)
+
+
+
+@app.route("/admin/village_profile", methods=['POST', 'GET'])
+def village_profile():
+    cur = mysql.connection.cursor()
+    result_value = cur.execute("SELECT * FROM VillageProfile")
+
+    if result_value > 0:
+        userDetails = cur.fetchall()
+
+    # Adding village profile (deal with the year variable)
+    if (request.method == 'POST'):
+        if request.form['signal'] == 'addUser':
+            print(request.form)
+            print("addDetails filled!")
+
+            pinCode = request.form['pinCode']
+            name = request.form['name']
+            noOfBeneficiaries = request.form['noOfBeneficiaries']
+            noOfHealthCenters = request.form['noOfHealthCenters']
+            noOfSchools = request.form['noOfSchools']
+            transport = request.form['transport']
+            infrastructure = request.form['infrastructure']
+            occupation = request.form['occupation']
+            technical_literacy = request.form['technical_literacy']
+            year = request.form['year']
+            beneficiaryAadharId = request.form['beneficiaryAadharId']
+            beneficiaryName = request.form['beneficiaryName']
+
+            print(pinCode)
+
+
+            # project = request.form['']
+
+            add_query = f"INSERT INTO VillageProfile (pincode, name, no_of_beneficiaries, no_of_primary_health_center, no_of_primary_school, transport, infrastructure, major_occupation, technical_literacy, year) "
+            add_query = add_query + f"VALUES (\'{pinCode}\', \'{name}\', \'{noOfBeneficiaries}\', \'{noOfHealthCenters}\', \'{noOfSchools}\', \'{transport}\', \'{infrastructure}\', \'{occupation}\', \'{technical_literacy}\', \'{year}\');"
+            print(add_query)
+
+            exec_query = cur.execute(add_query)
+            mysql.connection.commit()
+
+            return redirect('/admin/village_profile')
+
+
+        # editing village profile (deal with the year variable)
+        elif request.form['signal'] == 'editUser':
+            pinCode = request.form['pinCode']
+            name = request.form['name']
+            noOfBeneficiaries = request.form['noOfBeneficiaries']
+            noOfHealthCenters = request.form['noOfHealthCenters']
+            noOfSchools = request.form['noOfSchools']
+            transport = request.form['transport']
+            infrastructure = request.form['infrastructure']
+            occupation = request.form['occupation']
+            technical_literacy = request.form['technical_literacy']
+            year = request.form['year']
+            beneficiaryAadharId = request.form['beneficiaryAadharId']
+            beneficiaryName = request.form['beneficiaryName']
+
+
+            # updated based on pincode
+            edit_query = f"UPDATE VillageProfile "
+            edit_query = edit_query + f"SET pincode = \'{pinCode}\', name = \'{name}\', no_of_beneficiaries = \'{noOfBeneficiaries}\', no_of_primary_health_center = \'{noOfHealthCenters}\', no_of_primary_school = \'{noOfSchools}\', transport = \'{transport}\', infrastructure = \'{infrastructure}\', major_occupation = \'{occupation}\', technical_literacy = \'{technical_literacy}\', year = \'{year}\'"
+            edit_query = edit_query + f"WHERE pincode = \'{pinCode}\';"
+            print(edit_query)
+
+            exec_query = cur.execute(edit_query)
+            mysql.connection.commit()
+            return redirect('/admin/village_profile')
+            print("edit")
+
+        # delete the village profile (completed)
+        elif request.form['signal'] == 'delete':
+            print("delete filled!")
+            pinCode = request.form['pinCode']
+
+            # delete operation considering event_name and start_date
+            delete_query = f"DELETE FROM VillageProfile WHERE pincode = \'{pinCode}\';"
+
+            print(delete_query)
+
+            exec_query = cur.execute(delete_query)
+            mysql.connection.commit()
+            return redirect('/admin/village_profile')        
+
+
+    return render_template("admin/village_profile.html", userDetails=userDetails)
+
 
 @app.route("/admin/projects", methods=['POST', 'GET'])
 def projects():
@@ -66,11 +234,6 @@ def projects():
 
             print(event_name)
 
-
-            # project = request.form['']
-
-            #  (, start_date, types, budget, no_of_participants, duration, collection, total_expense)
-
             add_query = f"INSERT INTO Projects (event_name, start_date, types, budget, no_of_participants, duration, collection, total_expense) "
             add_query = add_query + f"VALUES (\'{event_name}\', \'{date}\', \'{Types}\', \'{budget}\', \'{participants}\', \'{duration}\', \'{collection}\', \'{expense}\');"
             print(add_query)
@@ -98,7 +261,7 @@ def projects():
             Types = request.form['types']
 
 
-            # updated based on event_name  (confirm it)
+            # updated based on event_name and start_date
             edit_query = f"UPDATE Projects "
             edit_query = edit_query + f"SET event_name = \'{event_name}\', start_date = \'{date}\', types = \'{Types}\', budget = \'{budget}\', no_of_participants = \'{participants}\', duration = \'{duration}\', collection = \'{collection}\', total_expense = \'{expense}\'"
             edit_query = edit_query + f"WHERE event_name = \'{event_name}\' and start_date = \'{date}\';"
