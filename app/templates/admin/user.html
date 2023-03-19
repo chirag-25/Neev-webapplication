@@ -195,7 +195,7 @@
 
             <div class="form-group">
               <label for="aadhar">Aadhar Id</label>
-              <input type="number" class="form-control" id="email" name="aadhar" min="100000000000" max="999999999999" required>
+              <input type="number" class="form-control" id="email" name="aadhar" min="100000000000" max="999999999999" readonly>
             </div>
 
             <div class="form-group">
@@ -233,15 +233,29 @@
               </select>
             </div>
 
-              <div class="form-group">
-              <label for="id">Enroll in New Event:</label>
-              <select class="form-control" id="od" name="project">
-                <option value="" selected>--Select New Event--</option>
-                {% for project in projects %}
-                    <option value="{{project[0]}}">{{project[0]}}</option>
-                {% endfor %}
-              </select>
-            </div>
+{#              <div class="form-group">#}
+{#              <label for="id">Enroll in New Event:</label>#}
+{#              <select class="form-control" id="od" name="project">#}
+{#                <option value="" selected>--Select New Event--</option>#}
+{#                {% for project in projects %}#}
+{#                    <option value="{{project[0]}}">{{project[0]}}</option>#}
+{#                {% endfor %}#}
+{#              </select>#}
+{#            </div>#}
+
+          <div class="form-group">
+            <!-- project and year -->
+                <div class="form-group d-flex flex-row justify-content-between align-items-center" style="width: 100%">
+                    <label for="project_name">Enroll in New Event</label>
+                    <select class="form-control mx-4" id="project_name" name="project_name" placeholder="Project Name">
+                        <option value="" selected>NA</option>
+                        {% for project in projects %}
+                        <option value="{{project[0]}}">{{project[0]}}</option>
+                        {% endfor %}
+                    </select>
+                    <input type="number" class="form-control" id="project_year" name="project_year" placeholder="Year" min="2008" />
+                </div>
+          </div>
 
             <div class="form-group">
               <label for="genderSelect">Village</label>
@@ -338,14 +352,17 @@
             </div>
 
               <div class="form-group">
-              <label for="id">Enroll in Event:</label>
-              <select class="form-control" id="od" name="project">
-                {% for project in projects %}
-                    <option value="{{project[0]}}">{{project[0]}}</option>
-                {% endfor %}
-
-              </select>
-            </div>
+                <!-- project and year -->
+                    <div class="form-group d-flex flex-row justify-content-between align-items-center" style="width: 100%">
+                        <label for="project_name">Enroll in New Event</label>
+                        <select class="form-control mx-4" id="project_name" name="project_name" placeholder="Project Name">
+                            {% for project in projects %}
+                            <option value="{{project[0]}}">{{project[0]}}</option>
+                            {% endfor %}
+                        </select>
+                        <input type="number" class="form-control" id="project_year" name="project_year" placeholder="Year" min="2008" />
+                    </div>
+              </div>
 
             <div class="form-group">
               <label for="genderSelect">Village</label>
