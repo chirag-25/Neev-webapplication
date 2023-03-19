@@ -131,7 +131,7 @@ def funding():
                         updated_profile_details.append(user)
             profileDetails = updated_profile_details
 
-            return render_template('admin/funding.html', userDetails=userDetails, profileDetails=profileDetails, calculate_events = calculate_events)
+            return render_template('admin/funding.html', userDetails=userDetails, profileDetails=profileDetails, calculate_events=calculate_events)
         elif request.form['signal'] == 'add':
             # print(request.form)
             print("addDetails filled!")
@@ -197,15 +197,14 @@ def village_profile():
     village_names_query = f"SELECT DISTINCT name FROM VillageProfile"
     village_names_query_exec = cur.execute(village_names_query)
     village_names = cur.fetchall()
-    
+
     occupation_name_query = f"SELECT DISTINCT major_occupation FROM VillageProfile"
     occupation_name_query_exec = cur.execute(occupation_name_query)
     occupation_names = cur.fetchall()
-    
+
     technical_literacy_query = f"SELECT DISTINCT technical_literacy FROM VillageProfile"
     technical_literacy_query_exec = cur.execute(technical_literacy_query)
     technical_literacy_names = cur.fetchall()
-    
 
     # print(userDetails)
     # Generate the user profile details
@@ -292,11 +291,76 @@ def village_profile():
             profile_details = updated_profile_details
             # print(profileDetails)
         elif (request.form['signal'] == 'editUser'):
+            pinCode = request.form['pinCode']
+            name = request.form['name']
+            noOfBeneficiaries = request.form['noOfBeneficiaries']
+            noOfHealthCenters = request.form['noOfHealthCenters']
+            noOfSchools = request.form['noOfSchools']
+            transport = request.form['transport']
+            infrastructure = request.form['infrastructure']
+            occupation = request.form['occupation']
+            technical_literacy = request.form['technical_literacy']
+            year = request.form['year']
+
+
+            # updated based on pincode
+            edit_query = f"UPDATE VillageProfile "
+            edit_query = edit_query + f"SET pincode = \'{pinCode}\', name = \'{name}\', no_of_beneficiaries = \'{noOfBeneficiaries}\', no_of_primary_health_center = \'{noOfHealthCenters}\', no_of_primary_school = \'{noOfSchools}\', transport = \'{transport}\', infrastructure = \'{infrastructure}\', major_occupation = \'{occupation}\', technical_literacy = \'{technical_literacy}\', year = \'{year}\'"
+            edit_query = edit_query + f"WHERE pincode = \'{pinCode}\';"
+            print(edit_query)
+
+            exec_query = cur.execute(edit_query)
+            mysql.connection.commit()
+            return redirect('/admin/villageprofile')
+            # return render_template('admin/village_profile.html')
+            print("edit")
+
             print("this is edit query")
         elif (request.form['signal'] == 'addUser'):
+            pinCode = request.form['pinCode']
+            name = request.form['name']
+            noOfBeneficiaries = request.form['noOfBeneficiaries']
+            noOfHealthCenters = request.form['noOfHealthCenters']
+            noOfSchools = request.form['noOfSchools']
+            transport = request.form['transport']
+            infrastructure = request.form['infrastructure']
+            occupation = request.form['occupation']
+            technical_literacy = request.form['technical_literacy']
+            year = request.form['year']
+            # beneficiaryAadharId = request.form['beneficiaryAadharId']
+            # beneficiaryName = request.form['beneficiaryName']
+
+            print(pinCode)
+
+            # project = request.form['']
+
+            add_query = f"INSERT INTO VillageProfile (pincode, name, no_of_beneficiaries, no_of_primary_health_center, no_of_primary_school, transport, infrastructure, major_occupation, technical_literacy, year) "
+            add_query = add_query + \
+                f"VALUES (\'{pinCode}\', \'{name}\', \'{noOfBeneficiaries}\', \'{noOfHealthCenters}\', \'{noOfSchools}\', \'{transport}\', \'{infrastructure}\', \'{occupation}\', \'{technical_literacy}\', \'{year}\');"
+            print(add_query)
+
+            exec_query = cur.execute(add_query)
+            mysql.connection.commit()
+
+            return redirect('/admin/villageprofile')
             print("add new data")
-        print(calculate_occupation)
-    return render_template('admin/village_profile.html', profile_details=profile_details, village_names = village_names, occupation_names = occupation_names, technical_literacy_names = technical_literacy_names)
+            
+        elif (request.form['signal'] == 'delete'):
+            pinCode = request.form['pinCode']
+            # print(pinCode)
+
+            # delete operation considering event_name and start_date
+            delete_query = f"DELETE FROM VillageProfile WHERE pincode = \'{pinCode}\';"
+
+            print("DELETE QUERY EXECUTED")
+
+            exec_query = cur.execute(delete_query)
+            print("delete query executed")
+            mysql.connection.commit()
+            
+            return redirect('/admin/villageprofile')        
+
+    return render_template('admin/village_profile.html', profile_details=profile_details, village_names=village_names, occupation_names=occupation_names, technical_literacy_names=technical_literacy_names)
 
 
 @app.route("/admin/volunteers")
@@ -320,7 +384,6 @@ def projects():
     event_name_query_exec = cur.execute(event_name_query)
     event_names = cur.fetchall()
 
-    
     project_details = []
     for project in projectDetails:
         project_profile = {'event_name': project[0], 'start_date': project[1], 'types': project[2], 'budget': project[3],
@@ -406,7 +469,7 @@ def projects():
             type_event = request.form['type_event']
             min_budget = request.form['min_budget']
             max_budget = request.form['max_budget']
-            
+
             where_query = f" SELECT * FROM Projects"
             flag = False
 
@@ -416,7 +479,7 @@ def projects():
                 else:
                     where_query += f"event_name = \"{event_name}\""
                 flag = True
-                
+
             if year != '':
                 if flag == False:
                     where_query += f" WHERE YEAR(start_date) = {year}"
@@ -429,14 +492,14 @@ def projects():
                 else:
                     where_query += f" AND types = \"{type_event}\""
                 flag = True
-                
+
             if min_budget != '' and max_budget != '':
                 if flag == False:
                     where_query += f" WHERE budget BETWEEN \'{min_budget}\' AND \'{max_budget}\'"
                 else:
                     where_query += f" AND budget BETWEEN \'{min_budget}\' AND \'{max_budget}\'"
                 flag = True
-                            
+
             exec_query = cur.execute(where_query)
             print("Search query executed")
             search_results = cur.fetchall()
@@ -447,15 +510,16 @@ def projects():
                     if user['event_name'] == result[0]:
                         updated_profile_details.append(user)
             project_details = updated_profile_details
-            
+
             print("this is search query")
         elif (request.form['signal'] == 'editUser'):
             print("this is edit query")
         elif (request.form['signal'] == 'addUser'):
             print("add new data")
-    return render_template('admin/projects.html', project_details=project_details, project_names = project_names,event_names = event_names)
+    return render_template('admin/projects.html', project_details=project_details, project_names=project_names, event_names=event_names)
 
-@app.route("/admin/trainers", methods=['GET','POST'])
+
+@app.route("/admin/trainers", methods=['GET', 'POST'])
 def trainers():
     cur = mysql.connection.cursor()
     result_value = cur.execute("SELECT * FROM Trainers")
@@ -466,7 +530,8 @@ def trainers():
     profile_details = []
     for user in userDetails:
         # Trainers(email_id, fee, name, age, gender)
-        user_profile = {'email_id': user[0], 'fee': user[1], 'name': user[2], 'age': user[3], 'gender': user[4]}
+        user_profile = {'email_id': user[0], 'fee': user[1],
+                        'name': user[2], 'age': user[3], 'gender': user[4]}
 
         extract_phone_query = f"SELECT phone_number FROM TrainerPhoneEntity WHERE email_id = \'{user[0]}\'"
         extract_projects_query = f"SELECT event_name,start_date FROM trains WHERE email_id = \'{user[0]}\'"
@@ -486,7 +551,8 @@ def trainers():
         else:
             user_profile['projects'] = ()
 
-        extract_beneficiaries_list_query = cur.execute(extract_beneficiaries_list_query)
+        extract_beneficiaries_list_query = cur.execute(
+            extract_beneficiaries_list_query)
         extract_beneficiaries_list = cur.fetchall()
         if len(extract_beneficiaries_list) > 0:
             user_profile['beneficiaries'] = extract_beneficiaries_list
@@ -510,7 +576,6 @@ def trainers():
             max_fee = request.form['max_fee']
             min_age = request.form['min_age']
             max_age = request.form['max_age']
-            
 
             where_query = f"SELECT email_id FROM Trainers "
             flag = False
@@ -534,7 +599,7 @@ def trainers():
                 else:
                     where_query += f" AND gender = \'{gender}\'"
                 flag = True
-                
+
             if min_fee != '' and max_fee != '':
                 if flag == False:
                     where_query += f" WHERE fee BETWEEN \'{min_fee}\' AND \'{max_fee}\'"
@@ -548,8 +613,7 @@ def trainers():
                 else:
                     where_query += f" AND age BETWEEN \'{min_age}\' AND \'{max_age}\'"
                 flag = True
-    
-            
+
             exec_query = cur.execute(where_query)
             search_results = cur.fetchall()
 
@@ -559,10 +623,8 @@ def trainers():
                     if user['email_id'] == result[0]:
                         updated_profile_details.append(user)
             profile_details = updated_profile_details
-            
-            
-            
-            pass 
+
+            pass
         elif request.form['signal'] == 'addUser':
             print('add filled!@')
             name = request.form['name']
@@ -579,13 +641,15 @@ def trainers():
             beneficiaryName = request.form['beneficiaryName']
 
             add_query = f"INSERT INTO Trainers (email_id, fee, name, age, gender) "
-            add_query = add_query + f"VALUES (\'{email_id}\', \'{fee}\', \'{name}\', \'{age}\', \'{gender}\')"
+            add_query = add_query + \
+                f"VALUES (\'{email_id}\', \'{fee}\', \'{name}\', \'{age}\', \'{gender}\')"
             exec_query = cur.execute(add_query)
             mysql.connection.commit()
             print("Trainer added")
 
             add_project_query = f"INSERT INTO trains (email_id, event_name, start_date) "
-            add_project_query = add_project_query + f"VALUES (\'{email_id}\', \"{projectEventName}\", (SELECT start_date FROM Projects WHERE event_name = \"{projectEventName}\" AND YEAR(start_date) = \'{project_start_year}\'))"
+            add_project_query = add_project_query + \
+                f"VALUES (\'{email_id}\', \"{projectEventName}\", (SELECT start_date FROM Projects WHERE event_name = \"{projectEventName}\" AND YEAR(start_date) = \'{project_start_year}\'))"
             exec_query = cur.execute(add_project_query)
             mysql.connection.commit()
             print("Trainer added to project")
@@ -593,7 +657,8 @@ def trainers():
             if beneficiaryAadharId != '':
                 # Insert intoTrainerBeneficiary
                 add_beneficiary_query = f"INSERT INTO TrainerBeneficiary (email_id, aadhar_id) "
-                add_beneficiary_query = add_beneficiary_query + f"VALUES (\'{email_id}\', \'{beneficiaryAadharId}\');"
+                add_beneficiary_query = add_beneficiary_query + \
+                    f"VALUES (\'{email_id}\', \'{beneficiaryAadharId}\');"
                 exec_query = cur.execute(add_project_query)
                 mysql.connection.commit()
 
@@ -616,7 +681,8 @@ def trainers():
 
             # updated based on email_id
             edit_query = f"UPDATE Trainers "
-            edit_query = edit_query + f"SET email_id = \'{email_id}\', fee = \'{fee}\', name = \'{name}\', age = \'{age}\', gender = \'{gender}\'"
+            edit_query = edit_query + \
+                f"SET email_id = \'{email_id}\', fee = \'{fee}\', name = \'{name}\', age = \'{age}\', gender = \'{gender}\'"
             edit_query = edit_query + f"WHERE email_id = \'{email_id}\';"
             exec_query = cur.execute(edit_query)
             mysql.connection.commit()
@@ -625,13 +691,14 @@ def trainers():
             check_query = f"SELECT * FROM trains WHERE email_id = \'{email_id}\' AND event_name = \"{projectEventName}\" AND start_date = (SELECT start_date FROM Projects WHERE event_name = \"{projectEventName}\" AND YEAR(start_date) = \'{project_start_year}\');"
             exec_query = cur.execute(check_query)
             check_result = cur.fetchall()
-            if len(check_result) == 0:   
+            if len(check_result) == 0:
                 add_project_query = f"INSERT INTO trains (email_id, event_name, start_date) "
-                add_project_query = add_project_query + f"VALUES (\'{email_id}\', \"{projectEventName}\", (SELECT start_date FROM Projects WHERE event_name = \"{projectEventName}\" AND YEAR(start_date) = \'{project_start_year}\'))"
+                add_project_query = add_project_query + \
+                    f"VALUES (\'{email_id}\', \"{projectEventName}\", (SELECT start_date FROM Projects WHERE event_name = \"{projectEventName}\" AND YEAR(start_date) = \'{project_start_year}\'))"
                 exec_query = cur.execute(add_project_query)
                 mysql.connection.commit()
                 print("Trainer added to project")
-            
+
             # #update project on email_id
             # edit_project_query = f"UPDATE trains "
             # edit_project_query = edit_project_query + f"SET event_name = \"{projectEventName}\", start_date = (SELECT start_date FROM Projects WHERE event_name = \"{projectEventName}\" AND YEAR(start_date) = \'{project_start_year}\') WHERE email_id = \'{email_id}\';"
@@ -654,12 +721,8 @@ def trainers():
             exec_query = cur.execute(delete_query)
             mysql.connection.commit()
             return redirect('/admin/trainers')
-        
-
 
     return render_template("admin/trainers.html", profile_details=profile_details, projects=projects)
-
-
 
 
 @app.route("/admin/user", methods=['POST', 'GET'])
@@ -670,11 +733,11 @@ def user():
     if result_value > 0:
         userDetails = cur.fetchall()
 
-
     # Generate the user profile details
     profile_details = []
     for user in userDetails:
-        user_profile = {'aadhar':user[0], 'name':user[1], 'dob':user[2], 'gender':user[3], 'martial':user[4], 'education':user[5], 'photo':user[6], 'employed':user[7], 'photo_caption':user[8]}
+        user_profile = {'aadhar': user[0], 'name': user[1], 'dob': user[2], 'gender': user[3], 'martial': user[4],
+                        'education': user[5], 'photo': user[6], 'employed': user[7], 'photo_caption': user[8]}
         calculate_age_query = f"SELECT TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) FROM Beneficiary WHERE aadhar_id = \'{user[0]}\'"
         extract_village_query = f"SELECT pincode, name FROM VillageProfile WHERE pincode = (SELECT pincode FROM belongs WHERE aadhar_id = \'{user[0]}\')"
         extract_enrolled_projects_query = f"SELECT * FROM participants WHERE aadhar_id = \'{user[0]}\'"
@@ -686,7 +749,8 @@ def user():
         extract_village = cur.execute(extract_village_query)
         extract_village = cur.fetchall()
 
-        extract_enrolled_projects = cur.execute(extract_enrolled_projects_query)
+        extract_enrolled_projects = cur.execute(
+            extract_enrolled_projects_query)
         extract_enrolled_projects = cur.fetchall()
 
         extract_phone = cur.execute(extract_phone_query)
@@ -713,7 +777,6 @@ def user():
             user_profile['phone'] = extract_phone[0][0]
         else:
             user_profile['phone'] = 'NA'
-
 
         profile_details.append(user_profile)
 
@@ -851,26 +914,30 @@ def user():
             project = request.form['project']
 
             add_query = f"INSERT INTO Beneficiary (aadhar_id, name, date_of_birth, gender, marital_status, education, photo, employed, photo_caption) "
-            add_query = add_query + f"VALUES ({aadhar}, \"{name}\", \'{dob}\', \'{gender}\', \'{martial}\', \'{education}\', NULL, \"{employed}\", NULL)"
+            add_query = add_query + \
+                f"VALUES ({aadhar}, \"{name}\", \'{dob}\', \'{gender}\', \'{martial}\', \'{education}\', NULL, \"{employed}\", NULL)"
             exec_query = cur.execute(add_query)
             mysql.connection.commit()
 
             # Add phone_number query
             add_phone_query = f"INSERT INTO BeneficiaryPhoneEntity (aadhar_id, phone_number) "
-            add_phone_query = add_phone_query + f"VALUES ({aadhar}, \"{phone_number}\")"
+            add_phone_query = add_phone_query + \
+                f"VALUES ({aadhar}, \"{phone_number}\")"
             exec_query = cur.execute(add_phone_query)
             mysql.connection.commit()
 
             # Add village query
             add_village_query = f"INSERT INTO belongs (aadhar_id, pincode) "
-            add_village_query = add_village_query + f"VALUES ({aadhar}, (SELECT pincode FROM VillageProfile WHERE name = \"{village}\"))"
+            add_village_query = add_village_query + \
+                f"VALUES ({aadhar}, (SELECT pincode FROM VillageProfile WHERE name = \"{village}\"))"
             exec_query = cur.execute(add_village_query)
             mysql.connection.commit()
 
             # Add project query
             add_project_query = f"INSERT INTO participants (aadhar_id, event_name, start_date) "
             # assumption is taken here that beneficiary can only participate in current year's project
-            add_project_query = add_project_query + f"VALUES ({aadhar}, \"{project}\", (SELECT start_date FROM Projects WHERE event_name = \"{project}\" AND YEAR(start_date) = YEAR(CURDATE())))"
+            add_project_query = add_project_query + \
+                f"VALUES ({aadhar}, \"{project}\", (SELECT start_date FROM Projects WHERE event_name = \"{project}\" AND YEAR(start_date) = YEAR(CURDATE())))"
             exec_query = cur.execute(add_project_query)
             mysql.connection.commit()
 
@@ -889,7 +956,8 @@ def user():
             project = request.form['project']
 
             edit_query = f"UPDATE Beneficiary "
-            edit_query = edit_query + f"SET name = \'{name}\', date_of_birth = \'{dob}\', gender = \'{gender}\', marital_status = \'{martial}\', education = \'{education}\', photo = NULL, employed = \"{employed}\", photo_caption = NULL "
+            edit_query = edit_query + \
+                f"SET name = \'{name}\', date_of_birth = \'{dob}\', gender = \'{gender}\', marital_status = \'{martial}\', education = \'{education}\', photo = NULL, employed = \"{employed}\", photo_caption = NULL "
             edit_query = edit_query + f"WHERE aadhar_id = {aadhar}"
             exec_query = cur.execute(edit_query)
             mysql.connection.commit()
@@ -897,21 +965,25 @@ def user():
             # Update phone_number, village and project if provided
             if phone_number != '':
                 add_phone_query = f"INSERT INTO BeneficiaryPhoneEntity (aadhar_id, phone_number) "
-                add_phone_query = add_phone_query + f"VALUES ({aadhar}, \"{phone_number}\")"
+                add_phone_query = add_phone_query + \
+                    f"VALUES ({aadhar}, \"{phone_number}\")"
                 exec_query = cur.execute(add_phone_query)
                 mysql.connection.commit()
 
             if village != '':
                 edit_village_query = f"UPDATE belongs "
-                edit_village_query = edit_village_query + f"SET pincode = (SELECT pincode FROM VillageProfile WHERE name = \"{village}\") "
-                edit_village_query = edit_village_query + f"WHERE aadhar_id = {aadhar}"
+                edit_village_query = edit_village_query + \
+                    f"SET pincode = (SELECT pincode FROM VillageProfile WHERE name = \"{village}\") "
+                edit_village_query = edit_village_query + \
+                    f"WHERE aadhar_id = {aadhar}"
                 exec_query = cur.execute(edit_village_query)
                 mysql.connection.commit()
 
             if project != '':
                 add_project_query = f"INSERT INTO participants (aadhar_id, event_name, start_date) "
                 # assumption is taken here that beneficiary can only participate in current year's project
-                add_project_query = add_project_query + f"VALUES ({aadhar}, \"{project}\", (SELECT start_date FROM Projects WHERE event_name = \"{project}\" AND YEAR(start_date) = YEAR(CURDATE())))"
+                add_project_query = add_project_query + \
+                    f"VALUES ({aadhar}, \"{project}\", (SELECT start_date FROM Projects WHERE event_name = \"{project}\" AND YEAR(start_date) = YEAR(CURDATE())))"
                 exec_query = cur.execute(add_project_query)
                 mysql.connection.commit()
 
@@ -927,8 +999,6 @@ def user():
 
     return render_template('admin/user.html', searchResults=tuple(), profile_details=profile_details, projects=projects, villages=villages, education_list=education_list)
     # return render_template('admin/user.html')
-
-
 
 
 if __name__ == '__main__':
