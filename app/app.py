@@ -131,7 +131,7 @@ def funding():
                         updated_profile_details.append(user)
             profileDetails = updated_profile_details
 
-            return render_template('admin/funding.html', userDetails=userDetails, profileDetails=profileDetails)
+            return render_template('admin/funding.html', userDetails=userDetails, profileDetails=profileDetails, calculate_events = calculate_events)
         elif request.form['signal'] == 'add':
             # print(request.form)
             print("addDetails filled!")
@@ -607,7 +607,10 @@ def trainers():
             gender = request.form['gender']
             age = request.form['age']
             fee = request.form['fee']
-            projectEventName = request.form['projectEventName']
+
+            projectEventName = request.form['project_name']
+            project_start_year = request.form['project_year']
+
             beneficiaryAadharId = request.form['beneficiaryAadharId']
             beneficiaryName = request.form['beneficiaryName']
 
@@ -615,12 +618,28 @@ def trainers():
             edit_query = f"UPDATE Trainers "
             edit_query = edit_query + f"SET email_id = \'{email_id}\', fee = \'{fee}\', name = \'{name}\', age = \'{age}\', gender = \'{gender}\'"
             edit_query = edit_query + f"WHERE email_id = \'{email_id}\';"
-            print(edit_query)
-
             exec_query = cur.execute(edit_query)
             mysql.connection.commit()
+
+            # check if the email_id, project, date exists
+            check_query = f"SELECT * FROM trains WHERE email_id = \'{email_id}\' AND event_name = \"{projectEventName}\" AND start_date = (SELECT start_date FROM Projects WHERE event_name = \"{projectEventName}\" AND YEAR(start_date) = \'{project_start_year}\');"
+            exec_query = cur.execute(check_query)
+            check_result = cur.fetchall()
+            if len(check_result) == 0:   
+                add_project_query = f"INSERT INTO trains (email_id, event_name, start_date) "
+                add_project_query = add_project_query + f"VALUES (\'{email_id}\', \"{projectEventName}\", (SELECT start_date FROM Projects WHERE event_name = \"{projectEventName}\" AND YEAR(start_date) = \'{project_start_year}\'))"
+                exec_query = cur.execute(add_project_query)
+                mysql.connection.commit()
+                print("Trainer added to project")
+            
+            # #update project on email_id
+            # edit_project_query = f"UPDATE trains "
+            # edit_project_query = edit_project_query + f"SET event_name = \"{projectEventName}\", start_date = (SELECT start_date FROM Projects WHERE event_name = \"{projectEventName}\" AND YEAR(start_date) = \'{project_start_year}\') WHERE email_id = \'{email_id}\';"
+            # print(edit_project_query)
+            # exec_query = cur.execute(edit_project_query)
+            # mysql.connection.commit()
+
             return redirect('/admin/trainers')
-            print("edit")
 
         # delete the trainer (done)
         elif request.form['signal'] == 'delete':

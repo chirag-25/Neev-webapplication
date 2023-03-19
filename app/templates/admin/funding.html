@@ -33,6 +33,7 @@
                 <div class="form-group d-flex flex-row justify-content-between align-items-center" style="width: 100%">
                     <label for="project_name">Project</label>
                     <select class="form-control mx-4" id="project_name" name="project_name" placeholder="Project Name">
+                        <option value="" selected>NA</option>
                         {% for project in calculate_events %}
                         <option value="{{project[0]}}">{{project[0]}}</option>
                         {% endfor %}
@@ -252,11 +253,7 @@
                             <input type="email" class="form-control" id="email_add" name="email" required />
                         </div>
 
-                        <!-- date of funding -->
-                        <div class="form-group">
-                            <label for="funding_date_add">Funding Date</label>
-                            <input type="date" class="form-control" id="funding_date_add" name="funding_date" />
-                        </div>
+
 
                         <!-- amount -->
                         <div>
@@ -273,6 +270,11 @@
                                 <option value="{{project[0]}}" id="addProjectName">{{project[0]}}</option>
                                 {% endfor %}
                             </select>
+                        </div>
+                        <!-- date of funding -->
+                        <div class="form-group">
+                            <label for="funding_date_add">Year</label>
+                            <input type="date" class="form-control" id="funding_date_add" name="funding_date" />
                         </div>
 
 
@@ -362,7 +364,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                 
+
                                 <tr>
                                     <th scope="row">1</th>
                                     <td>Sewing Workshop</td>
