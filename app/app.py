@@ -363,9 +363,178 @@ def village_profile():
     return render_template('admin/village_profile.html', profile_details=profile_details, village_names=village_names, occupation_names=occupation_names, technical_literacy_names=technical_literacy_names)
 
 
-@app.route("/admin/volunteers")
+@app.route("/admin/volunteers", methods = ['POST', 'GET'])
 def volunteers():
-    return render_template("admin/volunteers.html")
+    cur = mysql.connection.cursor()
+    result_value = cur.execute("SELECT * FROM Volunteers")
+
+    if result_value > 0:
+        userDetails = cur.fetchall()
+
+    # Generate the user profile details
+    profile_details = []
+    for user in userDetails:
+        # (email_id, name, phone_number, date_of_birth, gender)
+        # INSERT INTO volunteering(email_id, event_name, start_date)
+        user_profile = {'email_id': user[0], 'name': user[1], 'phone_number': user[2], 'date_of_birth': user[3], 'gender': user[4]}
+        calculate_age_query = f"SELECT TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) FROM Volunteers WHERE email_id = \'{user[0]}\'"
+        extract_enrolled_projects_query = f"SELECT * FROM volunteering WHERE email_id = \'{user[0]}\'"
+
+        calculate_age = cur.execute(calculate_age_query)
+        calculate_age = cur.fetchall()
+
+        extract_enrolled_projects = cur.execute(extract_enrolled_projects_query)
+        extract_enrolled_projects = cur.fetchall()
+
+        if len(calculate_age) > 0:
+            user_profile['age'] = calculate_age[0][0]
+        else:
+            user_profile['age'] = 'NA'
+
+        if len(extract_enrolled_projects) > 0:
+            user_profile['projects'] = extract_enrolled_projects
+        else:
+            user_profile['projects'] = ()
+
+        profile_details.append(user_profile)
+
+    # Generate projects list
+    projects_query = f"SELECT event_name FROM Projects"
+    projects_query = cur.execute(projects_query)
+    projects = cur.fetchall()
+
+    if (request.method == 'POST'):
+        if request.form['signal'] == 'search':
+            name = request.form['name']
+            email = request.form['email']
+            gender = request.form['gender']
+            project_name = request.form['project_name']
+            year = request.form['year']
+            
+            where_query = f" SELECT * FROM Volunteers"
+            
+            flag = False
+            
+            if name != '':
+                if flag == False:
+                    where_query += f" WHERE name = \'{name}\' "
+                else:
+                    where_query += f"name = \"{name}\""
+                flag = True
+
+            if email != '':
+                if flag == False:
+                    where_query += f" WHERE email_id = \'{email}\' "
+                else:
+                    where_query += f" AND email_id = \"{email}\""
+                flag = True 
+    
+            if gender != '':
+                if flag == False:
+                    where_query += f" WHERE gender = \'{gender}\' "
+                else:
+                    where_query += f" AND gender = \'{gender}\'"
+                flag = True
+            
+            if project_name != '':
+                if flag == False:
+                    where_query += f" WHERE email_id IN (SELECT email_id FROM volunteering WHERE event_name = \'{project_name}\') "
+                else:
+                    where_query += f" AND email_id IN (SELECT email_id FROM volunteering WHERE event_name = \"{project_name}\") "
+                flag = True
+                
+            if year != '':
+                if flag == False:
+                    # where_query += f" WHERE YEAR(start_date) = {year}"
+                    where_query += f" WHERE email_id IN (SELECT email_id FROM volunteering WHERE YEAR(start_date) = {year})"
+                else:
+                    # where_query += f" AND YEAR(start_date) = {year}"
+                    where_query += f" AND email_id IN (SELECT email_id FROM volunteering WHERE YEAR(start_date) = {year})"
+                flag = True
+                
+                
+                    
+            exec_query = cur.execute(where_query)
+            print("Search query executed")
+            search_results = cur.fetchall()
+
+            # print(search_results)
+
+            updated_profile_details = []
+            for user in profile_details:
+                for result in search_results:
+                    if user['email_id'] == result[0]:
+                        updated_profile_details.append(user)
+            profile_details = updated_profile_details
+
+        elif request.form['signal'] == 'addUser':
+            print(request.form)
+            print("addDetails filled!")
+
+            volunteers_name = request.form['name']
+            email = request.form['email']
+            date_of_birth = request.form['dob']
+            gender = request.form['gender']
+            phone = request.form['phone']
+
+            projectEventName = request.form['project_name']
+            project_start_year = request.form['project_year']
+            print(projectEventName, project_start_year)
+
+            add_query = f"INSERT INTO Volunteers (email_id, name, phone_number, date_of_birth, gender) "
+            add_query = add_query + f"VALUES (\'{email}\', \'{volunteers_name}\', \'{phone}\', \'{date_of_birth}\', \'{gender}\')"
+            exec_query = cur.execute(add_query)
+            mysql.connection.commit()
+
+            add_project_query = f"INSERT INTO volunteering (email_id, event_name, start_date) "
+            add_project_query = add_project_query + f"VALUES (\'{email}\', \"{projectEventName}\", (SELECT start_date FROM Projects WHERE event_name = \"{projectEventName}\" AND YEAR(start_date) = \'{project_start_year}\'))"
+            exec_query = cur.execute(add_project_query)
+            mysql.connection.commit()
+
+            return redirect('/admin/volunteers')
+
+        elif request.form['signal'] == 'editUser':
+            volunteers_name = request.form['volunteer_name']
+            email = request.form['email']
+            date_of_birth = request.form['dob']
+            gender = request.form['gender']
+            phone = request.form['phone']
+
+            projectEventName = request.form['project_name']
+            project_start_year = request.form['project_year']
+
+            edit_query = f"UPDATE Volunteers "
+            edit_query = edit_query + f"SET name = \'{volunteers_name}\', email_id = \'{email}\', date_of_birth = \'{date_of_birth}\', gender = \'{gender}\', phone_number = \'{phone}\'"
+            edit_query = edit_query + f"WHERE email_id = \'{email}\';"
+            exec_query = cur.execute(edit_query)
+            mysql.connection.commit()
+
+            # check if the email_id, project, date exists
+            check_query = f"SELECT * FROM volunteering WHERE email_id = \'{email}\' AND event_name = \"{projectEventName}\" AND start_date = (SELECT start_date FROM Projects WHERE event_name = \"{projectEventName}\" AND YEAR(start_date) = \'{project_start_year}\');"
+            exec_query = cur.execute(check_query)
+            check_result = cur.fetchall()
+            if len(check_result) == 0:
+                add_project_query = f"INSERT INTO volunteering (email_id, event_name, start_date) "
+                add_project_query = add_project_query + f"VALUES (\'{email}\', \"{projectEventName}\", (SELECT start_date FROM Projects WHERE event_name = \"{projectEventName}\" AND YEAR(start_date) = \'{project_start_year}\'))"
+                exec_query = cur.execute(add_project_query)
+                mysql.connection.commit()
+                print("Trainer added to project")
+
+            return redirect('/admin/volunteers')
+
+        elif request.form['signal'] == 'delete':
+            print("delete filled!")
+            email = request.form['email']
+            delete_query = f"DELETE FROM Volunteers WHERE email_id = \'{email}\'"
+
+            print(delete_query)
+
+            exec_query = cur.execute(delete_query)
+            mysql.connection.commit()
+            return redirect('/admin/volunteers')
+
+    return render_template("admin/volunteers.html", profile_details=profile_details, projects=projects)
+
 
 
 @app.route("/admin/projects", methods=['POST', 'GET'])
