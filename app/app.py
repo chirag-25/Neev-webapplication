@@ -390,6 +390,48 @@ def volunteers():
 
     return render_template("admin/volunteers.html", profile_details=profile_details, projects=projects)
 
+@app.route("/admin/villageprofile", methods=['POST','GET'])
+def village_profile():
+    cur = mysql.connection.cursor()
+    result_value = cur.execute("SELECT * FROM VillageProfile")
+
+    if result_value > 0:
+        userDetails = cur.fetchall()
+
+    print(userDetails)
+    # Generate the user profile details
+    profile_details = []
+    for user in userDetails:
+        # VillageProfile(pincode, name, no_of_beneficiaries, no_of_primary_health_center, no_of_primary_school, transport,
+        #                infrastructure, major_occupation, technical_literacy, year)
+        user_profile = {'pincode': user[0], 'name': user[1], 'no_of_beneficiaries': user[2], 'no_of_primary_health_center': user[3],
+                        'no_of_primary_school': user[4], 'transport': user[5], 'infrastructure': user[6], 'major_occupation': user[7], 'technical_literacy': user[8], 'year': user[9]}
+
+        extract_beneficiaries_list_query = f"SELECT name,aadhar_id FROM Beneficiary WHERE aadhar_id IN (SELECT aadhar_id FROM belongs WHERE pincode = \'{user[0]}\')"
+
+        extract_beneficiaries_list_query = cur.execute(extract_beneficiaries_list_query)
+        extract_beneficiaries_list = cur.fetchall()
+
+        if len(extract_beneficiaries_list) > 0:
+            user_profile['beneficiaries'] = extract_beneficiaries_list
+        else:
+            user_profile['beneficiaries'] = ()
+
+        profile_details.append(user_profile)
+
+    print(profile_details)
+
+    if(request.method=='POST'):
+        print(request.json)
+        form_data=request.json
+        if(form_data['signal']=='search'):
+            print("this is search query")
+        elif(form_data['signal']=='editUser'):
+            print("this is edit query")
+        elif(form_data['signal']=='addUser'):
+            print("add new data")
+    return render_template('admin/village_profile.html', profile_details=profile_details)
+
 ### Add new user
 @app.route("/", methods=['POST'])
 def insert():
