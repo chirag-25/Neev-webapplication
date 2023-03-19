@@ -123,19 +123,19 @@ def funding():
 
             exec_query = cur.execute(where_query)
             search_results = cur.fetchall()
-            print(search_results)
+            # print(search_results)
             
             updated_profile_details = []
             for user in profileDetails:
                 for result in search_results:
-                    print("email", result[0])
+                    # print("email", result[0])
                     if user['email'] == result[0]:
                         updated_profile_details.append(user)
             profileDetails = updated_profile_details
             
             return render_template('admin/funding.html', userDetails=userDetails, profileDetails = profileDetails)
         elif request.form['signal'] == 'add':
-            print(request.form)
+            # print(request.form)
             print("addDetails filled!")
             
             benefactor = request.form['name']
@@ -184,6 +184,105 @@ def funding():
         # print(profileDetails)
     return render_template('admin/funding.html', userDetails=userDetails, profileDetails = profileDetails, calculate_events = calculate_events,calculate_sponsors = calculate_sponsors)
 
+@app.route("/admin/villageprofile", methods=['POST','GET'])
+def village_profile():
+    cur = mysql.connection.cursor()
+    result_value = cur.execute("SELECT * FROM VillageProfile")
+
+    if result_value > 0:
+        userDetails = cur.fetchall()
+
+    # print(userDetails)
+    # Generate the user profile details
+    profile_details = []
+    for user in userDetails:
+        # VillageProfile(pincode, name, no_of_beneficiaries, no_of_primary_health_center, no_of_primary_school, transport,
+        #                infrastructure, major_occupation, technical_literacy, year)
+        user_profile = {'pincode': user[0], 'name': user[1], 'no_of_beneficiaries': user[2], 'no_of_primary_health_center': user[3],
+                        'no_of_primary_school': user[4], 'transport': user[5], 'infrastructure': user[6], 'major_occupation': user[7], 'technical_literacy': user[8], 'year': user[9]}
+
+        extract_beneficiaries_list_query = f"SELECT name,aadhar_id FROM Beneficiary WHERE aadhar_id IN (SELECT aadhar_id FROM belongs WHERE pincode = \'{user[0]}\')"
+
+        extract_beneficiaries_list_query = cur.execute(extract_beneficiaries_list_query)
+        extract_beneficiaries_list = cur.fetchall()
+
+        calculate_occupation = f"SELECT * FROM VillageProfile WHERE pincode = \'{user[0]}\'"
+        calculate_occupation = cur.fetchall()
+        
+
+        if len(extract_beneficiaries_list) > 0:
+            user_profile['beneficiaries'] = extract_beneficiaries_list
+        else:
+            user_profile['beneficiaries'] = ()
+            
+        if len(calculate_occupation) > 0:
+            user_profile['occupation'] = calculate_occupation
+        else:
+            user_profile['occupation'] = "NA"
+
+        profile_details.append(user_profile)
+
+    # print(profile_details)
+
+    if(request.method=='POST'):
+        if(request.form['signal']=='search'):
+            print("this is search query")
+            name = request.form['name']
+            pinCode = request.form['pinCode']
+            occupation = request.form['occupation']
+            technical_literacy = request.form['technical_literacy']
+            
+            print(name)
+            
+            where_query = f" SELECT * FROM VillageProfile"
+            flag = False
+            
+            if name != '':
+                if flag == False:
+                    where_query +=  f" WHERE name = \'{name}\' "
+                else:
+                    where_query += f"name = \"{name}\""
+                flag = True
+            if pinCode != '':
+                if flag == False:
+                    where_query += f" WHERE pincode = \'{pinCode}\' "
+                else:
+                    where_query += f" AND pincode = \"{pinCode}\""
+                flag = True
+            if occupation != '':
+                if flag == False:
+                    where_query += f" WHERE major_occupation = \'{occupation}\' "
+                else:
+                    where_query += f" AND major_occupation = \"{occupation}\""
+                flag = True
+                
+            if technical_literacy != '':
+                if flag == False:
+                    where_query += f" WHERE technical_literacy = \'{technical_literacy}\' "
+                else:
+                    where_query += f" AND technical_literacy = \"{technical_literacy}\""
+                flag = True
+                
+            exec_query = cur.execute(where_query)
+            print("Search query executed")
+            search_results = cur.fetchall()
+            
+            # print(search_results)
+            
+            updated_profile_details = []
+            for user in profile_details:
+                for result in search_results:
+                    if user['name'] == result[1]:
+                        updated_profile_details.append(user)
+            profile_details = updated_profile_details
+            # print(profileDetails)
+        elif(request.form['signal']=='editUser'):
+            print("this is edit query")
+        elif(request.form['signal']=='addUser'):
+            print("add new data")
+        print(calculate_occupation)
+    return render_template('admin/village_profile.html', profile_details=profile_details)
+
 
 @app.route("/admin/volunteers")
 def volunteers():
@@ -193,7 +292,7 @@ def volunteers():
 @app.route("/admin/user",methods=['POST','GET'])
 def user():
     if(request.method=='POST'):
-        print(request.json)
+        # print(request.json)
         form_data=request.json
         if(form_data['signal']=='search'):
             print("this is search query")
