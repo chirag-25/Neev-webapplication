@@ -445,7 +445,8 @@ def village_profile():
             print("add new data")
     return render_template('admin/village_profile.html', profile_details=profile_details)
 
-@app.route("/admin/projects", methods=['POST','GET'])
+
+@app.route("/admin/projects", methods=['POST', 'GET'])
 def projects():
     cur = mysql.connection.cursor()
     result_value = cur.execute("SELECT * FROM Projects")
@@ -453,9 +454,25 @@ def projects():
     if result_value > 0:
         projectDetails = cur.fetchall()
 
+    project_name_query = f"SELECT DISTINCT event_name FROM Projects"
+    project_name_query_exec = cur.execute(project_name_query)
+    project_names = cur.fetchall()
+
+    event_name_query = f"SELECT DISTINCT types FROM Projects"
+    event_name_query_exec = cur.execute(event_name_query)
+    event_names = cur.fetchall()
+
+    # extract distinct venue ID
+    venue_id_query = f"SELECT DISTINCT venue_id FROM Venue"
+    venue_id_query_exec = cur.execute(venue_id_query)
+    venue_ids = cur.fetchall()
+
     project_details = []
     for project in projectDetails:
-        project_profile = {'event_name': project[0], 'start_date': project[1], 'types': project[2], 'budget': project[3], 'no_of_participants': project[4], 'duration': project[5], 'collection': project[6], 'total_expense': project[7]}
+        project_profile = {'event_name': project[0], 'start_date': project[1], 'types': project[2],
+                           'budget': project[3],
+                           'no_of_participants': project[4], 'duration': project[5], 'collection': project[6],
+                           'total_expense': project[7]}
 
         even_name = project_profile['event_name']
         start_date = project_profile['start_date']
@@ -476,21 +493,24 @@ def projects():
         else:
             project_profile['venue_id'] = 'NA'
 
-        extract_beneficiaries_enrolled_query = cur.execute(extract_beneficiaries_enrolled_query)
+        extract_beneficiaries_enrolled_query = cur.execute(
+            extract_beneficiaries_enrolled_query)
         extract_beneficiaries_enrolled_query = cur.fetchall()
         if len(extract_beneficiaries_enrolled_query) > 0:
             project_profile['beneficiaries'] = extract_beneficiaries_enrolled_query
         else:
             project_profile['beneficiaries'] = ()
 
-        extract_volunteers_enrolled_query = cur.execute(extract_volunteers_enrolled_query)
+        extract_volunteers_enrolled_query = cur.execute(
+            extract_volunteers_enrolled_query)
         extract_volunteers_enrolled_query = cur.fetchall()
         if len(extract_volunteers_enrolled_query) > 0:
             project_profile['volunteers'] = extract_volunteers_enrolled_query
         else:
             project_profile['volunteers'] = ()
 
-        extract_donors_enrolled_query = cur.execute(extract_donors_enrolled_query)
+        extract_donors_enrolled_query = cur.execute(
+            extract_donors_enrolled_query)
         extract_donors_enrolled_query = cur.fetchall()
         if len(extract_donors_enrolled_query) > 0:
             project_profile['donors'] = extract_donors_enrolled_query
@@ -527,16 +547,127 @@ def projects():
 
         project_details.append(project_profile)
 
-    if(request.method=='POST'):
-        print(request.json)
-        form_data=request.json
-        if(form_data['signal']=='search'):
+    if (request.method == 'POST'):
+        if (request.form['signal'] == 'search'):
+            event_name = request.form['event_name']
+            year = request.form['year']
+            type_event = request.form['type_event']
+            min_budget = request.form['min_budget']
+            max_budget = request.form['max_budget']
+
+            where_query = f" SELECT * FROM Projects"
+            flag = False
+
+            if event_name != '':
+                if flag == False:
+                    where_query += f" WHERE event_name = \'{event_name}\' "
+                else:
+                    where_query += f"event_name = \"{event_name}\""
+                flag = True
+
+            if year != '':
+                if flag == False:
+                    where_query += f" WHERE YEAR(start_date) = {year}"
+                else:
+                    where_query += f" AND YEAR(start_date) = {year}"
+                flag = True
+            if type_event != '':
+                if flag == False:
+                    where_query += f" WHERE types = \'{type_event}\' "
+                else:
+                    where_query += f" AND types = \"{type_event}\""
+                flag = True
+
+            if min_budget != '' and max_budget != '':
+                if flag == False:
+                    where_query += f" WHERE budget BETWEEN \'{min_budget}\' AND \'{max_budget}\'"
+                else:
+                    where_query += f" AND budget BETWEEN \'{min_budget}\' AND \'{max_budget}\'"
+                flag = True
+
+            exec_query = cur.execute(where_query)
+            print("Search query executed")
+            search_results = cur.fetchall()
+
+            updated_profile_details = []
+            for user in project_details:
+                for result in search_results:
+                    if user['event_name'] == result[0]:
+                        updated_profile_details.append(user)
+            project_details = updated_profile_details
+
             print("this is search query")
-        elif(form_data['signal']=='editUser'):
-            print("this is edit query")
-        elif(form_data['signal']=='addUser'):
-            print("add new data")
-    return render_template('admin/projects.html', project_details=project_details)
+
+        # editing user info
+        elif request.form['signal'] == 'editProject':
+            event_name = request.form['event_name']
+            date = request.form['date']
+            budget = request.form['budget']
+            participants = request.form['participants']
+            duration = request.form['duration']
+            collection = request.form['collection']
+            expense = request.form['expense']
+            Types = request.form['types']
+
+            venue_id = request.form['venue_id']
+
+            # updated based on event_name and start_date
+            edit_query = f"UPDATE Projects "
+            edit_query = edit_query + f"SET event_name = \'{event_name}\', start_date = \'{date}\', types = \'{Types}\', budget = \'{budget}\', no_of_participants = \'{participants}\', duration = \'{duration}\', collection = \'{collection}\', total_expense = \'{expense}\'"
+            edit_query = edit_query + f"WHERE event_name = \'{event_name}\' and start_date = \'{date}\';"
+            exec_query = cur.execute(edit_query)
+            mysql.connection.commit()
+
+            if venue_id != '':
+                edit_venue_query = f"UPDATE HeldAt "
+                edit_venue_query = edit_venue_query + f"SET venue_id = \'{venue_id}\'"
+                edit_venue_query = edit_venue_query + f"WHERE event_name = \'{event_name}\' and start_date = \'{date}\';"
+                exec_query = cur.execute(edit_venue_query)
+                mysql.connection.commit()
+
+            return redirect('/admin/projects')
+
+        elif request.form['signal'] == 'addProject':
+            event_name = request.form['event_name']
+            date = request.form['date']
+            budget = request.form['budget']
+            participants = request.form['participants']
+            duration = request.form['duration']
+            collection = request.form['collection']
+            expense = request.form['expense']
+            Types = request.form['types']
+
+            venue_id = request.form['venue_id']
+
+            add_query = f"INSERT INTO Projects (event_name, start_date, types, budget, no_of_participants, duration, collection, total_expense) "
+            add_query = add_query + f"VALUES (\'{event_name}\', \'{date}\', \'{Types}\', \'{budget}\', \'{participants}\', \'{duration}\', \'{collection}\', \'{expense}\');"
+            exec_query = cur.execute(add_query)
+            mysql.connection.commit()
+
+            if venue_id != '':
+                # insert project in heldat
+                add_query = f"INSERT INTO HeldAt (venue_id, event_name, start_date) "
+                add_query = add_query + f"VALUES (\'{venue_id}\', \'{event_name}\', \'{date}\');"
+                exec_query = cur.execute(add_query)
+                mysql.connection.commit()
+
+            return redirect('/admin/projects')
+
+        # delete the user info
+        elif request.form['signal'] == 'delete':
+            event_name = request.form['event_name']
+            start_date = request.form['date']
+
+            # delete operation considering event_name and start_date
+            delete_query = f"DELETE FROM Projects WHERE event_name = \'{event_name}\' and start_date = \'{start_date}\';"
+
+            exec_query = cur.execute(delete_query)
+            mysql.connection.commit()
+            return redirect('/admin/projects')
+
+    return render_template('admin/projects.html', project_details=project_details, project_names=project_names,
+                           event_names=event_names, venue_ids=venue_ids)
+
 
 @app.route("/admin/trainers", methods=['GET','POST'])
 def trainers():
