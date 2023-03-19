@@ -35,6 +35,100 @@ def admin():
 def funding():
     return render_template("admin/funding.html")
 
+@app.route("/admin/projects", methods=['POST', 'GET'])
+def projects():
+    cur = mysql.connection.cursor()
+    result_value = cur.execute("SELECT * FROM Projects")
+
+    if result_value > 0:
+        userDetails = cur.fetchall()
+
+    # Adding volunteer
+    if (request.method == 'POST'):
+        if request.form['signal'] == 'addProject':
+            print(request.form)
+            print("addDetails filled!")
+
+            event_name = request.form['event_name']
+            date = request.form['date']
+            budget = request.form['budget']
+            participants = request.form['participants']
+            duration = request.form['duration']
+            collection = request.form['collection']
+            expense = request.form['expense']
+            venue_id = request.form['venue_id']
+            aadhar = request.form['aadhar']
+            volunteer_email_id = request.form['volunteer_email_id']
+            donor_email_id = request.form['donor_email_id']
+            trainer_email_id = request.form['trainer_email_id']
+            EmployID = request.form['EmployID']
+            Types = request.form['types']
+
+            print(event_name)
+
+
+            # project = request.form['']
+
+            #  (, start_date, types, budget, no_of_participants, duration, collection, total_expense)
+
+            add_query = f"INSERT INTO Projects (event_name, start_date, types, budget, no_of_participants, duration, collection, total_expense) "
+            add_query = add_query + f"VALUES (\'{event_name}\', \'{date}\', \'{Types}\', \'{budget}\', \'{participants}\', \'{duration}\', \'{collection}\', \'{expense}\');"
+            print(add_query)
+
+            exec_query = cur.execute(add_query)
+            mysql.connection.commit()
+
+            return redirect('/admin/projects')
+
+        # editing user info
+        elif request.form['signal'] == 'editProject':
+            event_name = request.form['event_name']
+            date = request.form['date']
+            budget = request.form['budget']
+            participants = request.form['participants']
+            duration = request.form['duration']
+            collection = request.form['collection']
+            expense = request.form['expense']
+            venue_id = request.form['venue_id']
+            aadhar = request.form['aadhar']
+            volunteer_email_id = request.form['volunteer_email_id']
+            donor_email_id = request.form['donor_email_id']
+            trainer_email_id = request.form['trainer_email_id']
+            EmployID = request.form['EmployID']
+            Types = request.form['types']
+
+
+            # updated based on event_name  (confirm it)
+            edit_query = f"UPDATE Projects "
+            edit_query = edit_query + f"SET event_name = \'{event_name}\', start_date = \'{date}\', types = \'{Types}\', budget = \'{budget}\', no_of_participants = \'{participants}\', duration = \'{duration}\', collection = \'{collection}\', total_expense = \'{expense}\'"
+            edit_query = edit_query + f"WHERE event_name = \'{event_name}\' and start_date = \'{date}\';"
+            print(edit_query)
+
+            exec_query = cur.execute(edit_query)
+            mysql.connection.commit()
+            return redirect('/admin/projects')
+            print("edit")
+
+        # delete the user info
+        elif request.form['signal'] == 'delete':
+            print("delete filled!")
+            event_name = request.form['event_name']
+            start_date = request.form['date']
+
+            # delete operation considering event_name and start_date
+            delete_query = f"DELETE FROM Projects WHERE event_name = \'{event_name}\' and start_date = \'{start_date}\';"
+
+            print(delete_query)
+
+            exec_query = cur.execute(delete_query)
+            mysql.connection.commit()
+            return redirect('/admin/projects')        
+
+
+    
+    return render_template("admin/projects.html", userDetails=userDetails)
+
+
 @app.route("/admin/volunteers", methods = ['POST', 'GET'])
 def volunteers():
     cur = mysql.connection.cursor()
@@ -43,6 +137,7 @@ def volunteers():
     if result_value > 0:
         userDetails = cur.fetchall()
 
+    # Adding volunteer
     if (request.method == 'POST'):
         if request.form['signal'] == 'addUser':
             print(request.form)
@@ -68,6 +163,7 @@ def volunteers():
 
             return redirect('/admin/volunteers')
 
+        # editing user info
         elif request.form['signal'] == 'editUser':
             volunteers_name = request.form['volunteer_name']
             email = request.form['email']
@@ -85,6 +181,7 @@ def volunteers():
             return redirect('/admin/volunteers')
             print("edit")
 
+        # delete the user info
         elif request.form['signal'] == 'delete':
             print("delete filled!")
             email = request.form['email']
