@@ -1,0 +1,622 @@
+{% extends 'layout.html'%}
+{% block content %}
+<div class="container">
+
+    <h1>Projects</h1>
+    <div class="container" style="width:60%">
+        <form name="searchForm" method="POST">
+            <div class="d-flex flex-wrap m-1 justify-content-between">
+                <input type="hidden" name="signal" value="search">
+                <div class="form-group">
+                    <label for=" event_name">Event name:</label>
+                    <input type="text" class="form-control" id="event_name" name="event_name">
+                </div>
+                <div class="form-group">
+                    <label for="year">Year</label>
+                    <input type="number" class="form-control" id="year" placeholder="Year" min="2000" name="year" />
+                </div>
+                
+                <div class="form-group">
+                    <label for="type_event">Type of Event</label>
+                    <input type="text" class="form-control" id="type_event" name="type_event">
+                </div>
+
+                <!-- amount  -->
+                <div class="form-group d-flex flex-row justify-content-between align-items-center" style="width: 100%">
+                    <label>Budget</label>
+                    <input type="number" class="form-control mx-3" name="min_budget" id="min_budget"
+                        placeholder="Min" />
+                    <input type="number" class="form-control" name="max_budget" id="max_budget" placeholder="Max" />
+                   
+                </div>
+                
+
+                 <!-- <div class="form-group">
+                    <label for="no of participants">Number of participants</label>
+                    <input type="number" class="form-control" id="no of participants" name="no of participants">
+                </div>
+
+                <div class="form-group">
+                    <label for="duration">Duration (in hours)</label>
+                    <input type="number" class="form-control" id="duration" name="duration">
+
+                </div>
+
+                <div class="form-group">
+                    <label for="collection">Collection (in ₹)</label>
+                    <input type="number" class="form-control" id="collection" name="collection">
+
+                </div>
+
+                <div class="form-group">
+                    <label for="expense">Total expense:</label>
+                    <input type="number" class="form-control" id="expense" name="expense">
+                </div>
+
+                <div class="form-group">
+                    <label for="venue_id">Venue ID</label>
+                    <input type="text" class="form-control" id="venue_id" name="venue_id">
+                </div>
+
+                <div class="form-group">
+                    <label for="aadhar">Beneficiary Aadhar Id</label>
+                    <input type="number" class="form-control" id="email" name="aadhar" min="100000000000"
+                        max="999999999999" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="volunteer_email_id">Volunteer email id</label>
+                    <input type="text" class="form-control" id="volunteer_email_id" name="volunteer_email_id" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="donor_email_id">Donor email id</label>
+                    <input type="text" class="form-control" id="donor_email_id" name="donor_email_id" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="trainer_email_id">Trainer email id</label>
+                    <input type="text" class="form-control" id="trainer_email_id" name="trainer_email_id" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="EmployID">Employee Id</label>
+                    <input type="number" class="form-control" id="email" name="EmployID" min="100000000000"
+                        max="999999999999" required>
+                </div> -->
+                <div>
+                    <button type="submit" class="btn btn-primary" onclick="" value="">Search</button>
+                </div>
+            </div>
+        </form>
+
+    </div>
+
+
+    <div class="container">
+        <button type="button" class="btn btn-success m-2" data-toggle="modal" data-target="#addModal" onclick="">Add New
+            Project</button>
+
+    </div>
+
+    <table class="table">
+
+        <thead>
+            <tr>
+                <th scope="col">Event name </th>
+                <th scope="col">Start date</th>
+                <th scope="col">Type</th>
+                <th scope="col">Budget </th>
+                <th scope="col">No. of participants </th>
+                <th scope="col">Duration</th>
+                <th scope="col">Collection</th>
+                <th scope="col">Expenses</th>
+                <th scope="col">Actions</th>
+            </tr>
+        </thead>
+        <!-- dummy data -->
+        <tbody>
+            {% for project in project_details %}
+            <tr>
+                <th scope="row" headers="event_name">{{ project['event_name'] }}</th>
+                <td headers="start_date">{{ project['start_date'] }}</td>
+                <td headers="types">{{ project['types'] }}</td>
+                <td headers="budget">{{ project['budget'] }}</td>
+                <td headers="no_of_participants">{{ project['no_of_participants'] }}</td>
+                <td headers="duration">{{ project['duration'] }}</td>
+                <td headers="collection">{{ project['collection'] }}</td>
+                <td headers="total_expense">{{ project['total_expense'] }}</td>
+
+                {# these will be used for the more page#}
+                <td headers="venue_id" style="display:none;">{{project['venue_id']}}</td>
+
+                <td headers="beneficiaries" style="display:none;">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Sr: No</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Aadhar ID</th>
+                            </tr>
+                        </thead>
+                        <tbody id="profile_table_body">
+
+                            {% for beneficiary in project['beneficiaries'] %}
+                            <tr>
+                                <th scope="row">{{ loop.index }}</th>
+                                <td>{{beneficiary[0]}}</td>
+                                <td>{{beneficiary[1]}}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </td>
+
+                <td headers="volunteers" style="display:none;">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Sr: No</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Email ID</th>
+                            </tr>
+                        </thead>
+                        <tbody id="profile_table_body">
+
+                            {% for volunteer in project['volunteers'] %}
+                            <tr>
+                                <th scope="row">{{ loop.index }}</th>
+                                <td>{{volunteer[0]}}</td>
+                                <td>{{volunteer[1]}}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </td>
+
+                <td headers="donors" style="display:none;">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Sr: No</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Email ID</th>
+                            </tr>
+                        </thead>
+                        <tbody id="profile_table_body">
+
+                            {% for donor in project['donors'] %}
+                            <tr>
+                                <th scope="row">{{ loop.index }}</th>
+                                <td>{{donor[0]}}</td>
+                                <td>{{donor[1]}}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </td>
+
+                <td headers="trainers" style="display:none;">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Sr: No</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Email ID</th>
+                            </tr>
+                        </thead>
+                        <tbody id="profile_table_body">
+
+                            {% for trainer in project['trainers'] %}
+                            <tr>
+                                <th scope="row">{{ loop.index }}</th>
+                                <td>{{trainer[0]}}</td>
+                                <td>{{trainer[1]}}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </td>
+
+                <td headers="employees" style="display:none;">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Sr: No</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Employee ID</th>
+                            </tr>
+                        </thead>
+                        <tbody id="profile_table_body">
+
+                            {% for employee in project['employees'] %}
+                            <tr>
+                                <th scope="row">{{ loop.index }}</th>
+                                <td>{{employee[0]}}</td>
+                                <td>{{employee[1]}}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </td>
+
+                <td headers="goods" style="display:none;">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Sr: No</th>
+                                <th scope="col">Item Name</th>
+                                <th scope="col">Quantity</th>
+                                <th scope="col">Price</th>
+                            </tr>
+                        </thead>
+                        <tbody id="profile_table_body">
+
+                            {% for item in project['goods'] %}
+                            <tr>
+                                <th scope="row">{{ loop.index }}</th>
+                                <td>{{item[0]}}</td>
+                                <td>{{item[1]}}</td>
+                                <td>{{item[2]}}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </td>
+
+                <td headers="expenses" style="display:none;">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Sr: No</th>
+                                <th scope="col">Amount</th>
+                                <th scope="col">Description</th>
+                            </tr>
+                        </thead>
+                        <tbody id="profile_table_body">
+
+                            {% for expense in project['expenses'] %}
+                            <tr>
+                                <th scope="row">{{ loop.index }}</th>
+                                <td>{{expense[0]}}</td>
+                                <td>{{expense[1]}}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </td>
+
+
+
+
+
+                <td>
+                    <button type="button" class="btn btn-primary btn-sm" data-toggle="modal"
+                        data-target="#editModal">Edit</button>
+                    <button type="button" class="btn btn-danger btn-sm" data-toggle="modal"
+                        data-target="#deleteModal">Delete</button>
+                    <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#profileModal"
+                        onclick="show_details(this)">Details</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+
+    <!-- edit modal  -->
+    <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel">Edit Project</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form name="editedDetails">
+
+                        <input type="hidden" value="editProject" name="signal">
+                        <div class="form-group">
+                            <label for=" event name">Event name:</label>
+                            <input type="text" class="form-control" id="event name" name="event name">
+                        </div>
+                        <div class="form-group">
+                            <label for="date">Start date</label>
+                            <input type="date" class="form-control" id="date" name="date">
+                        </div>
+                        <div class="form-group">
+                            <label for="budget">Budget</label>
+                            <input type="number" class="form-control" id="budget" name="budget">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="no of participants">Number of participants</label>
+                            <input type="number" class="form-control" id="no of participants" name="no of participants">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="duration">Duration (in hours)</label>
+                            <input type="number" class="form-control" id="duration" name="duration">
+
+                        </div>
+
+                        <div class="form-group">
+                            <label for="collection">Collection (in ₹)</label>
+                            <input type="number" class="form-control" id="collection" name="collection">
+
+                        </div>
+
+                        <div class="form-group">
+                            <label for="expense">Total expense:</label>
+                            <input type="number" class="form-control" id="expense" name="expense">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="venue_id">Venue ID</label>
+                            <input type="text" class="form-control" id="venue_id" name="venue_id">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="aadhar">Beneficiary Aadhar Id</label>
+                            <input type="number" class="form-control" id="email" name="aadhar" min="100000000000"
+                                max="999999999999" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="volunteer_email_id">Volunteer email id</label>
+                            <input type="text" class="form-control" id="volunteer_email_id" name="volunteer_email_id"
+                                required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="donor_email_id">Donor email id</label>
+                            <input type="text" class="form-control" id="donor_email_id" name="donor_email_id" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="trainer_email_id">Trainer email id</label>
+                            <input type="text" class="form-control" id="trainer_email_id" name="trainer_email_id"
+                                required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="EmployID">Employee Id</label>
+                            <input type="number" class="form-control" id="email" name="EmployID" min="100000000000"
+                                max="999999999999" required>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                            <input type="submit" class="btn btn-primary" id="saveChangesButton" value="Save Changes">
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+    <!-- add modal -->
+
+    <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel">Add New Project</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form name="addDetails">
+                        <input type="hidden" name="search" value="addProject">
+
+                        <input type="hidden" value="editProject" name="signal">
+                        <div class="form-group">
+                            <label for=" event name">Event name:</label>
+                            <input type="text" class="form-control" id="event name" name="event name">
+                        </div>
+                        <div class="form-group">
+                            <label for="date">Start date</label>
+                            <input type="date" class="form-control" id="date" name="date">
+                        </div>
+                        <div class="form-group">
+                            <label for="budget">Budget</label>
+                            <input type="number" class="form-control" id="budget" name="budget">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="no of participants">Number of participants</label>
+                            <input type="number" class="form-control" id="no of participants" name="no of participants">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="duration">Duration (in hours)</label>
+                            <input type="number" class="form-control" id="duration" name="duration">
+
+                        </div>
+
+                        <div class="form-group">
+                            <label for="collection">Collection (in ₹)</label>
+                            <input type="number" class="form-control" id="collection" name="collection">
+
+                        </div>
+
+                        <div class="form-group">
+                            <label for="expense">Total expense:</label>
+                            <input type="number" class="form-control" id="expense" name="expense">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="venue_id">Venue ID</label>
+                            <input type="text" class="form-control" id="venue_id" name="venue_id">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="aadhar">Beneficiary Aadhar Id</label>
+                            <input type="number" class="form-control" id="email" name="aadhar" min="100000000000"
+                                max="999999999999" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="volunteer_email_id">Volunteer email id</label>
+                            <input type="text" class="form-control" id="volunteer_email_id" name="volunteer_email_id"
+                                required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="donor_email_id">Donor email id</label>
+                            <input type="text" class="form-control" id="donor_email_id" name="donor_email_id" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="trainer_email_id">Trainer email id</label>
+                            <input type="text" class="form-control" id="trainer_email_id" name="trainer_email_id"
+                                required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="EmployID">Employee Id</label>
+                            <input type="number" class="form-control" id="email" name="EmployID" min="100000000000"
+                                max="999999999999" required>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                            <input type="submit" class="btn btn-primary" id="saveChangesButton" value="Add Project">
+                        </div>
+
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- delete modal  -->
+
+    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Delete project</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete this project?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="deleteButton">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- profile modal -->
+
+    <div class="modal fade" id="profileModal" tabindex="-1" role="dialog" aria-labelledby="profileModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="profileModalLabel">Project details</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+                    <div class="row">
+
+                        <div class="col-md-8">
+                            <h3 id="profile_event_name">Project 1</h3>
+                            <p id="profile_start_date">Start date: 18-03-2023</p>
+                            <p id="profile_types">type</p>
+                            <p id="profile_no_of_participants">Number of participants: 100</p>
+                            <p id="profile_budget">Budget: 100000</p>
+                            <p id="profile_duration">Duration: 10</p>
+                            <p id="profile_collection">Collection: 100000</p>
+                            <p id="profile_total_expense">Expense: 100000</p>
+                            <p id="profile_venue_id">Venue ID: 100000</p>
+
+                            <h4>Beneficiaries</h4>
+                            <div id="profile_beneficiaries"></div>
+
+                            <h4>Volunteers</h4>
+                            <div id="profile_volunteers"></div>
+
+                            <h4>Donors</h4>
+                            <div id="profile_donors"></div>
+
+                            <h4>Trainers</h4>
+                            <div id="profile_trainers"></div>
+
+                            <h4>Employees</h4>
+                            <div id="profile_employees"></div>
+
+                            <h4>Goods</h4>
+                            <div id="profile_goods"></div>
+
+                            <h4>Expenses</h4>
+                            <div id="profile_expenses"></div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<script>
+    function show_details(e) {
+        let p = e.parentNode.parentNode;
+        let name = p.querySelector("th[headers='event_name']").innerHTML;
+        let start_date = p.querySelector("td[headers='start_date']").innerHTML;
+        let types = p.querySelector("td[headers='types']").innerHTML;
+        let no_of_participants = p.querySelector("td[headers='no_of_participants']").innerHTML;
+        let budget = p.querySelector("td[headers='budget']").innerHTML;
+        let duration = p.querySelector("td[headers='duration']").innerHTML;
+        let collection = p.querySelector("td[headers='collection']").innerHTML;
+        let expense = p.querySelector("td[headers='total_expense']").innerHTML;
+        let venue_id = p.querySelector("td[headers='venue_id']").innerHTML;
+        let beneficiaries = p.querySelector("td[headers='beneficiaries']").innerHTML;
+        let volunteers = p.querySelector("td[headers='volunteers']").innerHTML;
+        let donors = p.querySelector("td[headers='donors']").innerHTML;
+        let trainers = p.querySelector("td[headers='trainers']").innerHTML;
+        let employees = p.querySelector("td[headers='employees']").innerHTML;
+        let goods = p.querySelector("td[headers='goods']").innerHTML;
+        let expenses = p.querySelector("td[headers='expenses']").innerHTML
+
+        document.querySelector("#profile_event_name").textContent = name;
+        document.querySelector("#profile_start_date").textContent = "Start date: " + start_date;
+        document.querySelector("#profile_types").textContent = "Type: " + types;
+        document.querySelector("#profile_no_of_participants").textContent = "Number of participants: " + no_of_participants;
+        document.querySelector("#profile_budget").textContent = "Budget: " + budget;
+        document.querySelector("#profile_duration").textContent = "Duration: " + duration;
+        document.querySelector("#profile_collection").textContent = "Collection: " + collection;
+        document.querySelector("#profile_total_expense").textContent = "Expense: " + expense;
+        document.querySelector("#profile_venue_id").textContent = "Venue ID: " + venue_id;
+        document.querySelector("#profile_beneficiaries").innerHTML = beneficiaries;
+        document.querySelector("#profile_volunteers").innerHTML = volunteers;
+        document.querySelector("#profile_donors").innerHTML = donors;
+        document.querySelector("#profile_trainers").innerHTML = trainers;
+        document.querySelector("#profile_employees").innerHTML = employees;
+        document.querySelector("#profile_goods").innerHTML = goods;
+        document.querySelector("#profile_expenses").innerHTML = expenses;
+    }
+</script>
+{% endblock content %}
