@@ -8,12 +8,19 @@
       <div class="d-flex flex-wrap m-1 justify-content-between">
         <input type="hidden" name="signal" value="search">
 
-
-        <!-- Name -->
         <div class="form-group">
-          <label for="name">Name</label>
-          <input type="text" class="form-control" id="name" name="name">
+
+            <label for="name">Village Name</label>
+            <select class="name" id="village_name" name="name">
+                <option value="" selected>NA</option>
+                {% for village in village_names %}
+                    <option value="{{village[0]}}">{{village[0]}}</option>
+                {% endfor %}
+            </select>
+
+
         </div>
+
 
         <div class="form-group">
           <label for="pinCode">PIN Code</label>
@@ -24,28 +31,26 @@
         <!-- major occupation -->
         <div class="form-group">
           <label for="majoroccupation">Major Occupation</label>
-          <!-- <select class="form-control " id="project_name" name="project_name" id = "majoroccupation" name="occupation" placeholder="Project Name"> -->
-            <!-- {% for occ in calculate_occupation %} -->
-            <!-- <option value="PROJECT A">PROJECT A</option> -->
-            <!-- {% endfor %} -->
-        <!-- </select> -->
-        <input type="text" class="form-control" id="majoroccupation" name="occupation">
-
+          <select class="name" id="occupation_name" name="occupation">
+            <option value="" selected>NA</option>
+            {% for occupation in occupation_names %}
+                <option value="{{occupation[0]}}">{{occupation[0]}}</option>
+            {% endfor %}
+        </select>
+          <!-- <input type="text" class="form-control" id="majoroccupation" name="occupation"> -->
         </div>
-
-
 
         <div class="form-group">
           <label for="technical_literacy">Technical Literacy</label>
-          <input type="text" class="form-control" id="technical_literacy" name="technical_literacy">
+          <select class="name" id="technical_literacy_name" name="technical_literacy">
+            <option value="" selected>NA</option>
+            {% for literacy in technical_literacy_names %}
+                <option value="{{literacy[0]}}">{{literacy[0]}}</option>
+            {% endfor %}
+        </select>
+
+          <!-- <input type="text" class="form-control" id="technical_literacy" name="technical_literacy"> -->
         </div>
-
-
-        <!-- <div class="form-group">
-          <label for="year">Year</label>
-          <input type="number" class="form-control" id="year" name="year" min="2005">
-        </div> -->
-
 
 
       </div>

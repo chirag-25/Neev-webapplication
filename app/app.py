@@ -194,6 +194,19 @@ def village_profile():
     if result_value > 0:
         userDetails = cur.fetchall()
 
+    village_names_query = f"SELECT DISTINCT name FROM VillageProfile"
+    village_names_query_exec = cur.execute(village_names_query)
+    village_names = cur.fetchall()
+    
+    occupation_name_query = f"SELECT DISTINCT major_occupation FROM VillageProfile"
+    occupation_name_query_exec = cur.execute(occupation_name_query)
+    occupation_names = cur.fetchall()
+    
+    technical_literacy_query = f"SELECT DISTINCT technical_literacy FROM VillageProfile"
+    technical_literacy_query_exec = cur.execute(technical_literacy_query)
+    technical_literacy_names = cur.fetchall()
+    
+
     # print(userDetails)
     # Generate the user profile details
     profile_details = []
@@ -283,7 +296,7 @@ def village_profile():
         elif (request.form['signal'] == 'addUser'):
             print("add new data")
         print(calculate_occupation)
-    return render_template('admin/village_profile.html', profile_details=profile_details)
+    return render_template('admin/village_profile.html', profile_details=profile_details, village_names = village_names, occupation_names = occupation_names, technical_literacy_names = technical_literacy_names)
 
 
 @app.route("/admin/volunteers")
@@ -303,7 +316,7 @@ def projects():
     project_name_query_exec = cur.execute(project_name_query)
     project_names = cur.fetchall()
 
-    event_name_query = f"SELECT DISTINCT types FROM Projects"
+    event_name_query = f"SELECT DISTINCT event_name FROM Projects"
     event_name_query_exec = cur.execute(event_name_query)
     event_names = cur.fetchall()
 
