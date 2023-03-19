@@ -205,7 +205,6 @@ def user():
             profile_details = updated_profile_details
 
         elif request.form['signal'] == 'add':
-
             aadhar = request.form['aadhar']
             name = request.form['name']
             dob = request.form['dob']
@@ -525,6 +524,128 @@ def projects():
             print("add new data")
     return render_template('admin/projects.html', project_details=project_details)
 
+@app.route("/admin/trainers", methods=['GET','POST'])
+def trainers():
+    cur = mysql.connection.cursor()
+    result_value = cur.execute("SELECT * FROM Trainers")
+
+    if result_value > 0:
+        userDetails = cur.fetchall()
+
+    profile_details = []
+    for user in userDetails:
+        # Trainers(email_id, fee, name, age, gender)
+        user_profile = {'email_id': user[0], 'fee': user[1], 'name': user[2], 'age': user[3], 'gender': user[4]}
+
+        extract_phone_query = f"SELECT phone_number FROM TrainerPhoneEntity WHERE email_id = \'{user[0]}\'"
+        extract_projects_query = f"SELECT event_name,start_date FROM trains WHERE email_id = \'{user[0]}\'"
+        extract_beneficiaries_list_query = f"SELECT name, aadhar_id FROM Beneficiary WHERE aadhar_id IN (SELECT aadhar_id FROM TrainerBeneficiary WHERE email_id = \'{user[0]}\')"
+
+        extract_phone_query = cur.execute(extract_phone_query)
+        extract_phone_query = cur.fetchall()
+        if len(extract_phone_query) > 0:
+            user_profile['phone_number'] = extract_phone_query[0][0]
+        else:
+            user_profile['phone_number'] = 'NA'
+
+        extract_projects_query = cur.execute(extract_projects_query)
+        extract_projects_query = cur.fetchall()
+        if len(extract_projects_query) > 0:
+            user_profile['projects'] = extract_projects_query
+        else:
+            user_profile['projects'] = ()
+
+        extract_beneficiaries_list_query = cur.execute(extract_beneficiaries_list_query)
+        extract_beneficiaries_list = cur.fetchall()
+        if len(extract_beneficiaries_list) > 0:
+            user_profile['beneficiaries'] = extract_beneficiaries_list
+        else:
+            user_profile['beneficiaries'] = ()
+
+        profile_details.append(user_profile)
+
+    # Generate projects list
+    projects_query = f"SELECT event_name FROM Projects"
+    projects_query = cur.execute(projects_query)
+    projects = cur.fetchall()
+
+    # Adding trainers (done)
+    if (request.method == 'POST'):
+        if request.form['signal'] == 'addUser':
+            print('add filled!@')
+            name = request.form['name']
+            email_id = request.form['email_id']
+            phoneNumber = request.form['phoneNumber']
+            gender = request.form['gender']
+            age = request.form['age']
+            fee = request.form['fee']
+
+            projectEventName = request.form['project_name']
+            project_start_year = request.form['project_year']
+
+            beneficiaryAadharId = request.form['beneficiaryAadharId']
+            beneficiaryName = request.form['beneficiaryName']
+
+            add_query = f"INSERT INTO Trainers (email_id, fee, name, age, gender) "
+            add_query = add_query + f"VALUES (\'{email_id}\', \'{fee}\', \'{name}\', \'{age}\', \'{gender}\')"
+            exec_query = cur.execute(add_query)
+            mysql.connection.commit()
+            print("Trainer added")
+
+            add_project_query = f"INSERT INTO trains (email_id, event_name, start_date) "
+            add_project_query = add_project_query + f"VALUES (\'{email_id}\', \"{projectEventName}\", (SELECT start_date FROM Projects WHERE event_name = \"{projectEventName}\" AND YEAR(start_date) = \'{project_start_year}\'))"
+            exec_query = cur.execute(add_project_query)
+            mysql.connection.commit()
+            print("Trainer added to project")
+
+            if beneficiaryAadharId != '':
+                # Insert intoTrainerBeneficiary
+                add_beneficiary_query = f"INSERT INTO TrainerBeneficiary (email_id, aadhar_id) "
+                add_beneficiary_query = add_beneficiary_query + f"VALUES (\'{email_id}\', \'{beneficiaryAadharId}\');"
+                exec_query = cur.execute(add_project_query)
+                mysql.connection.commit()
+
+            return redirect('/admin/trainers')
+
+        # editing trainers (done)
+        elif request.form['signal'] == 'editUser':
+            name = request.form['name']
+            email_id = request.form['email_id']
+            phoneNumber = request.form['phoneNumber']
+            gender = request.form['gender']
+            age = request.form['age']
+            fee = request.form['fee']
+            projectEventName = request.form['projectEventName']
+            beneficiaryAadharId = request.form['beneficiaryAadharId']
+            beneficiaryName = request.form['beneficiaryName']
+
+            # updated based on email_id
+            edit_query = f"UPDATE Trainers "
+            edit_query = edit_query + f"SET email_id = \'{email_id}\', fee = \'{fee}\', name = \'{name}\', age = \'{age}\', gender = \'{gender}\'"
+            edit_query = edit_query + f"WHERE email_id = \'{email_id}\';"
+            print(edit_query)
+
+            exec_query = cur.execute(edit_query)
+            mysql.connection.commit()
+            return redirect('/admin/trainers')
+            print("edit")
+
+        # delete the trainer (done)
+        elif request.form['signal'] == 'delete':
+            print("delete filled!")
+            email_id = request.form['email_id']
+
+            # delete operation considering event_name and start_date
+            delete_query = f"DELETE FROM Trainers WHERE email_id = \'{email_id}\';"
+
+            print(delete_query)
+
+            exec_query = cur.execute(delete_query)
+            mysql.connection.commit()
+            return redirect('/admin/trainers')
+
+
+    return render_template("admin/trainers.html", profile_details=profile_details, projects=projects)
 
 
 ### Add new user
