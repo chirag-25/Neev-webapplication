@@ -139,9 +139,13 @@ def funding():
             exec_query = cur.execute(add_query)
             mysql.connection.commit()
             
-            add_project_query = f"INSERT INTO Sponsors (email_id, event_name, start_date)"
-            add_project_query = add_project_query + f"VALUES (\"{email}\", \"{funding_to}\", \"{date}\" )"
-            add_project_query = add_project_query + f" WHERE email_id = \"{email}\" "
+            # add_project_query = f"INSERT INTO Sponsors (email_id, event_name, start_date)"
+            # add_project_query = add_project_query + f"VALUES (\"{email}\", \"{funding_to}\", \"{date}\" )"
+            # add_project_query = add_project_query + f" WHERE email_id = \"{email}\" "
+            
+            add_project_query = f"INSERT INTO Sponsors (email_id, event_name, start_date) "
+            # assumption is taken here that beneficiary can only participate in current year's project
+            add_project_query = add_project_query + f"VALUES (\"{email}\", \"{funding_to}\", (SELECT start_date FROM Projects WHERE event_name = \"{funding_to}\" AND YEAR(start_date) = YEAR(CURDATE())))"
             exec_add_project_query = cur.execute(add_project_query)
             mysql.connection.commit()
 
