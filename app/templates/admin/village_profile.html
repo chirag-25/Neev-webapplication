@@ -436,34 +436,6 @@
     form.querySelector("input[name='year']").value = year;
   }
 
-{#  <th scope="row" headers="pinCode">{{ user['pincode'] }}</th>#}
-{#        <td headers="name">{{ user['name'] }}</td>#}
-{#        <td headers="noOfBeneficiaries">{{ user['no_of_beneficiaries'] }}</td>#}
-{#        <td headers="noOfHealthCenters">{{ user['no_of_primary_health_center'] }}</td>#}
-{#        <td headers="noOfSchools">{{ user['no_of_primary_school'] }}</td>#}
-{#        <td headers="occupation">{{ user['major_occupation'] }}</td>#}
-{#        <td headers="transport">{{ user['transport'] }}</td>#}
-{#        <td headers="technical_literacy">{{ user['technical_literacy'] }}</td>#}
-{#          <td headers="infrastructure">{{ user['infrastructure'] }}</td>#}
-{#        <td headers="year">{{ user['year'] }}</td>#}
-{#          these will be used for the profile page#}
-{#              <td headers="beneficiaries_list" style="display:none;">#}
-
-  {#<h3 id="profile_name">Palaj</h3>#}
-  {#            <p id="profile_pincode">PIN CODE: 382355</p>#}
-  {#            <p id="profile_no_of_beneficiaries">No of Beneficiaries: 23</p>#}
-  {#            <p id="profile_no_of_phc">No of PHCs: 2</p>#}
-  {#            <p id="profile_no_of_school">No of Schools: 3</p>#}
-  {#            <div>#}
-  {#              <p id="profile_major_occupation">Major Occupation: Fishery</p>#}
-  {#              <p id="profile_transport">Transport: Cycles, Autos</p>#}
-  {#              <p id="profile_technical">Technical Literacy: Class 12 passout</p>#}
-  {#            </div>#}
-  {#            <p id="profile_year">Year: 2342</p>#}
-  {##}
-  {#            <h4>Beneficiaries List</h4>#}
-  {#              <div id="profile_beneficiaries_list"></div>#}
-
   function show_profile(e) {
         let p = e.parentNode.parentNode;
         let name = p.querySelector("td[headers='name']").innerHTML;

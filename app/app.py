@@ -432,6 +432,101 @@ def village_profile():
             print("add new data")
     return render_template('admin/village_profile.html', profile_details=profile_details)
 
+@app.route("/admin/projects", methods=['POST','GET'])
+def projects():
+    cur = mysql.connection.cursor()
+    result_value = cur.execute("SELECT * FROM Projects")
+
+    if result_value > 0:
+        projectDetails = cur.fetchall()
+
+    project_details = []
+    for project in projectDetails:
+        project_profile = {'event_name': project[0], 'start_date': project[1], 'types': project[2], 'budget': project[3], 'no_of_participants': project[4], 'duration': project[5], 'collection': project[6], 'total_expense': project[7]}
+
+        even_name = project_profile['event_name']
+        start_date = project_profile['start_date']
+
+        extract_venue_id_query = f"SELECT venue_id FROM HeldAt WHERE event_name = \'{even_name}\' AND start_date = \'{start_date}\'"
+        extract_beneficiaries_enrolled_query = f"SELECT name,aadhar_id FROM Beneficiary WHERE aadhar_id IN (SELECT aadhar_id FROM participants WHERE event_name = \'{even_name}\' AND start_date = \'{start_date}\')"
+        extract_volunteers_enrolled_query = f"SELECT name,email_id FROM Volunteers WHERE email_id IN (SELECT email_id FROM volunteering WHERE event_name = \'{even_name}\' AND start_date = \'{start_date}\')"
+        extract_donors_enrolled_query = f"SELECT funder_name,email_id FROM Funding WHERE email_id IN (SELECT email_id FROM Sponsors WHERE event_name = \'{even_name}\' AND start_date = \'{start_date}\')"
+        extract_trainers_query = f"SELECT name,email_id FROM Trainers WHERE email_id IN (SELECT email_id FROM trains WHERE event_name = \'{even_name}\' AND start_date = \'{start_date}\')"
+        extract_employee_query = f"SELECT name,employee_id FROM Teams WHERE employee_id IN (SELECT employee_id FROM Organize WHERE event_name = \'{even_name}\' AND start_date = \'{start_date}\')"
+        extract_goods_query = f"SELECT item_name,quantity,amount FROM Goods WHERE event_name = \'{even_name}\' AND start_date = \'{start_date}\'"
+        extract_expense_query = f"SELECT amount,description FROM ProjectExpense WHERE event_name = \'{even_name}\' AND start_date = \'{start_date}\'"
+
+        extract_venue_id_query = cur.execute(extract_venue_id_query)
+        extract_venue_id_query = cur.fetchall()
+        if len(extract_venue_id_query) > 0:
+            project_profile['venue_id'] = extract_venue_id_query[0][0]
+        else:
+            project_profile['venue_id'] = 'NA'
+
+        extract_beneficiaries_enrolled_query = cur.execute(extract_beneficiaries_enrolled_query)
+        extract_beneficiaries_enrolled_query = cur.fetchall()
+        if len(extract_beneficiaries_enrolled_query) > 0:
+            project_profile['beneficiaries'] = extract_beneficiaries_enrolled_query
+        else:
+            project_profile['beneficiaries'] = ()
+
+        extract_volunteers_enrolled_query = cur.execute(extract_volunteers_enrolled_query)
+        extract_volunteers_enrolled_query = cur.fetchall()
+        if len(extract_volunteers_enrolled_query) > 0:
+            project_profile['volunteers'] = extract_volunteers_enrolled_query
+        else:
+            project_profile['volunteers'] = ()
+
+        extract_donors_enrolled_query = cur.execute(extract_donors_enrolled_query)
+        extract_donors_enrolled_query = cur.fetchall()
+        if len(extract_donors_enrolled_query) > 0:
+            project_profile['donors'] = extract_donors_enrolled_query
+        else:
+            project_profile['donors'] = ()
+
+        extract_trainers_query = cur.execute(extract_trainers_query)
+        extract_trainers_query = cur.fetchall()
+        if len(extract_trainers_query) > 0:
+            project_profile['trainers'] = extract_trainers_query
+        else:
+            project_profile['trainers'] = ()
+
+        extract_employee_query = cur.execute(extract_employee_query)
+        extract_employee_query = cur.fetchall()
+        if len(extract_employee_query) > 0:
+            project_profile['employees'] = extract_employee_query
+        else:
+            project_profile['employees'] = ()
+
+        extract_goods_query = cur.execute(extract_goods_query)
+        extract_goods_query = cur.fetchall()
+        if len(extract_goods_query) > 0:
+            project_profile['goods'] = extract_goods_query
+        else:
+            project_profile['goods'] = ()
+
+        extract_expense_query = cur.execute(extract_expense_query)
+        extract_expense_query = cur.fetchall()
+        if len(extract_expense_query) > 0:
+            project_profile['expenses'] = extract_expense_query
+        else:
+            project_profile['expenses'] = ()
+
+        project_details.append(project_profile)
+
+    if(request.method=='POST'):
+        print(request.json)
+        form_data=request.json
+        if(form_data['signal']=='search'):
+            print("this is search query")
+        elif(form_data['signal']=='editUser'):
+            print("this is edit query")
+        elif(form_data['signal']=='addUser'):
+            print("add new data")
+    return render_template('admin/projects.html', project_details=project_details)
+
+
+
 ### Add new user
 @app.route("/", methods=['POST'])
 def insert():
