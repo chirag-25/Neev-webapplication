@@ -37,7 +37,6 @@ def user():
     if result_value > 0:
         userDetails = cur.fetchall()
 
-
     # Generate the user profile details
     profile_details = []
     for user in userDetails:
@@ -214,7 +213,9 @@ def user():
             employed = request.form['employed']
             phone_number = request.form['phone_number']
             village = request.form['village']
-            project = request.form['project']
+
+            project = request.form['project_name']
+            project_start_year = request.form['project_year']
 
             add_query = f"INSERT INTO Beneficiary (aadhar_id, name, date_of_birth, gender, marital_status, education, photo, employed, photo_caption) "
             add_query = add_query + f"VALUES ({aadhar}, \"{name}\", \'{dob}\', \'{gender}\', \'{martial}\', \'{education}\', NULL, \"{employed}\", NULL)"
@@ -235,8 +236,7 @@ def user():
 
             # Add project query
             add_project_query = f"INSERT INTO participants (aadhar_id, event_name, start_date) "
-            # assumption is taken here that beneficiary can only participate in current year's project
-            add_project_query = add_project_query + f"VALUES ({aadhar}, \"{project}\", (SELECT start_date FROM Projects WHERE event_name = \"{project}\" AND YEAR(start_date) = YEAR(CURDATE())))"
+            add_project_query = add_project_query + f"VALUES ({aadhar}, \"{project}\", (SELECT start_date FROM Projects WHERE event_name = \"{project}\" AND YEAR(start_date) = \'{project_start_year}\'))"
             exec_query = cur.execute(add_project_query)
             mysql.connection.commit()
 
@@ -252,7 +252,9 @@ def user():
             employed = request.form['employed']
             phone_number = request.form['phone_number']
             village = request.form['village']
-            project = request.form['project']
+
+            project = request.form['project_name']
+            project_start_year = request.form['project_year']
 
             edit_query = f"UPDATE Beneficiary "
             edit_query = edit_query + f"SET name = \'{name}\', date_of_birth = \'{dob}\', gender = \'{gender}\', marital_status = \'{martial}\', education = \'{education}\', photo = NULL, employed = \"{employed}\", photo_caption = NULL "
@@ -276,8 +278,7 @@ def user():
 
             if project != '':
                 add_project_query = f"INSERT INTO participants (aadhar_id, event_name, start_date) "
-                # assumption is taken here that beneficiary can only participate in current year's project
-                add_project_query = add_project_query + f"VALUES ({aadhar}, \"{project}\", (SELECT start_date FROM Projects WHERE event_name = \"{project}\" AND YEAR(start_date) = YEAR(CURDATE())))"
+                add_project_query = add_project_query + f"VALUES ({aadhar}, \"{project}\", (SELECT start_date FROM Projects WHERE event_name = \"{project}\" AND YEAR(start_date) = \'{project_start_year}\'))"
                 exec_query = cur.execute(add_project_query)
                 mysql.connection.commit()
 
