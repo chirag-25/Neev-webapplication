@@ -1,6 +1,18 @@
 {% extends './layout.html'%}
 {% block content %}
-<form>
+<h1>Staff Login</h1>
+
+{% with messages=get_flashed_messages() %}
+{% if messages %}
+{% for message in messages %}
+<div class="alert alert-danger" role="alert">
+  {{ message }}
+</div>
+
+{% endfor %}
+{% endif %}
+{% endwith %}
+<form method="post">
     <div class="form-group">
       <label for="exampleInputEmail1">Employee ID</label>
       <input type="number" name="employeeID" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter Employee ID">
@@ -15,6 +27,7 @@
       <!-- <label class="form-check-label" for="exampleCheck1">Check me out</label> -->
     </div>
     <button type="submit" class="btn btn-primary" onclick="">Submit</button>
+    
   </form>
 
   {% endblock content %}
