@@ -1,4 +1,181 @@
 {% extends 'layout.html'%}
 {% block content %}
-<h1> Neev Web App</h1>
+<nav class="navbar navbar-expand-lg bg-body-tertiary" style="width:100%;">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">Neev @ IITGN</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav" style="margin-left:auto;">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="#">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Project</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Team</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Login</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                        Apply
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><button type="button" class="btn btn-success m-2" data-toggle="modal"
+                                data-target="#apply_trainer_modal" onclick="">
+                                Trainer
+                            </button></li>
+                            <li><button type="button" class="btn btn-success m-2" data-toggle="modal"
+                                data-target="#apply_volunteer_modal" onclick="">
+                                Volunteer
+                            </button></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Modal for apply for trainer -->
+        <div class="modal fade" id="apply_trainer_modal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editModalLabel">Add New Benefactor</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form name="apply_trainer" method="POST" action="">
+                            <input type="hidden" name="search" value="apply_trainer" />
+                            
+                            <!-- Rahul change this -->
+                            
+                            <!-- new benefactor -->
+                            <div class="form-group">
+                                <label for="benefactor_add">Benefactor</label>
+                                <input type="text" class="form-control" id="benefactor_add" name="name" required />
+                            </div>
+
+                            <!-- email -->
+                            <div class="form-group">
+                                <label for="email_add">Email</label>
+                                <input type="email" class="form-control" id="email_add" name="email" required />
+                            </div>
+
+                            <!-- date of funding -->
+                            <div class="form-group">
+                                <label for="funding_date_add">Funding Date</label>
+                                <input type="date" class="form-control" id="funding_date_add" name="funding_date" />
+                            </div>
+
+                            <!-- amount -->
+                            <div>
+                                <label for="amount_add">Amount</label>
+                                <input type="number" class="form-control" id="amount" name="amount_add" min="0"
+                                    required />
+                            </div>
+
+                            <!-- project to be funded -->
+                            <div class="form-group">
+                                <label for="project_add">Funding to </label>
+                                <select class="form-control" id="project_add" name="project">
+                                    <option disabled selected value>-- select an option --</option>
+                                    <option value="project1">Project 1</option>
+                                    <option value="project2">Project 2</option>
+                                </select>
+                            </div>
+
+
+                            <!-- cancel and save changes-->
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                                    Cancel
+                                </button>
+                                <input type="submit" class="btn btn-primary" id="saveChangesButton"
+                                    value="Add Benefactor" />
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal for apply for volunteer -->
+        <div class="modal fade" id="apply_volunteer_modal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editModalLabel">Apply as Volunteer</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form name="apply_volunteer" method="POST" action="">
+                            <input type="hidden" name="search" value="apply_volunteer" />
+                            
+                            <!-- Rahul change this -->
+                            
+                            <!-- new benefactor -->
+                            <div class="form-group">
+                                <label for="benefactor_add">Benefactor</label>
+                                <input type="text" class="form-control" id="benefactor_add" name="name" required />
+                            </div>
+
+                            <!-- email -->
+                            <div class="form-group">
+                                <label for="email_add">Email</label>
+                                <input type="email" class="form-control" id="email_add" name="email" required />
+                            </div>
+
+                            <!-- date of funding -->
+                            <div class="form-group">
+                                <label for="funding_date_add">Funding Date</label>
+                                <input type="date" class="form-control" id="funding_date_add" name="funding_date" />
+                            </div>
+
+                            <!-- amount -->
+                            <div>
+                                <label for="amount_add">Amount</label>
+                                <input type="number" class="form-control" id="amount" name="amount_add" min="0"
+                                    required />
+                            </div>
+
+                            <!-- project to be funded -->
+                            <div class="form-group">
+                                <label for="project_add">Funding to </label>
+                                <select class="form-control" id="project_add" name="project">
+                                    <option disabled selected value>-- select an option --</option>
+                                    <option value="project1">Project 1</option>
+                                    <option value="project2">Project 2</option>
+                                </select>
+                            </div>
+
+
+                            <!-- cancel and save changes-->
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                                    Cancel
+                                </button>
+                                <input type="submit" class="btn btn-primary" id="saveChangesButton"
+                                    value="Add Benefactor" />
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+
+<h1> Neev Home page Web App</h1>
 {% endblock content %}

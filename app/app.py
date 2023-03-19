@@ -4,6 +4,7 @@ app=Flask(__name__)
 
 @app.route("/")
 def home():
+    # return render_template("admin/login.html")
     return render_template("home.html")
     # return render_template("admin/volunteers.html")
 
@@ -12,7 +13,6 @@ def login():
     if(request.method=='POST'):
         employee_form=request.form
         print(employee_form)
-    return render_template("admin/login.html")
 
 @app.route("/admin")
 def admin():
