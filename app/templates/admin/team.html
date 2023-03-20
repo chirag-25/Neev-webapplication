@@ -1,0 +1,386 @@
+{% extends '/admin/dashboard.html'%}
+{% block content %}
+
+    {% with messages=get_flashed_messages() %}
+    {% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-danger" role="alert">
+          {{ message }}
+        </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+<div>
+    <h1 style="margin-top: 10px;">Team</h1>
+    <hr>
+    <!-- search form -->
+    <div style="width: 60%">
+        <form name="searchForm" method="POST">
+            <div class="d-flex flex-wrap m-1 justify-content-between">
+                <!-- Hidden signal -->
+                <input type="hidden" name="signal" value="search">
+
+                <!-- name and emil -->
+                <div class="d-flex flex-row justify-content-between align-items-center my-1" style="width: 100%">
+                    <div class="form-group" style="width: 32%">
+                        <label for="employee_id">Employee ID</label>
+                        <input type="text" class="form-control" style="width: 100%" id="employee_id" name="employee_id" />
+                    </div>
+                    <div class="form-group" style="width: 32%">
+                        <label for="name">Name</label>
+                        <input type="text" class="form-control" style="width: 100%" id="name" name="name" />
+                    </div>
+                    <div class="form-group" style="width: 32%">
+                        <label for="email">Email ID</label>
+                        <input type="text" class="form-control" style="width: 100%" id="email" name="email" />
+                    </div>
+
+                </div>
+
+                <!-- salary  -->
+                <div class="form-group d-flex flex-row justify-content-between align-items-center my-2"
+                    style="width: 100%">
+                    <label>Salary</label>
+                    <input type="number" class="form-control mx-3" name="min_amount" id="min_amount" placeholder="Min"
+                        min="0" />
+                    <input type="number" class="form-control" name="max_amount" id="max_amount" placeholder="Max" />
+                    <label for="position" class="mx-3">Position</label>
+                    <select class="form-control" id="position" name="position">
+                        <option value="" selected>NA</option>
+                        {% for position in position_names %}
+                        <option value="{{position[0]}}">{{position[0]}}</option>
+                        {% endfor %}
+                    </select>
+                    <!-- <input type="text" class="form-control" name="position" id="position"> -->
+                </div>
+
+                <!-- project and year -->
+                <div class="form-group d-flex flex-row justify-content-between align-items-center" style="width: 100%">
+                    <label for="project_name">Project</label>
+                    <select class="form-control mx-4" id="project_name" name="project_name" placeholder="Project Name">
+                        <option value="" selected>NA</option>
+                        {% for project in project_names %}
+                        <option value="{{project[0]}}">{{project[0]}}</option>
+                        {% endfor %}
+                    </select>
+                    <!-- <input type="number" class="form-control" id="year" placeholder="Year" min="2000" name="year" /> -->
+                </div>
+
+            </div>
+
+            <!-- search -->
+            <div>
+                <button type="submit" class="btn btn-primary" onclick="" value="">
+                    Search
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!--table -->
+    <div>
+        <div style=" margin-top: 20px">
+            <!-- add button -->
+            <div>
+                <button type="button" class="btn btn-success my-2" data-toggle="modal" data-target="#addModal"
+                    onclick="">
+                    Add New Member
+                </button>
+            </div>
+            <h5>Team Members</h5>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Employee ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Position</th>
+                        <th>Salary</th>
+                        <th>Hire in</th>
+                        <th>Quit in</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for team in team_details %}
+                    <tr>
+                        <td headers="employee_id">{{team['employee_id']}}</td>
+                        <td headers="name">{{team['name']}}</td>
+                        <td headers="email">{{team['email_id']}}</td>
+                        <td headers="position">{{team['position']}}</td>
+                        <td headers="salary">{{team['salary']}}</td>
+                        <td headers="hired_in">{{team['year_of_joining']}}</td>
+                        <td headers="quit_in">{{team['year_of_leaving']}}</td>
+                        <td headers="projects" style="display:none;">
+                            <table class="table" >
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Sr: No</th>
+                                        <th scope="col">Project Name</th>
+                                        <th scope="col">Year</th>
+                                    </tr>
+                                </thead>
+                                <tbody >
+                                    {% for pro in team['Project_id'] %}
+                                    <!-- {{loop.index}} -->
+                                    <tr>
+                                        <th scope="row">{{ loop.index }}</th>
+                                        <td>{{pro[0]}}</td>
+                                        <td>{{pro[1]}}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-primary btn-sm" data-toggle="modal"
+                                data-target="#updateModal" onclick="edit(this)">
+                                Update
+                            </button>
+                            <button type="button" class="btn btn-success btn-sm" data-toggle="modal"
+                                data-target="#view_details_Modal" onclick="show_profile(this)">
+                                More Details
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+            </table>
+
+        </div>
+    </div>
+
+    <!-- add modal -->
+    <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="addModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addModalLabel">Add New Member</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form name="addDetails" method="POST">
+                        <input type="hidden" name="signal" value="add">
+                        <!-- new member -->
+                        <div class="form-group">
+                            <label for="name_add">Name</label>
+                            <input type="text" class="form-control" id="name_add" name="name" required />
+                        </div>
+
+                        <!-- email -->
+                        <div class="form-group">
+                            <label for="email_add">Email</label>
+                            <input type="email" class="form-control" id="email_add" name="email" required />
+                        </div>
+
+                        <!-- Salary -->
+                        <div>
+                            <label for="salary_add">Salary</label>
+                            <input type="number" class="form-control" id="salary_add" name="salary" min="0" required />
+                        </div>
+
+                        <!-- Position -->
+                        <div>
+                            <label for="position_add">Position</label>
+                            <input type="text" class="form-control" id="position_add" name="position" min="0"
+                                required />
+                        </div>
+
+                        <!-- hired date -->
+                        <div>
+                            <label for="hired_date_add">Hired Date</label>
+                            <input type="date" class="form-control" id="hired_date_add" name="hired_date"
+                                value="2002-02-12" />
+                        </div>
+
+                        <!-- cancel and save changes-->
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                                Cancel
+                            </button>
+                            <input type="submit" class="btn btn-primary" id="saveChangesButton"
+                                value="Add Benefactor" />
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- update -->
+    <div class="modal fade" id="updateModal" tabindex="-1" role="dialog" aria-labelledby="updateModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="updateModalLabel">Update</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form name="editedDetails" method="POST">
+
+                        <input type="hidden" name="signal" value="edit">
+                        <div class="form-group">
+                            <label for="employee_id">Employee ID</label>
+                            <input type="text" class="form-control" id="employee_id" name="employee_id" readonly>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="name">Name</label>
+                            <input type="text" class="form-control" id="name" name="name">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="aadhar">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="position_edit">Position</label>
+                            <input type="text" class="form-control" id="position_edit" name="position">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="salary_edit">Salary</label>
+                            <input type="number" class="form-control" id="salary_edit" name="salary" min="0">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="hired_in_edit">Hired In</label>
+                            <input type="date" class="form-control" id="hired_in_edit" name="hired_in" min="2008" readonly>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="quit_in_edit">Quit In</label>
+                            <input type="date" class="form-control" id="quit_in_edit" name="quit_in" min="2008">
+                        </div>
+
+                        <!-- project and year -->
+                        <div class="form-group d-flex flex-row justify-content-between align-items-center my-3"
+                            style="width: 100%">
+                            <!-- project and year -->
+                              <div class="form-group d-flex flex-row justify-content-between align-items-center" style="width: 100%">
+                                <label for="project_name">Add new project</label>
+                                <select class="form-control mx-4" id="project_name" name="project_name" placeholder="Project Name">
+                                  <option value="" selected>NA</option>
+                                  {% for project in project_names %}
+                                  <option value="{{project[0]}}">{{project[0]}}</option>
+                                  {% endfor %}
+                                </select>
+                                <input type="number" class="form-control" id="project_year" name="project_year" placeholder="Year"
+                                  min="2008"/>
+                                <input type="text" class="form-control" id="position_edit" name="role" placeholder="Role">
+                              </div>
+                        </div>
+
+                        <div class="modal-footer my-2">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                                Cancel
+                            </button>
+                            <input type="submit" class="btn btn-primary" id="saveChangesButton" value="Save Changes" />
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+ <!-- view details -->
+    <div class="modal fade" id="view_details_Modal" tabindex="-1" role="dialog"
+        aria-labelledby="view_details_ModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="view_details_ModalLabel">Applicant Detail</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h3 id="profile_name">Ronaldo</h3>
+                            <p id="profile_email">Email: abc@gmail.com</p>
+                            <p id="profile_position">Position: </p>
+                            <p id="profile_salary">Salary: </p>
+                            <p id="profile_hired_in">Hired In: </p>
+                            <p id="profile_quit">Quit In:</p>
+                            <!-- <p id="profile_reason">Reason:</p> -->
+
+                            <h4>Projects Coordinated</h4>
+                            <div id="team_table_body"></div>
+                        </div>
+                        <div class="col-md-4">
+                            <img src="https://via.placeholder.com/150" class="img-fluid">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    //   js to add details to the edit form
+    function edit(e) {
+        let p = e.parentNode.parentNode;
+        let employee_id = p.querySelector("td[headers='employee_id']").innerHTML;
+        let name = p.querySelector("td[headers='name']").innerHTML;
+        let email = p.querySelector('td[headers="email"]').innerHTML;
+        let position = p.querySelector('td[headers="position"]').innerHTML;
+        let salary = p.querySelector('td[headers="salary"]').innerHTML;
+        let hired_in = p.querySelector('td[headers="hired_in"]').innerHTML;
+        let quit = p.querySelector('td[headers="quit_in"]').innerHTML;
+
+        let form = document.querySelector("form[name='editedDetails']");
+        form.querySelector("input[name='employee_id']").value = employee_id;
+        form.querySelector("input[name='name']").value = name;
+        form.querySelector("input[name='email']").value = email;
+        form.querySelector("input[name='position']").value = position;
+        form.querySelector("input[name='salary']").value = salary;
+        form.querySelector("input[name='hired_in']").value = hired_in;
+        form.querySelector("input[name='quit_in']").value = quit;
+    }
+
+
+
+    function show_profile(e){
+
+        let p = e.parentNode.parentNode;
+        let name = p.querySelector("td[headers='name']").innerHTML;
+        console.log(name)
+        let email = p.querySelector('td[headers="email"]').innerHTML;
+        console.log(email)
+        let position = p.querySelector('td[headers="position"]').innerHTML;
+        console.log(position)
+        let salary = p.querySelector('td[headers="salary"]').innerHTML;
+        console.log(salary)
+        let hired_in = p.querySelector('td[headers="hired_in"]').innerHTML;
+        console.log(hired_in)
+        let projects = p.querySelector('td[headers="projects"]').innerHTML;
+        console.log(projects)
+        let quit = p.querySelector('td[headers="quit_in"]').innerHTML;
+        // console.log(quit)
+
+        document.querySelector("#profile_name").innerHTML = "Name " + name;
+        document.querySelector("#profile_email").innerHTML = "Email " + email;
+        document.querySelector("#profile_position").innerHTML = "Position "+ position;
+        document.querySelector("#profile_salary").innerHTML = "Salary " + salary;
+        document.querySelector("#profile_hired_in").innerHTML = "Hired in" + hired_in;
+        // console.log(projects)
+        document.querySelector("#team_table_body").innerHTML = projects;
+        document.querySelector("#profile_quit").innerHTML = quit;
+    }
+
+</script>
+
+{% endblock content %}

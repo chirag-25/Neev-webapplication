@@ -3,6 +3,8 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 from flask_mysqldb import MySQL
 import yaml
 from flask_bcrypt import Bcrypt
+from email_script import send_email
+import secrets
 
 app = Flask(__name__)
 bcrypt=Bcrypt(app)
@@ -67,7 +69,7 @@ def check_password(pass_word,id,table):
     cursor.execute(query)
     account=cursor.fetchone()
     if(account):
-        if(bcrypt.check_password_hash(account['EmployeePassword'],password=pass_word)):
+        if(account['EmployeePassword']==pass_word):
             return True
     return False
 
@@ -1421,7 +1423,7 @@ def user():
             project = request.form['project_name']
             project_start_year = request.form['project_year']
 
-            if  project != '':
+            if project != '':
                 if check_project_year_combination(project, project_start_year) == False:
                     flash(f"Project {project} is not available for year {project_start_year}", 'danger')
                     return redirect('/admin/user')
@@ -1472,6 +1474,196 @@ def user():
 
     return render_template('admin/user.html', searchResults=tuple(), profile_details=profile_details, projects=projects, villages=villages, education_list=education_list)
     # return render_template('admin/user.html')
+
+
+@app.route('/admin/team', methods=['GET', 'POST'])
+def team():
+    type = restrict_child_routes()
+    if type == 'No_access':
+        return redirect(url_for('login'))
+
+    cur = mysql.connection.cursor()
+    result_value = cur.execute("SELECT * FROM Teams")
+
+    if result_value > 0:
+        teamdetails = cur.fetchall()
+
+    position_name_query = f" SELECT DISTINCT position FROM Teams"
+    position_name_query_exec = cur.execute(position_name_query)
+    position_names = cur.fetchall()
+
+    project_name_query = f" SELECT DISTINCT event_name FROM Organize"
+    project_name_query_exec = cur.execute(project_name_query)
+    project_names = cur.fetchall()
+
+    team_details = []
+    for team in teamdetails:
+        team_profile = {'employee_id': team[0], 'name': team[1], 'email_id': team[2], 'salary': team[3],
+                        'position': team[4], 'year_of_joining': team[5], 'year_of_leaving': team[6],
+                        'reason_of_leaving': team[7]}
+
+        # extract_projects_role_date_query = f"SELECT event_name,start_date FROM Organize WHERE employee_id IN (SELECT employee_id FROM Organize WHERE event_name = \'{event_name}\' AND start_date = \'{start_date}\')"
+        extract_projects_role_date_query = f"SELECT event_name, start_date FROM Organize WHERE employee_id = \'{team_profile['employee_id']}\' "
+        extract_projects_role_date_query = cur.execute(extract_projects_role_date_query)
+        print("Project query executed")
+        extract_projects_role_date = cur.fetchall()
+
+        print(len(extract_projects_role_date))
+        if (len(extract_projects_role_date) > 0):
+            team_profile['Project_id'] = extract_projects_role_date
+        else:
+            team_profile['Project_id'] = ()
+
+        team_details.append(team_profile)
+
+    if (request.method == 'POST'):
+        if (request.form['signal'] == 'search'):
+            employee_id = request.form['employee_id']
+            name = request.form['name']
+            email = request.form['email']
+            min_amount = request.form['min_amount']
+            max_amount = request.form['max_amount']
+            position = request.form['position']
+            project_name = request.form['project_name']
+            # year = request.form['year']
+
+            where_query = f" SELECT * FROM Teams"
+            flag = False
+
+            if (employee_id != ''):
+                if (flag == False):
+                    where_query = where_query + f" WHERE employee_id = \"{employee_id}\""
+                else:
+                    where_query = where_query + f" AND employee_id = \"{employee_id}\""
+                flag = True
+            if (name != ''):
+                if (flag == False):
+                    where_query = where_query + f" WHERE name = \"{name}\""
+                else:
+                    where_query = where_query + f" AND name = \"{name}\""
+                flag = True
+
+            if (email != ''):
+                if (flag == False):
+                    where_query = where_query + f" WHERE email_id = \"{email}\""
+                else:
+                    where_query = where_query + f" AND email_id = \"{email}\""
+                flag = True
+
+            if min_amount != '' and max_amount != '':
+                if flag == False:
+                    where_query += f" WHERE salary BETWEEN \'{min_amount}\' AND \'{max_amount}\'"
+                else:
+                    where_query += f" AND salary BETWEEN \'{min_amount}\' AND \'{max_amount}\'"
+                flag = True
+
+            if (position != ''):
+                if (flag == False):
+                    where_query = where_query + f" WHERE position = \"{position}\""
+                else:
+                    where_query = where_query + f" AND position = \"{position}\""
+                flag = True
+
+            if project_name != '':
+                if flag == False:
+                    where_query += f" WHERE employee_id IN (SELECT employee_id FROM Organize WHERE event_name = \"{project_name}\")"
+                else:
+                    where_query += f" AND employee_id IN (SELECT employee_id FROM Organize WHERE event_name = \"{project_name}\")"
+                flag = True
+
+            exec_query = cur.execute(where_query)
+            print("Search query executed")
+            search_results = cur.fetchall()
+
+            updated_team_details = []
+            for user in team_details:
+                for result in search_results:
+                    if user['employee_id'] == result[0]:
+                        updated_team_details.append(user)
+            team_details = updated_team_details
+
+        elif (request.form['signal'] == 'add'):
+            name = request.form['name']
+            email = request.form['email']
+            salary = request.form['salary']
+            position = request.form['position']
+            hired_date = request.form['hired_date']
+
+            count_till_now_query = f" SELECT COUNT(*) FROM Teams"
+            count_till_now_query = cur.execute(count_till_now_query)
+            count_till_now = cur.fetchone()
+            if len(count_till_now) > 0:
+                count_till_now = count_till_now[0]
+            else:
+                count_till_now = 0
+
+            add_member_query = f"INSERT INTO Teams (employee_id, name, email_id, salary, position, year_of_joining, year_of_leaving, reason_of_leaving) VALUES (\'{count_till_now + 1}\' , \'{name}\', \'{email}\', \'{salary}\', \'{position}\', \'{hired_date}\', NULL, NULL)"
+            add_member_query = cur.execute(add_member_query)
+            mysql.connection.commit()
+
+            # add user to staff_table
+            password_length = 13
+            password = secrets.token_urlsafe(password_length)
+            add_staff_password_query = f"INSERT INTO staff_password (EmployeeID, EmployeePassword) VALUES (\'{count_till_now + 1}\', \'{password}\')"
+            add_staff_password_query = cur.execute(add_staff_password_query)
+            mysql.connection.commit()
+
+            # send email to user
+            send_email(email, str(count_till_now + 1), name, password)
+
+            return redirect('/admin/team')
+
+        elif (request.form['signal'] == 'edit'):
+            employee_id = request.form['employee_id']
+            name = request.form['name']
+            email = request.form['email']
+            salary = request.form['salary']
+            position = request.form['position']
+            hired_date = request.form['hired_in']
+            left_date = request.form['quit_in']
+
+            if left_date == '':
+                left_date = 'NULL'
+
+            project_name = request.form['project_name']
+            project_year = request.form['project_year']
+            project_role = request.form['role']
+
+            print(f"Project name: {project_name}, Project year: {project_year}, Project role: {project_role}")
+
+            if project_name != '':
+                if check_project_year_combination(project_name, project_year) == False:
+                    flash(f"Project {project_name} is not available for year {project_year}", 'danger')
+                    return redirect('/admin/team')
+
+            update_team_query = f"UPDATE Teams SET name = \'{name}\', email_id = \'{email}\', salary = {salary}, position = \'{position}\', year_of_joining = \'{hired_date}\', year_of_leaving = {left_date} WHERE employee_id = \'{employee_id}\'"
+            print(update_team_query)
+            update_team_query = cur.execute(update_team_query)
+            mysql.connection.commit()
+
+            if project_name != '':
+                # check if the employee is already assigned to the project
+                check_query = f"SELECT * FROM Organize WHERE employee_id = \'{employee_id}\' AND event_name = \'{project_name}\' AND start_date IN (SELECT start_date FROM Projects WHERE event_name = \"{project_name}\" AND YEAR(start_date) = \'{project_year}\')"
+                check_query = cur.execute(check_query)
+                check_query = cur.fetchall()
+                if len(check_query) == 0:
+                    insert_query = f"INSERT INTO Organize (employee_id, event_name, start_date, role) "
+                    insert_query += f"VALUES (\'{employee_id}\', \'{project_name}\', (SELECT start_date FROM Projects WHERE event_name = \"{project_name}\" AND YEAR(start_date) = \'{project_year}\'), \'{project_role}\')"
+                    insert_query = cur.execute(insert_query)
+                    mysql.connection.commit()
+
+            return redirect('/admin/team')
+
+        elif (request.form['signal'] == 'delete'):
+            employee_id = request.form['employee_id']
+            delete_query = f"DELETE FROM Teams WHERE employee_id = \'{employee_id}\'"
+            delete_query_exec = cur.execute(delete_query)
+
+            mysql.connection.commit()
+
+
+    return render_template('admin/team.html', team_details=team_details, position_names=position_names,
+                           project_names=project_names)
 
 if __name__ == '__main__':
     app.run(debug=True)
