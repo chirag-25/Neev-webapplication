@@ -1265,5 +1265,9 @@ def user():
 def dashboard():
     return render_template('admin/dashboard.html')
 
+@app.route('/admin/team', methods=['GET', 'POST'])
+def team():
+    return render_template('admin/team.html')
+
 if __name__ == '__main__':
     app.run(debug=True)
