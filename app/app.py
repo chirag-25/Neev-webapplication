@@ -30,6 +30,15 @@ def login():
     # return render_template("admin/login.html")
 
 
+@app.route("/admin/dashboard_request.html", methods=['POST', 'GET'])
+def dashboard_request():
+    return render_template("admin/dashboard_request.html")
+
+@app.route("/admin/user_profile.html", methods=['POST', 'GET'])
+def user_profile():
+    return render_template("admin/user_profile.html")
+
+
 @app.route("/admin")
 def admin():
     return render_template("admin/dashboard.html")

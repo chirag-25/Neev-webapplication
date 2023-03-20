@@ -1,0 +1,160 @@
+{% extends '/admin/dashboard.html'%}
+{% block content %}
+<div>
+    <div>
+        <h1 style="margin-top: 30px;">Dashboard</h1>
+        <hr>
+        <div style=" margin-top: 20px">
+            <h5>Request Status View</h5>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>SrNo</th>
+                        <th>Apply For</th>
+                        <th>Applied On</th>
+                        <th>Name</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>Trainer</td>
+                        <td>2010-3-2</td>
+                        <td>Chirag</td>
+                        <td>Queued</td>
+                        <td>
+                            <button type="button" class="btn btn-primary btn-sm" data-toggle="modal"
+                                data-target="#acceptModal" onclick="edit(this)">
+                                Accept
+                            </button>
+                            <button type="button" class="btn btn-danger btn-sm" data-toggle="modal"
+                                data-target="#rejectModal" onclick="delete_user(this)">
+                                Reject
+                            </button>
+                            <button type="button" class="btn btn-success btn-sm" data-toggle="modal"
+                                data-target="#view_details_Modal" onclick="show_profile(this)">
+                                View
+                            </button>
+                        </td>
+                    </tr>
+            </table>
+
+        </div>
+    </div>
+
+    <div class="modal fade" id="acceptModal" tabindex="-1" role="dialog" aria-labelledby="acceptModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="acceptModalLabel">Accept Applicant</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to accept?
+                </div>
+                <div class="modal-footer">
+                    <form name="acceptForm" method="POST">
+                        <input type="hidden" name="signal" value="accept">
+                        <div>
+                            <label for="name_accept">Name</label>
+                            <input type="text" class="form-control" id="name_accept" name="name" readonly>
+                        </div>
+                        <div>
+                            <label for="position_accept">Position</label>
+                            <input type="text" class="form-control" id="position_accept" name="position" readonly>
+                        </div>
+                        <div class="d-flex flex-row my-2">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal" style="margin-right: 10px;">
+                                Cancel
+                            </button>
+                            <button type="submit" class="btn btn-primary" id="acceptButton">
+                                Accept
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal fade" id="rejectModal" tabindex="-1" role="dialog" aria-labelledby="rejectModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="rejectModalLabel">Reject Applicant</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to reject?
+                </div>
+                <div class="modal-footer">
+                    <form name="acceptForm" method="POST">
+                        <input type="hidden" name="signal" value="accept">
+                        <div>
+                            <label for="name_reject">Name</label>
+                            <input type="text" class="form-control" id="name_reject" name="name" readonly>
+                        </div>
+                        <div>
+                            <label for="position_reject">Position</label>
+                            <input type="text" class="form-control" id="position_reject" name="position" readonly>
+                        </div>
+                        <div class="d-flex flex-row my-2">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal" style="margin-right: 10px;">
+                                Cancel
+                            </button>
+                            <button type="submit" class="btn btn-danger" id="rejectButton">
+                                Reject
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal fade" id="view_details_Modal" tabindex="-1" role="dialog" aria-labelledby="view_details_ModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="view_details_ModalLabel">Applicant Detail</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+                    <div class="row">
+          
+                      <div class="col-md-8">
+                        <h3 id="profile_name">Ronaldo</h3>
+                          <p id="profile_email">abc@gmail.com</p>
+                        <p id="profile_phone">1234567890</p>
+                        <p id="profile_gender">Gender: Male</p>
+                        <p id="profile_dob">DOB: 10/10/1998</p>
+                        <p id="profile_age">Age: 25</p>
+                        <h4>Projects Enrolled</h4>
+                          <div id="profile_project_table"></div>
+                      </div>
+                      <div class="col-md-4">
+                        <img src="https://via.placeholder.com/150" class="img-fluid">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                  </div>    
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock content %}

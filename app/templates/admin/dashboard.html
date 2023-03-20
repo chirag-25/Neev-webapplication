@@ -41,7 +41,7 @@
                 <div class="d-flex flex-column align-items-center align-items-sm-start pt-2 text-white min-vh-100 ">
                     <!-- profile -->
                     <div class="d-inline-block nav-item light-black" style="height: 100px; width: 100%;">
-                        <a href="#"
+                        <a href="{{ url_for('user_profile') }}"
                             class="nav-link text-white d-flex align-items-center justify-content-center d-block h-100   ">
                             <i class='bx bx-user d-inline-block' style="font-size: 90px;"></i>
                         </a>
@@ -49,7 +49,7 @@
                     <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start d-inline-block "
                         id="menu" style="width: 100%;">
                         <li class="nav-item light-black">
-                            <a href="#" class="nav-link align-middle px-2 text-white">
+                            <a href="{{url_for('dashboard_request')}}" class="nav-link align-middle px-2 text-white">
                                 <i class="bx bxs-dashboard"></i><span class="ms-1 d-none d-sm-inline">Dashboard</span>
                             </a>
                         </li>
