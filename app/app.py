@@ -666,6 +666,11 @@ def projects():
     venue_id_query_exec = cur.execute(venue_id_query)
     venue_ids = cur.fetchall()
 
+    # extract distinct employee ID from teams table
+    employee_id_query = f"SELECT DISTINCT employee_id FROM Teams"
+    employee_id_query_exec = cur.execute(employee_id_query)
+    employee_ids = cur.fetchall()
+
     project_details = []
     for project in projectDetails:
         project_profile = {'event_name': project[0], 'start_date': project[1], 'types': project[2],
@@ -810,6 +815,9 @@ def projects():
 
             venue_id = request.form['venue_id']
 
+            employee_id = request.form['employee_id']
+            employee_role = request.form['role']
+
             # updated based on event_name and start_date
             edit_query = f"UPDATE Projects "
             edit_query = edit_query + \
@@ -827,6 +835,16 @@ def projects():
                     f"WHERE event_name = \'{event_name}\' and start_date = \'{date}\';"
                 exec_query = cur.execute(edit_venue_query)
                 mysql.connection.commit()
+
+            if employee_id != '':
+                check_query = f"SELECT * FROM Organize WHERE employee_id = \'{employee_id}\' AND event_name = \"{event_name}\" AND start_date = \'{date}\';"
+                exec_query = cur.execute(check_query)
+                check_result = cur.fetchall()
+                if len(check_result) == 0:
+                    add_project_query = f"INSERT INTO Organize (employee_id, event_name, start_date, role) "
+                    add_project_query = add_project_query + f"VALUES (\'{employee_id}\', \"{event_name}\", \'{date}\', \'{employee_role}\');"
+                    exec_query = cur.execute(add_project_query)
+                    mysql.connection.commit()
 
             return redirect('/admin/projects')
 
@@ -871,7 +889,7 @@ def projects():
             return redirect('/admin/projects')
 
     return render_template('admin/projects.html', project_details=project_details, project_names=project_names,
-                           event_names=event_names, venue_ids=venue_ids)
+                           event_names=event_names, venue_ids=venue_ids, employee_ids=employee_ids)
 
 
 @app.route("/admin/trainers", methods=['GET', 'POST'])

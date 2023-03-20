@@ -328,6 +328,21 @@
                             </select>
                         </div>
 
+
+                        <div class="form-group">
+                          <!-- project and year -->
+                          <div class="form-group d-flex flex-row justify-content-between align-items-center" style="width: 100%">
+                            <label for="employee_id">Employee</label>
+                            <select class="form-control mx-4" id="employee_id" name="employee_id" placeholder="Employee ID">
+                                <option value="" selected>NA</option>
+                              {% for employee in employee_ids %}
+                              <option value="{{employee[0]}}">{{employee[0]}}</option>
+                              {% endfor %}
+                            </select>
+                          <input type="text" class="form-control" id="role" name="role">
+                          </div>
+                        </div>
+
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                             <input type="submit" class="btn btn-primary" id="saveChangesButton" value="Save Changes">
@@ -406,6 +421,7 @@
                                 {% endfor %}
                             </select>
                         </div>
+
 
 
                         <div class="modal-footer">
