@@ -1,8 +1,12 @@
-from flask import Flask, render_template, request, redirect
+import MySQLdb
+from flask import Flask, render_template, request, redirect, url_for, flash, session
 from flask_mysqldb import MySQL
 import yaml
+from flask_bcrypt import Bcrypt
 
 app = Flask(__name__)
+bcrypt=Bcrypt(app)
+app.secret_key='secret_key'
 
 # Configure the database
 db = yaml.load(open('db.yaml'), Loader=yaml.Loader)
@@ -13,6 +17,25 @@ app.config['MYSQL_DB'] = db['mysql_db']
 
 mysql = MySQL(app)
 
+def if_admin():
+    cursor = mysql.connection.cursor()
+    id_search_query = f"SELECT * FROM admin_password WHERE EmployeeID=\'{session['id']}\'"
+    cursor.execute(id_search_query)
+    account = cursor.fetchone()
+    if account:
+        return True
+    return False
+
+def restrict_child_routes():
+    print("restrict_child_routes")
+    if 'loggedin' in session:
+        if if_admin():
+            return 'admin'
+    elif ('loggedin' in session):
+        return 'staff'
+    else:
+        return 'No_access'
+
 
 @app.route("/")
 def home():
@@ -20,32 +43,92 @@ def home():
     # return render_template("admin/volunteers.html")
 
 
+# @app.route("/admin")
+# def admin():
+#     if 'loggedin' in session and if_admin():
+#         return render_template("admin/dashboard.html",type="admin")
+#     elif('loggedin' in session ):
+#         return render_template("admin/dashboard.html",type="staff")
+#     else:
+#         return redirect(url_for('login'))
+
+def check_password(pass_word,id,table):
+    cursor=mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    query="SELECT * FROM" +" "+table +" " + "WHERE EmployeeID="+str(id)
+    cursor.execute(query)
+    account=cursor.fetchone()
+    if(account):
+        if(bcrypt.check_password_hash(account['EmployeePassword'],password=pass_word)):
+            return True
+    return False
+
 @app.route("/login", methods=['GET', 'POST'])
 def login():
     if (request.method == 'POST'):
-        employee_form = request.form
-        print(employee_form)
-        return render_template("admin/projects.html")
-    return render_template("admin/login.html")
-    # return render_template("admin/login.html")
+        employee_id = request.form["employeeID"]
+        password = request.form["password"]
+        # pw_hash=bcrypt.generate_password_hash(password,10)
+        print(bcrypt.generate_password_hash("sandeep1").decode('utf-8'))
+        print(bcrypt.generate_password_hash("dheeraj1").decode('utf-8'))
+        print("Employee ID: ", employee_id)
+        print("Password: ", password)
+        # cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
 
+        if (check_password(password, employee_id, "admin_password")):
+            session['loggedin'] = True
+            session['id'] = employee_id
+            # session['username']=account['username']
+            # return render_template("admin/user.html")
+            return redirect('/admin/dashboard?type=admin')
+        elif (check_password(password, employee_id, "staff_password")):
+            session['loggedin'] = True
+            session['id'] = employee_id
+            # session['username']=account['username']
+            return redirect('/admin/dashboard?type=staff')
+        else:
+            msg = "Incorrect Employee ID/password"
+            flash(msg)
+
+        # cursor.execute("SELECT * FROM admin_password WHERE EmployeeID=%s AND EmployeePassword=%s",(employee_id,password))
+        # account=cursor.fetchone()
+
+        # if(account):
+        #     session['loggedin']=True
+        #     session['id']=account['EmployeeID']
+        #     # session['username']=account['username']
+        #     return render_template("admin/user.html")
+        # else:
+        #     cursor.execute("SELECT * FROM staff_password WHERE EmployeeID=%s AND EmployeePassword=%s",(employee_id,password))
+        #     account=cursor.fetchone()
+        #     if(account):
+        #         session['loggedin']=True
+        #         session['id']=account['EmployeeID']
+        #         # session['username']=account['username']
+        #         return render_template("staff/user.html")
+        #     msg="Incorrect Employee ID/password"
+        #     flash(msg)
+    return render_template("admin/login.html")
 
 @app.route("/admin/dashboard_request.html", methods=['POST', 'GET'])
 def dashboard_request():
     return render_template("admin/dashboard_request.html")
 
+
 @app.route("/admin/user_profile.html", methods=['POST', 'GET'])
 def user_profile():
     return render_template("admin/user_profile.html")
 
-
-@app.route("/admin")
-def admin():
-    return render_template("admin/dashboard.html")
-
+@app.route("/admin/dashboard")
+def dashboard():
+    type = restrict_child_routes()
+    return render_template("admin/dashboard.html", type=type)
 
 @app.route("/admin/funding", methods=['POST', 'GET'])
 def funding():
+    type = restrict_child_routes()
+    if type == 'No_access':
+        return redirect(url_for('login'))
+
     cur = mysql.connection.cursor()
     result_value = cur.execute("SELECT * FROM Funding")
     if result_value > 0:
@@ -199,6 +282,10 @@ def funding():
 
 @app.route("/admin/villageprofile", methods=['POST', 'GET'])
 def village_profile():
+    type = restrict_child_routes()
+    if type == 'No_access':
+        return redirect(url_for('login'))
+
     cur = mysql.connection.cursor()
     result_value = cur.execute("SELECT * FROM VillageProfile")
 
@@ -375,6 +462,10 @@ def village_profile():
 
 @app.route("/admin/volunteers", methods=['POST', 'GET'])
 def volunteers():
+    type = restrict_child_routes()
+    if type == 'No_access':
+        return redirect(url_for('login'))
+
     cur = mysql.connection.cursor()
     result_value = cur.execute("SELECT * FROM Volunteers")
 
@@ -552,6 +643,10 @@ def volunteers():
 
 @app.route("/admin/projects", methods=['POST', 'GET'])
 def projects():
+    type = restrict_child_routes()
+    if type == 'No_access':
+        return redirect(url_for('login'))
+
     cur = mysql.connection.cursor()
     result_value = cur.execute("SELECT * FROM Projects")
 
@@ -781,6 +876,10 @@ def projects():
 
 @app.route("/admin/trainers", methods=['GET', 'POST'])
 def trainers():
+    type = restrict_child_routes()
+    if type == 'No_access':
+        return redirect(url_for('login'))
+
     cur = mysql.connection.cursor()
     result_value = cur.execute("SELECT * FROM Trainers")
 
@@ -987,6 +1086,10 @@ def trainers():
 
 @app.route("/admin/user", methods=['POST', 'GET'])
 def user():
+    type = restrict_child_routes()
+    if type == 'No_access':
+        return redirect(url_for('login'))
+
     cur = mysql.connection.cursor()
     result_value = cur.execute("SELECT * FROM Beneficiary")
 
@@ -1260,10 +1363,6 @@ def user():
 
     return render_template('admin/user.html', searchResults=tuple(), profile_details=profile_details, projects=projects, villages=villages, education_list=education_list)
     # return render_template('admin/user.html')
-
-@app.route('/admin/dashboard', methods=['GET', 'POST'])
-def dashboard():
-    return render_template('admin/dashboard.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
