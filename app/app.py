@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect
 from flask_mysqldb import MySQL
 import yaml
-
+import datetime
 app = Flask(__name__)
 
 # Configure the database
@@ -20,28 +20,69 @@ def home():
     # return render_template("admin/volunteers.html")
 
 
+temp_id = 'E001'
+
 @app.route("/login", methods=['GET', 'POST'])
 def login():
     if (request.method == 'POST'):
+        print(f"in login")
         employee_form = request.form
         print(employee_form)
-        return render_template("admin/projects.html")
+        id = "E002"
+        cur = mysql.connection.cursor()
+        result_value = cur.execute(f"SELECT * FROM Teams WHERE employee_id = \'{id}\'")
+        if result_value ==0:
+            print("no user")
+            return redirect("/admin/login.html")
+        global temp_id
+        temp_id = id
+        print(f"tmp id: {temp_id}")
+        return redirect("/admin/user_profile.html")
     return render_template("admin/login.html")
     # return render_template("admin/login.html")
 
 
-@app.route("/admin/dashboard_request.html", methods=['POST', 'GET'])
+@app.route("/admin/dashboard_   request.html", methods=['POST', 'GET'])
 def dashboard_request():
     return render_template("admin/dashboard_request.html")
 
 @app.route("/admin/user_profile.html", methods=['POST', 'GET'])
 def user_profile():
-    return render_template("admin/user_profile.html")
+    print(f'in user profile')
+    cur = mysql.connection.cursor()
+    result_value = cur.execute(f"SELECT * FROM Teams where employee_id = \'{temp_id}\'")
+    profileDetails = []
+    if result_value == 1:
+        user = cur.fetchall()[0]
+        user_profile = {
+            'employ_id': user[0], 
+            'name' : user[1],
+            'email_id': user[2],
+            'salary': user[3],
+            'position': user[4],
+            'join_date': user[5],
+            'leave_date': user[6],
+            'reason': user[7]
+            }
+        profileDetails.append(user_profile)
 
+    
+    if (request.method == 'POST'):
+        if request.form['signal'] == 'edit':
+            print("edit of profile")
+            username = request.form['username']
+            email = request.form['email']
+            employ_id = temp_id
+            edit_query = f"UPDATE Teams SET name = \'{username}\', email_id = \'{email}\' WHERE employee_id = \'{employ_id}\'"
+            print(f"edit query: {edit_query}")
+            exec_query = cur.execute(edit_query)
+            mysql.connection.commit()
+            pass
+        
+        return redirect("/admin/user_profile.html")
+        pass
+    return render_template("admin/user_profile.html", profileDetails=profileDetails)
 
-@app.route("/admin")
-def admin():
-    return render_template("admin/dashboard.html")
 
 
 @app.route("/admin/funding", methods=['POST', 'GET'])
@@ -1005,7 +1046,6 @@ def user():
 
         calculate_age = cur.execute(calculate_age_query)
         calculate_age = cur.fetchall()
-
         extract_village = cur.execute(extract_village_query)
         extract_village = cur.fetchall()
 
