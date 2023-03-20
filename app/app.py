@@ -48,12 +48,6 @@ def check_project_year_combination(project_name, year):
         return True
     return False
 
-@app.route("/")
-def home():
-    return render_template("home.html")
-    # return render_template("admin/volunteers.html")
-
-
 # @app.route("/admin")
 # def admin():
 #     if 'loggedin' in session and if_admin():
@@ -78,61 +72,70 @@ def log_out():
     session.pop('id', None)
     return redirect(url_for('login'))
 
+temp_id = 'E001'
 @app.route("/login", methods=['GET', 'POST'])
 def login():
     if (request.method == 'POST'):
         employee_id = request.form["employeeID"]
         password = request.form["password"]
-        # pw_hash=bcrypt.generate_password_hash(password,10)
-        print(bcrypt.generate_password_hash("sandeep1").decode('utf-8'))
-        print(bcrypt.generate_password_hash("dheeraj1").decode('utf-8'))
-        print("Employee ID: ", employee_id)
-        print("Password: ", password)
-        # cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        global temp_id
+        temp_id = employee_id
 
         if (check_password(password, employee_id, "admin_password")):
             session['loggedin'] = True
             session['id'] = employee_id
             # session['username']=account['username']
             # return render_template("admin/user.html")
-            return redirect('/admin/dashboard?type=admin')
+            return redirect('/admin/user_profile?type=admin')
         elif (check_password(password, employee_id, "staff_password")):
             session['loggedin'] = True
             session['id'] = employee_id
             # session['username']=account['username']
-            return redirect('/admin/dashboard?type=staff')
+            return redirect('/admin/user_profile?type=staff')
         else:
             msg = "Incorrect Employee ID/password"
             flash(msg)
-
-        # cursor.execute("SELECT * FROM admin_password WHERE EmployeeID=%s AND EmployeePassword=%s",(employee_id,password))
-        # account=cursor.fetchone()
-
-        # if(account):
-        #     session['loggedin']=True
-        #     session['id']=account['EmployeeID']
-        #     # session['username']=account['username']
-        #     return render_template("admin/user.html")
-        # else:
-        #     cursor.execute("SELECT * FROM staff_password WHERE EmployeeID=%s AND EmployeePassword=%s",(employee_id,password))
-        #     account=cursor.fetchone()
-        #     if(account):
-        #         session['loggedin']=True
-        #         session['id']=account['EmployeeID']
-        #         # session['username']=account['username']
-        #         return render_template("staff/user.html")
-        #     msg="Incorrect Employee ID/password"
-        #     flash(msg)
     return render_template("admin/login.html")
 
-@app.route("/admin/dashboard_request.html", methods=['POST', 'GET'])
-def dashboard_request():
-    return render_template("admin/dashboard_request.html")
 
-
-@app.route("/admin/user_profile.html", methods=['POST', 'GET'])
+@app.route("/admin/user_profile", methods=['POST', 'GET'])
 def user_profile():
-    return render_template("admin/user_profile.html")
+    print(f'in user profile')
+
+    type = restrict_child_routes()
+
+    cur = mysql.connection.cursor()
+    result_value = cur.execute(f"SELECT * FROM Teams where employee_id = \'{temp_id}\'")
+    profileDetails = []
+    if result_value == 1:
+        user = cur.fetchall()[0]
+        user_profile = {
+            'employ_id': user[0],
+            'name': user[1],
+            'email_id': user[2],
+            'salary': user[3],
+            'position': user[4],
+            'join_date': user[5],
+            'leave_date': user[6],
+            'reason': user[7]
+        }
+        profileDetails.append(user_profile)
+
+    if (request.method == 'POST'):
+        if request.form['signal'] == 'edit':
+            print("edit of profile")
+            username = request.form['username']
+            email = request.form['email']
+            employ_id = temp_id
+            edit_query = f"UPDATE Teams SET name = \'{username}\', email_id = \'{email}\' WHERE employee_id = \'{employ_id}\'"
+            print(f"edit query: {edit_query}")
+            exec_query = cur.execute(edit_query)
+            mysql.connection.commit()
+
+        elif request.form['signal'] == 'logout':
+            return log_out()
+
+    return render_template("admin/user_profile.html", profileDetails=profileDetails, type=type)
 
 @app.route("/admin/dashboard", methods=['POST', 'GET'])
 def dashboard():

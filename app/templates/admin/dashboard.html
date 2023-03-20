@@ -59,12 +59,6 @@
                         </li>
 
                         <li class="nav-item light-black">
-                            <a href="{{url_for('dashboard_request')}}" class="nav-link align-middle px-2 text-white">
-                                <i class="bx bxs-dashboard"></i><span class="ms-1 d-none d-sm-inline">Dashboard</span>
-                            </a>
-                        </li>
-
-                        <li class="nav-item light-black">
                             <a href="{{ url_for('projects') }}" class="nav-link align-middle px-2 text-white">
                                 <i class='bx bx-calendar-event'></i> <span
                                     class="ms-1 d-none d-sm-inline">Project</span></a>
@@ -92,6 +86,13 @@
                             <a href="{{url_for('trainers')}}" class="nav-link align-middle px-2 text-white">
                                 <i class='bx bxs-user'></i></i><span class="ms-1 d-none d-sm-inline">Trainer</span></a>
                         </li>
+
+                        {% if type == 'admin' %}
+                            <li class="nav-item light-black">
+                                <a href="{{url_for('team')}}" class="nav-link align-middle px-2 text-white">
+                                    <i class='bx bx-group'></i><span class="ms-1 d-none d-sm-inline">Team</span></a>
+                            </li>
+                        {% endif %}
                     </ul>
                     <hr>
 
