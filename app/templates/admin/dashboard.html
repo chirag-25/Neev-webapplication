@@ -48,6 +48,16 @@
                     </div>
                     <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start d-inline-block "
                         id="menu" style="width: 100%;">
+
+                        <li>
+                            <form name="deleteForm" method="POST">
+                            <div class="form-group">
+                                <input type="hidden" name="signal" value="logout">
+                                <button type="submit" class="btn btn-danger">Log Out</button>
+                            </div>
+                            </form>
+                        </li>
+
                         <li class="nav-item light-black">
                             <a href="{{url_for('dashboard_request')}}" class="nav-link align-middle px-2 text-white">
                                 <i class="bx bxs-dashboard"></i><span class="ms-1 d-none d-sm-inline">Dashboard</span>
@@ -84,6 +94,8 @@
                         </li>
                     </ul>
                     <hr>
+
+
                     <div class="mb-3 px-3 d-flex fixed-bottom ">
                         <div><a href="www.google.com"><i class="bx bxl-instagram-alt  text-white h2"></i></a></div>
                         <div><a href="www.github.com"><i class="bx bxl-twitter px-2 text-white h2"></i></a></div>

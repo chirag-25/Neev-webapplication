@@ -36,6 +36,15 @@ def restrict_child_routes():
     else:
         return 'No_access'
 
+def check_project_year_combination(project_name, year):
+    #check in projects whether the project name and year combination exists
+    cursor = mysql.connection.cursor()
+    query = f"SELECT * FROM Projects WHERE event_name=\'{project_name}\' AND start_date IN (SELECT start_date FROM Projects WHERE YEAR(start_date)=\'{year}\')"
+    exec_query = cursor.execute(query)
+    exec_query = cursor.fetchall()
+    if len(exec_query) > 0:
+        return True
+    return False
 
 @app.route("/")
 def home():
@@ -61,6 +70,11 @@ def check_password(pass_word,id,table):
         if(bcrypt.check_password_hash(account['EmployeePassword'],password=pass_word)):
             return True
     return False
+
+def log_out():
+    session.pop('loggedin', None)
+    session.pop('id', None)
+    return redirect(url_for('login'))
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
@@ -118,9 +132,14 @@ def dashboard_request():
 def user_profile():
     return render_template("admin/user_profile.html")
 
-@app.route("/admin/dashboard")
+@app.route("/admin/dashboard", methods=['POST', 'GET'])
 def dashboard():
     type = restrict_child_routes()
+
+    if (request.method == 'POST'):
+        if request.form['signal'] == 'logout':
+            return log_out()
+
     return render_template("admin/dashboard.html", type=type)
 
 @app.route("/admin/funding", methods=['POST', 'GET'])
@@ -234,8 +253,12 @@ def funding():
             amount = request.form['amount_add']
             email = request.form['email']
             date = request.form['funding_date']
-
+            year = date.split('-')[0]
             funding_to = request.form['project']
+
+            if check_project_year_combination(funding_to, year) == False:
+                flash(f"Project {funding_to} is not available for year {year}", 'danger')
+                return redirect('/admin/funding')
 
             add_query = f"INSERT INTO Funding (email_id, amount, funder_name, date) "
             add_query = add_query + \
@@ -261,14 +284,35 @@ def funding():
             amount = request.form['amount']
             email = request.form['email']
             date = request.form['funding_date']
+            project_name = request.form['project_name']
+
+            # check if project is available for the year
+            year = date.split('-')[0]
+            print(year)
+            if project_name != '':
+                if check_project_year_combination(project_name, year) == False:
+                    flash(f"Project {project_name} is not available for year {year}", 'danger')
+                    return redirect('/admin/funding')
 
             edit_query = f"UPDATE Funding "
             edit_query = edit_query + \
                 f"SET funder_name = \'{benefactor}\', amount = \'{amount}\', email_id = \'{email}\', date = \'{date}\' "
             edit_query = edit_query + f"WHERE email_id = \'{email}\'"
-
             exec_query = cur.execute(edit_query)
             mysql.connection.commit()
+
+            if project_name != '':
+                #check if project is already defined for the user
+                check_query = f"SELECT * FROM Sponsors WHERE email_id = \'{email}\' AND event_name = \"{project_name}\" AND start_date IN (SELECT start_date FROM Projects WHERE event_name = \"{project_name}\" AND YEAR(start_date) = YEAR(\'{date}\'));"
+                exec_query = cur.execute(check_query)
+                check_result = cur.fetchall()
+                if len(check_result) == 0:
+                    #insert project
+                    add_project_query = f"INSERT INTO Sponsors (email_id, event_name, start_date) "
+                    add_project_query = add_project_query + f"VALUES (\"{email}\", \"{project_name}\", (SELECT start_date FROM Projects WHERE event_name = \"{project_name}\" AND YEAR(start_date) = YEAR(\'{date}\')))"
+                    exec_query = cur.execute(add_project_query)
+                    mysql.connection.commit()
+
             return redirect('/admin/funding')
         elif request.form['signal'] == 'delete':
             email = request.form['email']
@@ -276,6 +320,9 @@ def funding():
             exec_query = cur.execute(delete_query)
             mysql.connection.commit()
             return redirect('/admin/funding')
+
+        elif request.form['signal'] == 'logout':
+            return log_out()
         # print(profileDetails)
     return render_template('admin/funding.html', userDetails=userDetails, profileDetails=profileDetails, calculate_events=calculate_events, calculate_sponsors=calculate_sponsors)
 
@@ -457,6 +504,9 @@ def village_profile():
 
             return redirect('/admin/villageprofile')
 
+        elif request.form['signal'] == 'logout':
+            return log_out()
+
     return render_template('admin/village_profile.html', profile_details=profile_details, village_names=village_names, occupation_names=occupation_names, technical_literacy_names=technical_literacy_names)
 
 
@@ -580,7 +630,11 @@ def volunteers():
 
             projectEventName = request.form['project_name']
             project_start_year = request.form['project_year']
-            print(projectEventName, project_start_year)
+
+            # check if project is available for the year
+            if check_project_year_combination(projectEventName, project_start_year) == False:
+                flash(f"Project {projectEventName} is not available for year {project_start_year}", 'danger')
+                return redirect('/admin/volunteers')
 
             add_query = f"INSERT INTO Volunteers (email_id, name, phone_number, date_of_birth, gender) "
             add_query = add_query + \
@@ -605,6 +659,11 @@ def volunteers():
 
             projectEventName = request.form['project_name']
             project_start_year = request.form['project_year']
+
+            # check if project is available for the year
+            if check_project_year_combination(projectEventName, project_start_year) == False:
+                flash(f"Project {projectEventName} is not available for year {project_start_year}", 'danger')
+                return redirect('/admin/volunteers')
 
             edit_query = f"UPDATE Volunteers "
             edit_query = edit_query + \
@@ -637,6 +696,9 @@ def volunteers():
             exec_query = cur.execute(delete_query)
             mysql.connection.commit()
             return redirect('/admin/volunteers')
+
+        elif request.form['signal'] == 'logout':
+            return log_out()
 
     return render_template("admin/volunteers.html", profile_details=profile_details, projects=projects)
 
@@ -888,6 +950,9 @@ def projects():
             mysql.connection.commit()
             return redirect('/admin/projects')
 
+        elif request.form['signal'] == 'logout':
+            return log_out()
+
     return render_template('admin/projects.html', project_details=project_details, project_names=project_names,
                            event_names=event_names, venue_ids=venue_ids, employee_ids=employee_ids)
 
@@ -1014,6 +1079,11 @@ def trainers():
             projectEventName = request.form['project_name']
             project_start_year = request.form['project_year']
 
+            # check if project year combination exists
+            if check_project_year_combination(projectEventName, project_start_year) == False:
+                flash(f"Project {projectEventName} is not available for year {project_start_year}", 'danger')
+                return redirect('/admin/trainers')
+
             beneficiaryAadharId = request.form['beneficiaryAadharId']
             beneficiaryName = request.form['beneficiaryName']
 
@@ -1052,6 +1122,11 @@ def trainers():
 
             projectEventName = request.form['project_name']
             project_start_year = request.form['project_year']
+
+            # check if project year combination exists
+            if check_project_year_combination(projectEventName, project_start_year) == False:
+                flash(f"Project {projectEventName} is not available for year {project_start_year}", 'danger')
+                return redirect('/admin/trainers')
 
             beneficiaryAadharId = request.form['beneficiaryAadharId']
             beneficiaryName = request.form['beneficiaryName']
@@ -1098,6 +1173,9 @@ def trainers():
             exec_query = cur.execute(delete_query)
             mysql.connection.commit()
             return redirect('/admin/trainers')
+
+        elif request.form['signal'] == 'logout':
+            return log_out()
 
     return render_template("admin/trainers.html", profile_details=profile_details, projects=projects)
 
@@ -1295,6 +1373,11 @@ def user():
             project = request.form['project_name']
             project_start_year = request.form['project_year']
 
+            # check if project is available for the year
+            if check_project_year_combination(project, project_start_year) == False:
+                flash(f"Project {project} is not available for year {project_start_year}", 'danger')
+                return redirect('/admin/user')
+
             add_query = f"INSERT INTO Beneficiary (aadhar_id, name, date_of_birth, gender, marital_status, education, photo, employed, photo_caption) "
             add_query = add_query + \
                 f"VALUES ({aadhar}, \"{name}\", \'{dob}\', \'{gender}\', \'{martial}\', \'{education}\', NULL, \"{employed}\", NULL)"
@@ -1338,6 +1421,11 @@ def user():
             project = request.form['project_name']
             project_start_year = request.form['project_year']
 
+            if  project != '':
+                if check_project_year_combination(project, project_start_year) == False:
+                    flash(f"Project {project} is not available for year {project_start_year}", 'danger')
+                    return redirect('/admin/user')
+
             edit_query = f"UPDATE Beneficiary "
             edit_query = edit_query + \
                 f"SET name = \'{name}\', date_of_birth = \'{dob}\', gender = \'{gender}\', marital_status = \'{martial}\', education = \'{education}\', photo = NULL, employed = \"{employed}\", photo_caption = NULL "
@@ -1378,6 +1466,9 @@ def user():
             exec_query = cur.execute(delete_query)
             mysql.connection.commit()
             return redirect('/admin/user')
+
+        elif request.form['signal'] == 'logout':
+            return log_out()
 
     return render_template('admin/user.html', searchResults=tuple(), profile_details=profile_details, projects=projects, villages=villages, education_list=education_list)
     # return render_template('admin/user.html')

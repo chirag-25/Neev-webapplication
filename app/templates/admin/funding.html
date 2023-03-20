@@ -1,5 +1,16 @@
 {% extends '/admin/dashboard.html'%} 
 {% block content %}
+
+    {% with messages=get_flashed_messages() %}
+    {% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-danger" role="alert">
+          {{ message }}
+        </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
 <div>
     <h1>Benefactor</h1>
     <!-- search form -->
@@ -205,11 +216,11 @@
                         <div class="form-group d-flex justify-content-between align-items-center">
                             <select class="form-control flex-item" style="width: 48%;" id="project_name_eidt"
                                 name="project_name" placeholder="Project Name">
-                                <option value="Sewing">Sewing</option>
-                                <option value="Cooking">Cooking</option>
+                                <option selected value="">NA</option>
+                                {% for project in calculate_events %}
+                                <option value="{{project[0]}}">{{project[0]}}</option>
+                                {% endfor %}
                             </select>
-                            <input type="number" class="form-control flex-item" style="width: 48%;" name="year"
-                                placeholder="Year" min="2008" />
                         </div>
 
 
