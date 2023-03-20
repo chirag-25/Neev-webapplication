@@ -25,7 +25,9 @@ def login():
     if (request.method == 'POST'):
         employee_form = request.form
         print(employee_form)
+        return render_template("admin/projects.html")
     return render_template("admin/login.html")
+    # return render_template("admin/login.html")
 
 
 @app.route("/admin")
@@ -1250,6 +1252,9 @@ def user():
     return render_template('admin/user.html', searchResults=tuple(), profile_details=profile_details, projects=projects, villages=villages, education_list=education_list)
     # return render_template('admin/user.html')
 
+@app.route('/admin/dashboard', methods=['GET', 'POST'])
+def dashboard():
+    return render_template('admin/dashboard.html')
 
 if __name__ == '__main__':
     app.run(debug=True)

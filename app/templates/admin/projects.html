@@ -1,38 +1,38 @@
-{% extends 'layout.html'%}
+{% extends '/admin/dashboard.html'%}
 {% block content %}
-<div class="container">
+<div>
 
-    <h1>Projects</h1>
-    <div class="container" style="width:60%">
+    <h1>Projects/Events</h1>
+    <div style="width:60%">
         <form name="searchForm" method="POST">
-            <div class="d-flex flex-wrap m-1 justify-content-between">
+            <div class="d-flex flex-wrap m-2 ">
                 <input type="hidden" name="signal" value="search">
-                <div class="form-group">
-
-                    <label for="event_name">Event Name</label>
-                    <select class="form-control" id="event_name" name="event_name">
-                        <option value="" selected>NA</option>
-                        {% for project_name in project_names %}
+                <!-- event name, year, type of event -->
+                <div class="d-flex my-1 justify-content-between" style="width: 100%;">
+                    <div class="form-group"  style=" width: 38%;">
+                        <label for="event_name">Event Name</label>
+                        <select class="form-control" id="event_name" name="event_name">
+                            <option value="" selected>NA</option>
+                            {% for project_name in project_names %}
                             <option value="{{project_name[0]}}">{{project_name[0]}}</option>
-                        {% endfor %}
-                    </select>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group" style=" width: 18%;">
+                        <label for="year">Year</label>
+                        <input type="number" class="form-control" id="year" placeholder="Year" min="2000" name="year" />
+                    </div>
 
+                    <div class="form-group" style="width: 38%;">
+                        <label for="type_event">Type of Events</label>
+                        <select class="form-control" id="type_event" name="type_event">
 
-                </div>
-                <div class="form-group">
-                    <label for="year">Year</label>
-                    <input type="number" class="form-control" id="year" placeholder="Year" min="2000" name="year" />
-                </div>
-
-                <div class="form-group">
-                    <label for="type_event">Type of Events</label>
-                    <select class="form-control" id="type_event" name="type_event">
-
-                        <option value="" selected>NA</option>
-                        {% for event in event_names %}
+                            <option value="" selected>NA</option>
+                            {% for event in event_names %}
                             <option value="{{event[0]}}">{{event[0]}}</option>
-                        {% endfor %}
-                    </select>
+                            {% endfor %}
+                        </select>
+                    </div>
                 </div>
 
                 <!-- amount  -->
@@ -41,23 +41,23 @@
                     <input type="number" class="form-control mx-3" name="min_budget" id="min_budget"
                         placeholder="Min" />
                     <input type="number" class="form-control" name="max_budget" id="max_budget" placeholder="Max" />
-
                 </div>
                 <div>
-                    <button type="submit" class="btn btn-primary" onclick="" value="">Search</button>
+                    <button type="submit" class="btn btn-primary my-2" onclick="" value="">Search</button>
                 </div>
             </div>
         </form>
 
     </div>
 
-
-    <div class="container">
+    <!-- new button -->
+    <div>
         <button type="button" class="btn btn-success m-2" data-toggle="modal" data-target="#addModal" onclick="">Add New
             Project</button>
 
     </div>
 
+    <!-- display table -->
     <table class="table">
 
         <thead>
@@ -250,10 +250,10 @@
 
 
                 <td>
-                    <button type="button" class="btn btn-primary btn-sm" data-toggle="modal"
-                        data-target="#editModal" onclick="edit(this)">Edit</button>
-                    <button type="button" class="btn btn-danger btn-sm" data-toggle="modal"
-                        data-target="#deleteModal" onclick="delete_user(this)">Delete</button>
+                    <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editModal"
+                        onclick="edit(this)">Edit</button>
+                    <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#deleteModal"
+                        onclick="delete_user(this)">Delete</button>
                     <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#profileModal"
                         onclick="show_details(this)">Details</button>
                 </td>
@@ -263,160 +263,162 @@
     </table>
 
 
-   <!-- edit modal  -->
-<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="editModalLabel">Edit Project</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
+    <!-- edit modal  -->
+    <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel">Edit Project</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form name="editedDetails" method="POST">
+                        <input type="hidden" value="editProject" name="signal">
+                        <div class="form-group">
+                            <label for=" event_name">Event name:</label>
+                            <input type="text" class="form-control" id="event_name" name="event_name" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="date">Start date</label>
+                            <input type="date" class="form-control" id="date" name="date" readonly />
+                        </div>
+                        <div class="form-group">
+                            <label for="budget">Budget</label>
+                            <input type="number" class="form-control" id="budget" name="budget">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="participants">Number of participants</label>
+                            <input type="number" class="form-control" id="participants" name="participants">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="duration">Duration (in hours)</label>
+                            <input type="number" class="form-control" id="duration" name="duration">
+
+                        </div>
+
+                        <div class="form-group">
+                            <label for="collection">Collection (in ₹)</label>
+                            <input type="number" class="form-control" id="collection" name="collection">
+
+                        </div>
+
+                        <div class="form-group">
+                            <label for="expense">Total expense:</label>
+                            <input type="number" class="form-control" id="expense" name="expense">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="types">Types</label>
+                            <input type="text" class="form-control" id="types" name="types" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="type_event">Venue ID</label>
+                            <select class="form-control" id="type_event" name="venue_id">
+
+                                <option value="" selected>NA</option>
+                                {% for venue in venue_ids %}
+                                <option value="{{venue[0]}}">{{venue[0]}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                            <input type="submit" class="btn btn-primary" id="saveChangesButton" value="Save Changes">
+                        </div>
+                    </form>
+                </div>
+
+            </div>
         </div>
-        <div class="modal-body">
-          <form name="editedDetails" method="POST">
-            <input type="hidden"  value="editProject" name="signal">
-            <div class="form-group">
-              <label for=" event_name" >Event name:</label>
-              <input type="text" class="form-control" id="event_name" name="event_name" readonly>
-            </div>
-            <div class="form-group">
-              <label for="date">Start date</label>
-              <input type="date" class="form-control" id="date" name="date" readonly />
-            </div>
-            <div class="form-group">
-              <label for="budget">Budget</label>
-              <input type="number" class="form-control" id="budget" name="budget">
-            </div>
-
-            <div class="form-group">
-              <label for="participants">Number of participants</label>
-              <input type="number" class="form-control" id="participants" name="participants">
-            </div>
-
-            <div class="form-group">
-              <label for="duration">Duration (in hours)</label>
-              <input type="number" class="form-control" id="duration" name="duration">
-
-            </div>
-
-            <div class="form-group">
-              <label for="collection">Collection (in ₹)</label>
-              <input type="number" class="form-control" id="collection" name="collection">
-
-            </div>
-
-            <div class="form-group">
-              <label for="expense">Total expense:</label>
-              <input type="number" class="form-control" id="expense" name="expense">
-            </div>
-
-            <div class="form-group">
-                <label for="types">Types</label>
-                <input type="text" class="form-control" id="types" name="types" required>
-            </div>
-
-           <div class="form-group">
-                    <label for="type_event">Venue ID</label>
-                    <select class="form-control" id="type_event" name="venue_id">
-
-                        <option value="" selected>NA</option>
-                        {% for venue in venue_ids %}
-                            <option value="{{venue[0]}}">{{venue[0]}}</option>
-                        {% endfor %}
-                    </select>
-            </div>
-
-              <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                <input type="submit" class="btn btn-primary" id="saveChangesButton" value="Save Changes">
-              </div>
-          </form>
-        </div>
-
-      </div>
     </div>
-  </div>
 
 
     <!-- add modal -->
 
-<div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="editModalLabel">Add New Project</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <form name="addDetails" method="POST">
-          <!-- <input type="hidden" name="search" value="addProject"> -->
-          <input type="hidden"  value="addProject" name="signal">
-          <div class="form-group">
-            <label for=" event_name" >Event name:</label>
-            <input type="text" class="form-control" id="event_name" name="event_name"/>
-          </div>
-          <div class="form-group">
-            <label for="date">Start date</label>
-            <input type="date" class="form-control" id="date" name="date">
-          </div>
-          <div class="form-group">
-            <label for="budget">Budget</label>
-            <input type="number" class="form-control" id="budget" name="budget">
-          </div>
+    <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel">Add New Project</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form name="addDetails" method="POST">
+                        <!-- <input type="hidden" name="search" value="addProject"> -->
+                        <input type="hidden" value="addProject" name="signal">
+                        <div class="form-group">
+                            <label for=" event_name">Event name:</label>
+                            <input type="text" class="form-control" id="event_name" name="event_name" />
+                        </div>
+                        <div class="form-group">
+                            <label for="date">Start date</label>
+                            <input type="date" class="form-control" id="date" name="date">
+                        </div>
+                        <div class="form-group">
+                            <label for="budget">Budget</label>
+                            <input type="number" class="form-control" id="budget" name="budget">
+                        </div>
 
-          <div class="form-group">
-            <label for="participants">Number of participants</label>
-            <input type="number" class="form-control" id="participants" name="participants">
-          </div>
+                        <div class="form-group">
+                            <label for="participants">Number of participants</label>
+                            <input type="number" class="form-control" id="participants" name="participants">
+                        </div>
 
-          <div class="form-group">
-            <label for="duration">Duration (in hours)</label>
-            <input type="number" class="form-control" id="duration" name="duration">
+                        <div class="form-group">
+                            <label for="duration">Duration (in hours)</label>
+                            <input type="number" class="form-control" id="duration" name="duration">
 
-          </div>
+                        </div>
 
-          <div class="form-group">
-            <label for="collection">Collection (in ₹)</label>
-            <input type="number" class="form-control" id="collection" name="collection">
+                        <div class="form-group">
+                            <label for="collection">Collection (in ₹)</label>
+                            <input type="number" class="form-control" id="collection" name="collection">
 
-          </div>
+                        </div>
 
-          <div class="form-group">
-            <label for="expense">Total expense:</label>
-            <input type="number" class="form-control" id="expense" name="expense">
-          </div>
+                        <div class="form-group">
+                            <label for="expense">Total expense:</label>
+                            <input type="number" class="form-control" id="expense" name="expense">
+                        </div>
 
-            <div class="form-group">
-                <label for="types">Types</label>
-                <input type="text" class="form-control" id="types" name="types" required>
+                        <div class="form-group">
+                            <label for="types">Types</label>
+                            <input type="text" class="form-control" id="types" name="types" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="type_event">Venue ID</label>
+                            <select class="form-control" id="type_event" name="venue_id">
+
+                                <option value="" selected>NA</option>
+                                {% for venue in venue_ids %}
+                                <option value="{{venue[0]}}">{{venue[0]}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                            <input type="submit" class="btn btn-primary" id="saveChangesButton" value="Add Project">
+                        </div>
+
+                    </form>
+                </div>
+
             </div>
-
-            <div class="form-group">
-                    <label for="type_event">Venue ID</label>
-                    <select class="form-control" id="type_event" name="venue_id">
-
-                        <option value="" selected>NA</option>
-                        {% for venue in venue_ids %}
-                            <option value="{{venue[0]}}">{{venue[0]}}</option>
-                        {% endfor %}
-                    </select>
-            </div>
-
-
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-              <input type="submit" class="btn btn-primary" id="saveChangesButton" value="Add Project">
-            </div>
-
-        </form>
-      </div>
-
+        </div>
     </div>
-  </div>
-</div>
 
 
 
@@ -533,7 +535,7 @@
         form.querySelector("input[name='duration']").value = duration;
         form.querySelector("input[name='collection']").value = collection;
         form.querySelector("input[name='expense']").value = expense;
-      }
+    }
 
     function show_details(e) {
         let p = e.parentNode.parentNode;
@@ -583,7 +585,7 @@
 
         form.querySelector("input[name='event_name']").value = name;
         form.querySelector("input[name='date']").value = start_date;
-      }
+    }
 
 
 </script>
