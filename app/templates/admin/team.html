@@ -67,7 +67,7 @@
         </form>
     </div>
 
-
+    <!--table -->
     <div>
         <div style=" margin-top: 20px">
             <!-- add button -->
@@ -93,13 +93,13 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td>1</td>
-                        <td>Chirag</td>
-                        <td>abc@gamil.com</td>
-                        <td>Trainer</td>
-                        <td>150000</td>
-                        <td>2002</td>
-                        <td></td>
+                        <td headers="sno">1</td>
+                        <td headers="name">Chirag</td>
+                        <td headers="email">abc@gamil.com</td>
+                        <td headers="position">Trainer</td>
+                        <td headers="salary">150000</td>
+                        <td headers="hired_in">2002</td>
+                        <td headers="quit"></td>
                         <td>
                             <button type="button" class="btn btn-primary btn-sm" data-toggle="modal"
                                 data-target="#updateModal" onclick="edit(this)">
@@ -214,13 +214,13 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="hired_edit">Hired In</label>
-                            <input type="number" class="form-control" id="hired_edit" name="hired" min="2008">
+                            <label for="hired_in_edit">Hired In</label>
+                            <input type="number" class="form-control" id="hired_in_edit" name="hired_in" min="2008">
                         </div>
 
                         <div class="form-group">
-                            <label for="resigned_edit">Resigned In</label>
-                            <input type="number" class="form-control" id="resigned_edit" name="resigned" min="2008">
+                            <label for="quit_in_edit">Quit In</label>
+                            <input type="number" class="form-control" id="quit_in_edit" name="quit_in" min="2008">
                         </div>
 
                         <!-- project and year -->
@@ -341,4 +341,69 @@
         </div>
     </div>
 </div>
+
+<script>
+    //   js to add details to the edit form
+    function edit(e) {
+        console.log(e.parentNode.parentNode);
+        let p = e.parentNode.parentNode;
+        let name = p.querySelector("td[headers='name']").innerHTML;
+        let email = p.querySelector('td[headers="email"]').innerHTML;
+        let position = p.querySelector('td[headers="position"]').innerHTML;
+        let salary = p.querySelector('td[headers="salary"]').innerHTML;
+        let hired_in = p.querySelector('td[headers="hired_in"]').innerHTML;
+        let quit = p.querySelector('td[headers="quit"]').innerHTML;
+        
+        console.log(name, email, position, salary, hired_in, quit);
+        let form = document.querySelector("form[name='editedDetails']");
+        form.querySelector("input[name='name']").value = name;
+        form.querySelector("input[name='email']").value = email;
+        form.querySelector("input[name='position']").value = position;
+        form.querySelector("input[name='salary']").value = salary;
+        form.querySelector("input[name='hired_in']").value = hired_in;
+        form.querySelector("input[name='quit_in']").value = quit;
+
+    }
+    // function delete_user(e) {
+    //     let p = e.parentNode.parentNode;
+    //     // let email = p.querySelector('td[headers="email"]').innerHTML;
+    //     let email = p.querySelector('td[headers="email"]').innerHTML;
+    //     console.log(email)
+    //     let form = document.querySelector("form[name='deleteForm']");
+
+    //     form.querySelector("input[name='email']").value = email;
+    // }
+    // function addUserToModal(e) {
+    //     // e.preventDefault()
+    //     let p = e.parentNode.parentNode;
+    //     let email = p.querySelector('td[headers="email"]').innerHTML;
+    //     let benefactor = p.querySelector("td[headers='benefactor']").innerHTML;
+    //     let projects = p.querySelector('td[headers="projects"]').innerHTML;
+    //     let amount = p.querySelector('td[headers="amount"]').innerHTML;
+    //     console.log(amount)
+    //     console.log(email)
+    //     console.log(benefactor)
+
+    //     const nameModal = document.querySelector('.name_modal');
+    //     const emailModal = document.querySelector('.email_modal');
+    //     nameModal.innerHTML = benefactor;
+    //     emailModal.innerHTML = email;
+
+    //     // Change the amount in the modal
+    //     // const Amount = document.querySelector('.add_amount_table');
+    //     // console.log(Amount)
+    //     // Amount.innerHTML = amount;
+
+    //     document.querySelector("#profile_project_table").innerHTML = projects;
+
+    //     // Submit a hidden form to get email and name on Flask server
+    //     // const form = document.querySelector('#myForm');
+    //     // console.log(form);
+    //     // form.querySelector("input[name='email']").value = email;
+    //     // form.querySelector("input[name='benefactor']").value = benefactor;
+    //     // form.submit();
+    // }
+
+</script>
+
 {% endblock content %}
