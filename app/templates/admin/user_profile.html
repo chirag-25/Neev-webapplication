@@ -8,16 +8,15 @@
           <div class="col-md-6">
             <h3>Personal Information</h3>
             <ul class="list-group">
-              <li class="list-group-item">Name: John Doe</li>
-              <li class="list-group-item">Email: johndoe@example.com</li>
-              <li class="list-group-item">Address: 123 Main St, Anytown, USA</li>
+              <li class="list-group-item">Name: <span id="user_name">John Doe</span> </li>
+              <li class="list-group-item">Email: <span id="user_email">johndoe@example.com </span></li>
             </ul>
           </div>
           <div class="col-md-6">
             <h3>Employment Information</h3>
             <ul class="list-group">
               <li class="list-group-item">Position: Sales Associate</li>
-              <li class="list-group-item">Hire Date: January 1, 2021</li>
+              <li class="list-group-item">Working since: 2021</li>
               <li class="list-group-item">Salary: $50,000 per year</li>
             </ul>
           </div>
@@ -37,17 +36,12 @@
                   <tr>
                     <td>1</td>
                     <td>555-555-5555</td>
-                    <td>Home USA</td>
+                    <td>Home<td>
                   </tr>
                   <tr>
                     <td>2</td>
                     <td>555-555-5556</td>
                     <td>Office</td>
-                  </tr>
-                  <tr>
-                    <td>3</td>
-                    <td>555-555-5557</td>
-                    <td>Anytown, USA</td>
                   </tr>
                 </tbody>
               </table>
@@ -87,12 +81,6 @@
                         <div class="form- my-1">
                             <label for="username_edit">Name</label>
                             <input type="text" class="form-control" id="username_edit" name="username" required />
-                        </div>
-
-                        <!-- address -->
-                        <div class="form-group my-1">
-                            <label for="address_edit">Address</label>
-                            <input type="text" class="form-control" id="address_edit" name="address" required />
                         </div>
 
                         <!-- phone -->
