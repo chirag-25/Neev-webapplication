@@ -1,5 +1,36 @@
-# neev-webapplication
+# Neev Web app
+## Initial Setup
 
-[Link to assignment 3 dbms](https://docs.google.com/document/d/18AjrnwYsm_yC_czwOWrr4RIQMEbOC0vJzNA7WBZaC5g/edit?usp=sharing)
+Clone this project
 
-[Github link to flask app](https://github.com/febin-george/flaskapp)
+Run this on terminal
+```bash
+pip3 install -r requirements.txt
+```
+Change the password in db.yaml to that of your MySQL's password
+
+Run the database.sql file in your MySQL database. it will create the NEEV2 database 
+
+Go to app folder by
+```bash
+cd app
+```
+
+Run the application by executing the command 
+``` bash
+python3 app.py
+```
+
+Click on login link and give the below details to login as admin
+
+We have created the admin user in our database with 
+
+```text
+id = 1
+password: GFfK65EW785wzCKaAA
+```
+
+This admin can only add other members. For other members option for adding the new member is denied
+
+
+
