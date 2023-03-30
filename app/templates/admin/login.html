@@ -1,20 +1,33 @@
 {% extends './layout.html'%}
 {% block content %}
-<form>
+
+    {% with messages=get_flashed_messages() %}
+{% if messages %}
+{% for message in messages %}
+    <div class="alert alert-danger" role="alert">
+      {{ message }}
+    </div>
+{% endfor %}
+{% endif %}
+{% endwith %}
+
+<div class="container align-items-center my-5" style="width: 30%; margin-top:">
+  <form method="POST" action="">
     <div class="form-group">
       <label for="exampleInputEmail1">Employee ID</label>
-      <input type="number" name="employeeID" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter Employee ID">
+      <input type="number" name="employeeID" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter Employee ID" required>
       <!-- <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small> -->
     </div>
     <div class="form-group">
       <label for="exampleInputPassword1">Password</label>
-      <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password" name="password">
+      <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password" name="password" required>
     </div>
-    <div class="form-group form-check">
+    <!-- <div class="form-group form-check"> -->
       <!-- <input type="checkbox" class="form-check-input" id="exampleCheck1"> -->
       <!-- <label class="form-check-label" for="exampleCheck1">Check me out</label> -->
-    </div>
+    <!-- </div> -->
     <button type="submit" class="btn btn-primary" onclick="">Submit</button>
   </form>
+</div>
 
   {% endblock content %}

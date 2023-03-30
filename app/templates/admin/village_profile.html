@@ -1,37 +1,31 @@
-{% extends 'layout.html'%}
+{% extends '/admin/dashboard.html'%}
 {% block content %}
 <div class="container">
-
     <h1>Village Profile</h1>
-    <div class="container" style="width: 65%">
+    <div  style="width: 65%">
         <form name="searchForm" method="POST">
             <div class="d-flex flex-wrap m-1 justify-content-between">
                 <input type="hidden" name="signal" value="search">
-
+                
                 <div class="form-group">
-
-                    <label for="name">Village Name</label>
-                    <select class="name" id="village_name" name="name">
+                    <label for="village_name">Village Name</label>
+                    <select class="form-control" id="village_name" name="name">
                         <option value="" selected>NA</option>
                         {% for village in village_names %}
                         <option value="{{village[0]}}">{{village[0]}}</option>
                         {% endfor %}
                     </select>
-
-
                 </div>
-
 
                 <div class="form-group">
                     <label for="pinCode">PIN Code</label>
                     <input type="number" class="form-control" id="pinCode" name="pinCode" min="100000" max="999999">
                 </div>
 
-
                 <!-- major occupation -->
                 <div class="form-group">
                     <label for="majoroccupation">Major Occupation</label>
-                    <select class="name" id="occupation_name" name="occupation">
+                    <select class="form-control" id="majoroccupation" name="occupation">
                         <option value="" selected>NA</option>
                         {% for occupation in occupation_names %}
                         <option value="{{occupation[0]}}">{{occupation[0]}}</option>
@@ -39,10 +33,9 @@
                     </select>
                     <!-- <input type="text" class="form-control" id="majoroccupation" name="occupation"> -->
                 </div>
-
                 <div class="form-group">
                     <label for="technical_literacy">Technical Literacy</label>
-                    <select class="name" id="technical_literacy_name" name="technical_literacy">
+                    <select class="form-control" id="technical_literacy" name="technical_literacy">
                         <option value="" selected>NA</option>
                         {% for literacy in technical_literacy_names %}
                         <option value="{{literacy[0]}}">{{literacy[0]}}</option>
@@ -51,21 +44,19 @@
 
                     <!-- <input type="text" class="form-control" id="technical_literacy" name="technical_literacy"> -->
                 </div>
-
-
             </div>
 
 
             <div>
-                <button type="submit" class="btn btn-primary" onclick="" value="">Search</button>
+                <button type="submit" class="btn btn-primary my-1" onclick="" value="">Search</button>
             </div>
         </form>
 
     </div>
 
 
-    <div class="container">
-        <button type="button" class="btn btn-success m-2" data-toggle="modal" data-target="#addModal" onclick="">Add New
+    <div >
+        <button type="button" class="btn btn-success my-3" data-toggle="modal" data-target="#addModal" onclick="">Add New
             Village Profile</button>
     </div>
 
@@ -297,7 +288,7 @@
 
 
                         <div class="form-group">
-                            <label for="year_add">Delete</label>
+                            <label for="year_add">Date</label>
                             <input type="date" class="form-control" id="year_add" name="year" min="2005">
                         </div>
 

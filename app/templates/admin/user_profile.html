@@ -1,0 +1,109 @@
+{% extends '/admin/dashboard.html'%} 
+{% block content %}
+<div>
+    <div class="container my-5">
+      {% for user in profileDetails %}
+        <h1>Welcome, {{user['name']}} </h1>
+        <hr>
+        <div class="row">
+          <div class="col-md-6">
+            <h3>Personal Information</h3>
+            <ul class="list-group">
+              <li class="list-group-item">Name: <span id="user_name">{{user['name']}} </span> </li>
+
+              <li class="list-group-item">Email: <span id="user_email"> {{user['email_id']}} </span></li>
+            </ul>
+          </div>
+          <div class="col-md-6">
+            <h3>Employment Information</h3>
+            <ul class="list-group">
+              <li class="list-group-item">Employ Id: <span id="user_employ_id"> {{user['employ_id']}} </span></li>
+              <li class="list-group-item">Position: <span> {{user['position']}} </span></li>
+              <li class="list-group-item">Working since: {{user['join_date']}} </li>
+              <li class="list-group-item">Salary: <span> {{user['salary']}} </span> per year</li>
+            </ul>
+          </div>
+
+            </div>
+          </div>
+          {% endfor %}
+          <div>
+            <button type="button" class="btn btn-primary btn  " data-toggle="modal" data-target="#editModal"
+            onclick="edit(this)">
+            Edit Information</button>
+          </div>
+
+          <!-- edit modal  -->
+          <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel"
+          aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel">Edit Profile </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form name="editedDetails" method="POST">
+                        <input type="hidden" value="edit" name="signal"/>
+                        <!-- employ id -->
+                        <div class="form-group my-1">
+                            <label for="employ_id_edit">Employ Id</label>
+                            <input type="text" class="form-control" id="employ_id_edit" name="employ_id" required readonly />
+                        </div>
+                        <!-- email -->
+                        <div class="form-group my-1">
+                            <label for="email_edit">Email</label>
+                            <input type="email" class="form-control" id="email_edit" name="email" required  />
+                        </div>
+
+                        <!--  name -->
+                        <div class="form- my-1">
+                            <label for="username_edit">Name</label>
+                            <input type="text" class="form-control" id="username_edit" name="username"  />
+                        </div>
+
+                        <!-- phone -->
+                        <!-- <div class="form-group">
+                            <label for="phone_edit">Phone</label>
+                            <input type="tel" class="form-control" id="phone_edit" name="phone" required />
+                            <input type="text" class="form-control" id="location_edit" name="location"  placeholder="Location" required />
+
+                        </div> -->
+
+                        <!-- cancel and save changes-->
+                        <div class="modal-footer" style="margin-top: 20px;">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                                Cancel
+                            </button>
+                            <input type="submit" class="btn btn-primary" id="saveChangesButton" value="Save Changes" />
+                        </div>
+                      </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+ function edit(e) {
+    let p = e.parentNode.parentNode;
+    let username = p.querySelector("span[id='user_name']").innerHTML;
+    let email = p.querySelector("span[id='user_email']").innerHTML;
+    console.log(username, email);
+    let employ_id = p.querySelector("span[id='user_employ_id']").innerHTML;
+
+    console.log(username, email, employ_id);
+
+    let form = document.querySelector("form[name='editedDetails']");
+
+    form.querySelector("input[name='username']").value = username;
+    form.querySelector("input[name='employ_id']").value = employ_id;
+    form.querySelector("input[name='email']").value = email;
+  }
+
+</script>
+
+{% endblock content %}

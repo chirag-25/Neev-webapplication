@@ -1,8 +1,12 @@
-from flask import Flask, render_template, request, redirect
+import MySQLdb
+from flask import Flask, render_template, request, redirect, url_for, flash, session
 from flask_mysqldb import MySQL
 import yaml
+from email_script import send_email
+import secrets
 
 app = Flask(__name__)
+app.secret_key='secret_key'
 
 # Configure the database
 db = yaml.load(open('db.yaml'), Loader=yaml.Loader)
@@ -13,28 +17,145 @@ app.config['MYSQL_DB'] = db['mysql_db']
 
 mysql = MySQL(app)
 
+def if_admin():
+    cursor = mysql.connection.cursor()
+    id_search_query = f"SELECT * FROM admin_password WHERE EmployeeID=\'{session['id']}\'"
+    cursor.execute(id_search_query)
+    account = cursor.fetchone()
+    if account:
+        return True
+    return False
+
+def restrict_child_routes():
+    print("restrict_child_routes")
+    if 'loggedin' in session:
+        if if_admin():
+            return 'admin'
+    elif ('loggedin' in session):
+        return 'staff'
+    else:
+        return 'No_access'
+
+def check_project_year_combination(project_name, year):
+    #check in projects whether the project name and year combination exists
+    cursor = mysql.connection.cursor()
+    query = f"SELECT * FROM Projects WHERE event_name=\'{project_name}\' AND start_date IN (SELECT start_date FROM Projects WHERE YEAR(start_date)=\'{year}\')"
+    exec_query = cursor.execute(query)
+    exec_query = cursor.fetchall()
+    if len(exec_query) > 0:
+        return True
+    return False
+
+# @app.route("/admin")
+# def admin():
+#     if 'loggedin' in session and if_admin():
+#         return render_template("admin/dashboard.html",type="admin")
+#     elif('loggedin' in session ):
+#         return render_template("admin/dashboard.html",type="staff")
+#     else:
+#         return redirect(url_for('login'))
+
+def check_password(pass_word,id,table):
+    cursor=mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    query="SELECT * FROM" +" "+table +" " + "WHERE EmployeeID="+str(id)
+    cursor.execute(query)
+    account=cursor.fetchone()
+    if(account):
+        if(account['EmployeePassword']==pass_word):
+            return True
+    return False
+
+def log_out():
+    session.pop('loggedin', None)
+    session.pop('id', None)
+    return redirect(url_for('login'))
+
+temp_id = 'E001'
 
 @app.route("/")
 def home():
     return render_template("home.html")
-    # return render_template("admin/volunteers.html")
-
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
     if (request.method == 'POST'):
-        employee_form = request.form
-        print(employee_form)
+        employee_id = request.form["employeeID"]
+        password = request.form["password"]
+        global temp_id
+        temp_id = employee_id
+
+        if (check_password(password, employee_id, "admin_password")):
+            session['loggedin'] = True
+            session['id'] = employee_id
+            # session['username']=account['username']
+            # return render_template("admin/user.html")
+            return redirect('/admin/user_profile?type=admin')
+        elif (check_password(password, employee_id, "staff_password")):
+            session['loggedin'] = True
+            session['id'] = employee_id
+            # session['username']=account['username']
+            return redirect('/admin/user_profile?type=staff')
+        else:
+            msg = "Incorrect Employee ID/password"
+            flash(msg)
     return render_template("admin/login.html")
 
 
-@app.route("/admin")
-def admin():
-    return render_template("admin/dashboard.html")
+@app.route("/admin/user_profile", methods=['POST', 'GET'])
+def user_profile():
+    print(f'in user profile')
 
+    type = restrict_child_routes()
+
+    cur = mysql.connection.cursor()
+    result_value = cur.execute(f"SELECT * FROM Teams where employee_id = \'{temp_id}\'")
+    profileDetails = []
+    if result_value == 1:
+        user = cur.fetchall()[0]
+        user_profile = {
+            'employ_id': user[0],
+            'name': user[1],
+            'email_id': user[2],
+            'salary': user[3],
+            'position': user[4],
+            'join_date': user[5],
+            'leave_date': user[6],
+            'reason': user[7]
+        }
+        profileDetails.append(user_profile)
+
+    if (request.method == 'POST'):
+        if request.form['signal'] == 'edit':
+            print("edit of profile")
+            username = request.form['username']
+            email = request.form['email']
+            employ_id = temp_id
+            edit_query = f"UPDATE Teams SET name = \'{username}\', email_id = \'{email}\' WHERE employee_id = \'{employ_id}\'"
+            print(f"edit query: {edit_query}")
+            exec_query = cur.execute(edit_query)
+            mysql.connection.commit()
+
+        elif request.form['signal'] == 'logout':
+            return log_out()
+
+    return render_template("admin/user_profile.html", profileDetails=profileDetails, type=type)
+
+@app.route("/admin/dashboard", methods=['POST', 'GET'])
+def dashboard():
+    type = restrict_child_routes()
+
+    if (request.method == 'POST'):
+        if request.form['signal'] == 'logout':
+            return log_out()
+
+    return render_template("admin/dashboard.html", type=type)
 
 @app.route("/admin/funding", methods=['POST', 'GET'])
 def funding():
+    type = restrict_child_routes()
+    if type == 'No_access':
+        return redirect(url_for('login'))
+
     cur = mysql.connection.cursor()
     result_value = cur.execute("SELECT * FROM Funding")
     if result_value > 0:
@@ -140,8 +261,12 @@ def funding():
             amount = request.form['amount_add']
             email = request.form['email']
             date = request.form['funding_date']
-
+            year = date.split('-')[0]
             funding_to = request.form['project']
+
+            if check_project_year_combination(funding_to, year) == False:
+                flash(f"Project {funding_to} is not available for year {year}", 'danger')
+                return redirect('/admin/funding')
 
             add_query = f"INSERT INTO Funding (email_id, amount, funder_name, date) "
             add_query = add_query + \
@@ -167,14 +292,35 @@ def funding():
             amount = request.form['amount']
             email = request.form['email']
             date = request.form['funding_date']
+            project_name = request.form['project_name']
+
+            # check if project is available for the year
+            year = date.split('-')[0]
+            print(year)
+            if project_name != '':
+                if check_project_year_combination(project_name, year) == False:
+                    flash(f"Project {project_name} is not available for year {year}", 'danger')
+                    return redirect('/admin/funding')
 
             edit_query = f"UPDATE Funding "
             edit_query = edit_query + \
                 f"SET funder_name = \'{benefactor}\', amount = \'{amount}\', email_id = \'{email}\', date = \'{date}\' "
             edit_query = edit_query + f"WHERE email_id = \'{email}\'"
-
             exec_query = cur.execute(edit_query)
             mysql.connection.commit()
+
+            if project_name != '':
+                #check if project is already defined for the user
+                check_query = f"SELECT * FROM Sponsors WHERE email_id = \'{email}\' AND event_name = \"{project_name}\" AND start_date IN (SELECT start_date FROM Projects WHERE event_name = \"{project_name}\" AND YEAR(start_date) = YEAR(\'{date}\'));"
+                exec_query = cur.execute(check_query)
+                check_result = cur.fetchall()
+                if len(check_result) == 0:
+                    #insert project
+                    add_project_query = f"INSERT INTO Sponsors (email_id, event_name, start_date) "
+                    add_project_query = add_project_query + f"VALUES (\"{email}\", \"{project_name}\", (SELECT start_date FROM Projects WHERE event_name = \"{project_name}\" AND YEAR(start_date) = YEAR(\'{date}\')))"
+                    exec_query = cur.execute(add_project_query)
+                    mysql.connection.commit()
+
             return redirect('/admin/funding')
         elif request.form['signal'] == 'delete':
             email = request.form['email']
@@ -182,12 +328,19 @@ def funding():
             exec_query = cur.execute(delete_query)
             mysql.connection.commit()
             return redirect('/admin/funding')
+
+        elif request.form['signal'] == 'logout':
+            return log_out()
         # print(profileDetails)
     return render_template('admin/funding.html', userDetails=userDetails, profileDetails=profileDetails, calculate_events=calculate_events, calculate_sponsors=calculate_sponsors)
 
 
 @app.route("/admin/villageprofile", methods=['POST', 'GET'])
 def village_profile():
+    type = restrict_child_routes()
+    if type == 'No_access':
+        return redirect(url_for('login'))
+
     cur = mysql.connection.cursor()
     result_value = cur.execute("SELECT * FROM VillageProfile")
 
@@ -359,11 +512,18 @@ def village_profile():
 
             return redirect('/admin/villageprofile')
 
+        elif request.form['signal'] == 'logout':
+            return log_out()
+
     return render_template('admin/village_profile.html', profile_details=profile_details, village_names=village_names, occupation_names=occupation_names, technical_literacy_names=technical_literacy_names)
 
 
 @app.route("/admin/volunteers", methods=['POST', 'GET'])
 def volunteers():
+    type = restrict_child_routes()
+    if type == 'No_access':
+        return redirect(url_for('login'))
+
     cur = mysql.connection.cursor()
     result_value = cur.execute("SELECT * FROM Volunteers")
 
@@ -478,7 +638,11 @@ def volunteers():
 
             projectEventName = request.form['project_name']
             project_start_year = request.form['project_year']
-            print(projectEventName, project_start_year)
+
+            # check if project is available for the year
+            if check_project_year_combination(projectEventName, project_start_year) == False:
+                flash(f"Project {projectEventName} is not available for year {project_start_year}", 'danger')
+                return redirect('/admin/volunteers')
 
             add_query = f"INSERT INTO Volunteers (email_id, name, phone_number, date_of_birth, gender) "
             add_query = add_query + \
@@ -503,6 +667,11 @@ def volunteers():
 
             projectEventName = request.form['project_name']
             project_start_year = request.form['project_year']
+
+            # check if project is available for the year
+            if check_project_year_combination(projectEventName, project_start_year) == False:
+                flash(f"Project {projectEventName} is not available for year {project_start_year}", 'danger')
+                return redirect('/admin/volunteers')
 
             edit_query = f"UPDATE Volunteers "
             edit_query = edit_query + \
@@ -536,11 +705,18 @@ def volunteers():
             mysql.connection.commit()
             return redirect('/admin/volunteers')
 
+        elif request.form['signal'] == 'logout':
+            return log_out()
+
     return render_template("admin/volunteers.html", profile_details=profile_details, projects=projects)
 
 
 @app.route("/admin/projects", methods=['POST', 'GET'])
 def projects():
+    type = restrict_child_routes()
+    if type == 'No_access':
+        return redirect(url_for('login'))
+
     cur = mysql.connection.cursor()
     result_value = cur.execute("SELECT * FROM Projects")
 
@@ -559,6 +735,11 @@ def projects():
     venue_id_query = f"SELECT DISTINCT venue_id FROM Venue"
     venue_id_query_exec = cur.execute(venue_id_query)
     venue_ids = cur.fetchall()
+
+    # extract distinct employee ID from teams table
+    employee_id_query = f"SELECT DISTINCT employee_id FROM Teams"
+    employee_id_query_exec = cur.execute(employee_id_query)
+    employee_ids = cur.fetchall()
 
     project_details = []
     for project in projectDetails:
@@ -704,6 +885,9 @@ def projects():
 
             venue_id = request.form['venue_id']
 
+            employee_id = request.form['employee_id']
+            employee_role = request.form['role']
+
             # updated based on event_name and start_date
             edit_query = f"UPDATE Projects "
             edit_query = edit_query + \
@@ -721,6 +905,16 @@ def projects():
                     f"WHERE event_name = \'{event_name}\' and start_date = \'{date}\';"
                 exec_query = cur.execute(edit_venue_query)
                 mysql.connection.commit()
+
+            if employee_id != '':
+                check_query = f"SELECT * FROM Organize WHERE employee_id = \'{employee_id}\' AND event_name = \"{event_name}\" AND start_date = \'{date}\';"
+                exec_query = cur.execute(check_query)
+                check_result = cur.fetchall()
+                if len(check_result) == 0:
+                    add_project_query = f"INSERT INTO Organize (employee_id, event_name, start_date, role) "
+                    add_project_query = add_project_query + f"VALUES (\'{employee_id}\', \"{event_name}\", \'{date}\', \'{employee_role}\');"
+                    exec_query = cur.execute(add_project_query)
+                    mysql.connection.commit()
 
             return redirect('/admin/projects')
 
@@ -764,12 +958,19 @@ def projects():
             mysql.connection.commit()
             return redirect('/admin/projects')
 
+        elif request.form['signal'] == 'logout':
+            return log_out()
+
     return render_template('admin/projects.html', project_details=project_details, project_names=project_names,
-                           event_names=event_names, venue_ids=venue_ids)
+                           event_names=event_names, venue_ids=venue_ids, employee_ids=employee_ids)
 
 
 @app.route("/admin/trainers", methods=['GET', 'POST'])
 def trainers():
+    type = restrict_child_routes()
+    if type == 'No_access':
+        return redirect(url_for('login'))
+
     cur = mysql.connection.cursor()
     result_value = cur.execute("SELECT * FROM Trainers")
 
@@ -886,6 +1087,11 @@ def trainers():
             projectEventName = request.form['project_name']
             project_start_year = request.form['project_year']
 
+            # check if project year combination exists
+            if check_project_year_combination(projectEventName, project_start_year) == False:
+                flash(f"Project {projectEventName} is not available for year {project_start_year}", 'danger')
+                return redirect('/admin/trainers')
+
             beneficiaryAadharId = request.form['beneficiaryAadharId']
             beneficiaryName = request.form['beneficiaryName']
 
@@ -924,6 +1130,11 @@ def trainers():
 
             projectEventName = request.form['project_name']
             project_start_year = request.form['project_year']
+
+            # check if project year combination exists
+            if check_project_year_combination(projectEventName, project_start_year) == False:
+                flash(f"Project {projectEventName} is not available for year {project_start_year}", 'danger')
+                return redirect('/admin/trainers')
 
             beneficiaryAadharId = request.form['beneficiaryAadharId']
             beneficiaryName = request.form['beneficiaryName']
@@ -971,11 +1182,18 @@ def trainers():
             mysql.connection.commit()
             return redirect('/admin/trainers')
 
+        elif request.form['signal'] == 'logout':
+            return log_out()
+
     return render_template("admin/trainers.html", profile_details=profile_details, projects=projects)
 
 
 @app.route("/admin/user", methods=['POST', 'GET'])
 def user():
+    type = restrict_child_routes()
+    if type == 'No_access':
+        return redirect(url_for('login'))
+
     cur = mysql.connection.cursor()
     result_value = cur.execute("SELECT * FROM Beneficiary")
 
@@ -1163,6 +1381,11 @@ def user():
             project = request.form['project_name']
             project_start_year = request.form['project_year']
 
+            # check if project is available for the year
+            if check_project_year_combination(project, project_start_year) == False:
+                flash(f"Project {project} is not available for year {project_start_year}", 'danger')
+                return redirect('/admin/user')
+
             add_query = f"INSERT INTO Beneficiary (aadhar_id, name, date_of_birth, gender, marital_status, education, photo, employed, photo_caption) "
             add_query = add_query + \
                 f"VALUES ({aadhar}, \"{name}\", \'{dob}\', \'{gender}\', \'{martial}\', \'{education}\', NULL, \"{employed}\", NULL)"
@@ -1206,6 +1429,11 @@ def user():
             project = request.form['project_name']
             project_start_year = request.form['project_year']
 
+            if project != '':
+                if check_project_year_combination(project, project_start_year) == False:
+                    flash(f"Project {project} is not available for year {project_start_year}", 'danger')
+                    return redirect('/admin/user')
+
             edit_query = f"UPDATE Beneficiary "
             edit_query = edit_query + \
                 f"SET name = \'{name}\', date_of_birth = \'{dob}\', gender = \'{gender}\', marital_status = \'{martial}\', education = \'{education}\', photo = NULL, employed = \"{employed}\", photo_caption = NULL "
@@ -1247,9 +1475,201 @@ def user():
             mysql.connection.commit()
             return redirect('/admin/user')
 
+        elif request.form['signal'] == 'logout':
+            return log_out()
+
     return render_template('admin/user.html', searchResults=tuple(), profile_details=profile_details, projects=projects, villages=villages, education_list=education_list)
     # return render_template('admin/user.html')
 
+
+@app.route('/admin/team', methods=['GET', 'POST'])
+def team():
+    type = restrict_child_routes()
+    if type == 'No_access':
+        return redirect(url_for('login'))
+
+    cur = mysql.connection.cursor()
+    result_value = cur.execute("SELECT * FROM Teams")
+
+    if result_value > 0:
+        teamdetails = cur.fetchall()
+
+    position_name_query = f" SELECT DISTINCT position FROM Teams"
+    position_name_query_exec = cur.execute(position_name_query)
+    position_names = cur.fetchall()
+
+    project_name_query = f" SELECT DISTINCT event_name FROM Organize"
+    project_name_query_exec = cur.execute(project_name_query)
+    project_names = cur.fetchall()
+
+    team_details = []
+    for team in teamdetails:
+        team_profile = {'employee_id': team[0], 'name': team[1], 'email_id': team[2], 'salary': team[3],
+                        'position': team[4], 'year_of_joining': team[5], 'year_of_leaving': team[6],
+                        'reason_of_leaving': team[7]}
+
+        # extract_projects_role_date_query = f"SELECT event_name,start_date FROM Organize WHERE employee_id IN (SELECT employee_id FROM Organize WHERE event_name = \'{event_name}\' AND start_date = \'{start_date}\')"
+        extract_projects_role_date_query = f"SELECT event_name, start_date FROM Organize WHERE employee_id = \'{team_profile['employee_id']}\' "
+        extract_projects_role_date_query = cur.execute(extract_projects_role_date_query)
+        print("Project query executed")
+        extract_projects_role_date = cur.fetchall()
+
+        print(len(extract_projects_role_date))
+        if (len(extract_projects_role_date) > 0):
+            team_profile['Project_id'] = extract_projects_role_date
+        else:
+            team_profile['Project_id'] = ()
+
+        team_details.append(team_profile)
+
+    if (request.method == 'POST'):
+        if (request.form['signal'] == 'search'):
+            employee_id = request.form['employee_id']
+            name = request.form['name']
+            email = request.form['email']
+            min_amount = request.form['min_amount']
+            max_amount = request.form['max_amount']
+            position = request.form['position']
+            project_name = request.form['project_name']
+            # year = request.form['year']
+
+            where_query = f" SELECT * FROM Teams"
+            flag = False
+
+            if (employee_id != ''):
+                if (flag == False):
+                    where_query = where_query + f" WHERE employee_id = \"{employee_id}\""
+                else:
+                    where_query = where_query + f" AND employee_id = \"{employee_id}\""
+                flag = True
+            if (name != ''):
+                if (flag == False):
+                    where_query = where_query + f" WHERE name = \"{name}\""
+                else:
+                    where_query = where_query + f" AND name = \"{name}\""
+                flag = True
+
+            if (email != ''):
+                if (flag == False):
+                    where_query = where_query + f" WHERE email_id = \"{email}\""
+                else:
+                    where_query = where_query + f" AND email_id = \"{email}\""
+                flag = True
+
+            if min_amount != '' and max_amount != '':
+                if flag == False:
+                    where_query += f" WHERE salary BETWEEN \'{min_amount}\' AND \'{max_amount}\'"
+                else:
+                    where_query += f" AND salary BETWEEN \'{min_amount}\' AND \'{max_amount}\'"
+                flag = True
+
+            if (position != ''):
+                if (flag == False):
+                    where_query = where_query + f" WHERE position = \"{position}\""
+                else:
+                    where_query = where_query + f" AND position = \"{position}\""
+                flag = True
+
+            if project_name != '':
+                if flag == False:
+                    where_query += f" WHERE employee_id IN (SELECT employee_id FROM Organize WHERE event_name = \"{project_name}\")"
+                else:
+                    where_query += f" AND employee_id IN (SELECT employee_id FROM Organize WHERE event_name = \"{project_name}\")"
+                flag = True
+
+            exec_query = cur.execute(where_query)
+            print("Search query executed")
+            search_results = cur.fetchall()
+
+            updated_team_details = []
+            for user in team_details:
+                for result in search_results:
+                    if user['employee_id'] == result[0]:
+                        updated_team_details.append(user)
+            team_details = updated_team_details
+
+        elif (request.form['signal'] == 'add'):
+            name = request.form['name']
+            email = request.form['email']
+            salary = request.form['salary']
+            position = request.form['position']
+            hired_date = request.form['hired_date']
+
+            count_till_now_query = f" SELECT COUNT(*) FROM Teams"
+            count_till_now_query = cur.execute(count_till_now_query)
+            count_till_now = cur.fetchone()
+            if len(count_till_now) > 0:
+                count_till_now = count_till_now[0]
+            else:
+                count_till_now = 0
+
+            add_member_query = f"INSERT INTO Teams (employee_id, name, email_id, salary, position, year_of_joining, year_of_leaving, reason_of_leaving) VALUES (\'{count_till_now + 1}\' , \'{name}\', \'{email}\', \'{salary}\', \'{position}\', \'{hired_date}\', NULL, NULL)"
+            add_member_query = cur.execute(add_member_query)
+            mysql.connection.commit()
+
+            # add user to staff_table
+            password_length = 13
+            password = secrets.token_urlsafe(password_length)
+            add_staff_password_query = f"INSERT INTO staff_password (EmployeeID, EmployeePassword) VALUES (\'{count_till_now + 1}\', \'{password}\')"
+            add_staff_password_query = cur.execute(add_staff_password_query)
+            mysql.connection.commit()
+
+            # send email to user
+            send_email(email, str(count_till_now + 1), name, password)
+
+            return redirect('/admin/team')
+
+        elif (request.form['signal'] == 'edit'):
+            employee_id = request.form['employee_id']
+            name = request.form['name']
+            email = request.form['email']
+            salary = request.form['salary']
+            position = request.form['position']
+            hired_date = request.form['hired_in']
+            left_date = request.form['quit_in']
+
+            if left_date == '':
+                left_date = 'NULL'
+
+            project_name = request.form['project_name']
+            project_year = request.form['project_year']
+            project_role = request.form['role']
+
+            print(f"Project name: {project_name}, Project year: {project_year}, Project role: {project_role}")
+
+            if project_name != '':
+                if check_project_year_combination(project_name, project_year) == False:
+                    flash(f"Project {project_name} is not available for year {project_year}", 'danger')
+                    return redirect('/admin/team')
+
+            update_team_query = f"UPDATE Teams SET name = \'{name}\', email_id = \'{email}\', salary = {salary}, position = \'{position}\', year_of_joining = \'{hired_date}\', year_of_leaving = {left_date} WHERE employee_id = \'{employee_id}\'"
+            print(update_team_query)
+            update_team_query = cur.execute(update_team_query)
+            mysql.connection.commit()
+
+            if project_name != '':
+                # check if the employee is already assigned to the project
+                check_query = f"SELECT * FROM Organize WHERE employee_id = \'{employee_id}\' AND event_name = \'{project_name}\' AND start_date IN (SELECT start_date FROM Projects WHERE event_name = \"{project_name}\" AND YEAR(start_date) = \'{project_year}\')"
+                check_query = cur.execute(check_query)
+                check_query = cur.fetchall()
+                if len(check_query) == 0:
+                    insert_query = f"INSERT INTO Organize (employee_id, event_name, start_date, role) "
+                    insert_query += f"VALUES (\'{employee_id}\', \'{project_name}\', (SELECT start_date FROM Projects WHERE event_name = \"{project_name}\" AND YEAR(start_date) = \'{project_year}\'), \'{project_role}\')"
+                    insert_query = cur.execute(insert_query)
+                    mysql.connection.commit()
+
+            return redirect('/admin/team')
+
+        elif (request.form['signal'] == 'delete'):
+            employee_id = request.form['employee_id']
+            delete_query = f"DELETE FROM Teams WHERE employee_id = \'{employee_id}\'"
+            delete_query_exec = cur.execute(delete_query)
+
+            mysql.connection.commit()
+
+
+    return render_template('admin/team.html', team_details=team_details, position_names=position_names,
+                           project_names=project_names)
 
 if __name__ == '__main__':
     app.run(debug=True)

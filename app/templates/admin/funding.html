@@ -1,16 +1,27 @@
-{% extends 'layout.html'%} {% block content %}
-<div class="container">
-    <h1>Funding Details</h1>
+{% extends '/admin/dashboard.html'%} 
+{% block content %}
 
+    {% with messages=get_flashed_messages() %}
+    {% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-danger" role="alert">
+          {{ message }}
+        </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+<div>
+    <h1>Benefactor</h1>
     <!-- search form -->
-    <div class="container" style="width: 60%">
+    <div style="width: 60%">
         <form name="searchForm" method="POST">
             <div class="d-flex flex-wrap m-1 justify-content-between">
                 <!-- Hidden signal -->
                 <input type="hidden" name="signal" value="search">
 
                 <!-- benefactor and emil -->
-                <div class="d-flex flex-row justify-content-between align-items-center" style="width: 100%">
+                <div class="d-flex flex-row justify-content-between align-items-center my-1" style="width: 100%">
 
                     <div class="form-group" style="width: 48%">
                         <label for="benefactor">Benefactor:</label>
@@ -22,10 +33,10 @@
                     </div>
                 </div>
                 <!-- amount  -->
-                <div class="form-group d-flex flex-row justify-content-between align-items-center" style="width: 100%">
+                <div class="form-group d-flex flex-row justify-content-between align-items-center my-1" style="width: 100%">
                     <label>Amount</label>
                     <input type="number" class="form-control mx-3" name="min_amount" id="min_amount"
-                        placeholder="Min" />
+                        placeholder="Min"  min="0"/>
                     <input type="number" class="form-control" name="max_amount" id="max_amount" placeholder="Max" />
                 </div>
 
@@ -52,8 +63,8 @@
     </div>
 
     <!-- add button -->
-    <div class="container">
-        <button type="button" class="btn btn-success m-2" data-toggle="modal" data-target="#addModal" onclick="">
+    <div>
+        <button type="button" class="btn btn-success my-2" data-toggle="modal" data-target="#addModal" onclick="">
             Add New Benefactor
         </button>
     </div>
@@ -205,11 +216,11 @@
                         <div class="form-group d-flex justify-content-between align-items-center">
                             <select class="form-control flex-item" style="width: 48%;" id="project_name_eidt"
                                 name="project_name" placeholder="Project Name">
-                                <option value="Sewing">Sewing</option>
-                                <option value="Cooking">Cooking</option>
+                                <option selected value="">NA</option>
+                                {% for project in calculate_events %}
+                                <option value="{{project[0]}}">{{project[0]}}</option>
+                                {% endfor %}
                             </select>
-                            <input type="number" class="form-control flex-item" style="width: 48%;" name="year"
-                                placeholder="Year" min="2008" />
                         </div>
 
 

@@ -1,147 +1,166 @@
-{% extends 'layout.html'%}
+{% extends '/admin/dashboard.html'%}
 {% block content %}
-<div class="container">
-    <!-- Trainers-{EmailId}, Name, Fee, Gender, Age
+
+    {% with messages=get_flashed_messages() %}
+    {% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-danger" role="alert">
+          {{ message }}
+        </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+<div>
+  <!-- Trainers-{EmailId}, Name, Fee, Gender, Age
         PhoneTrainer- {PhoneNumber, EmailId}
         Beneficiary-{AadhaarId}, Name, DOB, Gender, Marital Status, Education, Photo, Employed
         Projects- {EventName, StartDate}, Types, Budget, NoOfParticipants, Duration, Collection, PhotoLinks, TotalExpense -->
 
-    <h1>Trainers Page</h1>
-    <div class="container" style="width:60%">
-        <form name="searchForm" method = "POST">
-          <div class="d-flex flex-wrap m-1 justify-content-between">
-            <input type="hidden" name="signal" value="search">
-          <div class="form-group">
-            <label for="name" >Name:</label>
-            <input type="text" class="form-control" id="name" name="name">
-          </div>
-          <div class="form-group">
-            <label for="id">Email ID:</label>
-            <input type="text" class="form-control" id="id" name="email_id">
-          </div>
-          <div class="form-group">
-            <label for="genderSelect">Gender</label>
-            <select class="form-control" id="genderSelect" name="gender">
-              <option value="Male">Male</option>
-              <option value="Female">Female</option>
-              <option value="other">Other</option>
-            </select>
-          </div>
 
-          <div class="form-group align-items-center">
-            <label >Age</label>
-            <div class="form-group d-flex">
-              <input type="number" class="form-control mr-3" id="min_age" name="min_age" max="200" placeholder="min">
-              <input type="number" class="form-control" id="max_age" name="max_age" max="200" placeholder="max">
-            </div>
+  <h1>Trainers</h1>
+  <div style="width:50%">
+    <form name="searchForm" method="POST">
+      <div class="d-flex flex-wrap m-1 justify-content-between">
+        <input type="hidden" name="signal" value="search">
+        <div class="form-group">
+          <label for="name">Name</label>
+          <input type="text" class="form-control" id="name" name="name">
+        </div>
+        <div class="form-group">
+          <label for="id">Email ID</label>
+          <input type="text" class="form-control" id="id" name="email_id">
+        </div>
+        <div class="form-group">
+          <label for="genderSelect">Gender</label>
+          <select class="form-control" id="genderSelect" name="gender">
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
 
+        <div class="form-group align-items-center d-flex m-2">
+          <label style="margin-right: 10px;">Age</label>
+          <div class="form-group d-flex ">
+            <input type="number" class="form-control" id="min_age" name="min_age" max="200" placeholder="min"
+              style="width: 100px; margin-right: 10px;">
+            <input type="number" class="form-control" id="max_age" name="max_age" max="200" placeholder="max"
+              style="width: 100px;">
           </div>
+        </div>
 
-          <div class="form-group align-items-center">
-            <label >Fee</label>
-            <div class="form-group d-flex">
-            <input type="number" class="form-control mr-3" id="min_fee" name="min_fee" min="0" placeholder="min">
-            <input type="number" class="form-control" id="max_fee" name="max_fee" min="0" placeholder="max">
-            </div>
+        <div class="form-group align-items-center d-flex">
+          <label style="margin-right: 10px;">Fee</label>
+          <div class="form-group d-flex">
+            <input type="number" class="form-control mr-3" id="min_fee" name="min_fee" min="0" placeholder="Min Fee"
+              style="width: 150px; margin-right: 10px;">
+            <input type="number" class="form-control" id="max_fee" name="max_fee" min="0" placeholder="Max Fee"
+              style="width: 150px;">
           </div>
-
-
-          </div>
-
-          <div >
-            <button type="submit"  class="btn btn-primary" onclick="" value="">Search</button>
-          </div>
-        </form>
+        </div>
 
       </div>
 
+      <div></div>
+        <button type="submit" class="btn btn-primary" onclick="" value="">Search</button>
+      </div>
+    </form>
 
-          <div class="container">
-            <button type="button" class="btn btn-success m-2" data-toggle="modal" data-target="#addModal" onclick="">Add New Trainer</button>
+  </div>
 
-          </div>
 
-   <table class="table">
+  <div>
+    <button type="button" class="btn btn-success my-2" data-toggle="modal" data-target="#addModal" onclick="">Add New
+      Trainer</button>
 
-     <thead>
-    <tr>
-      <th scope="col">Email ID </th>
-      <th scope="col">Name</th>
-      <th scope="col">Age </th>
-      <th scope="col">Gender </th>
-      <th scope="col">Fee</th>
-      <th scope="col">Phone</th>
-      <th scope="col">Actions</th>
-    </tr>
-  </thead>
-  <!-- dummy data -->
-  <tbody>
-{%for user in profile_details%}
-    <tr>
-      <th scope="row" headers="email_id">{{user['email_id']}}</th>
-      <td  headers="name">{{user['name']}}</td>
-      <td  headers="age">{{user['age']}}</td>
-      <td headers="gender">{{user['gender']}}</td>
-      <td headers="fee">{{user['fee']}}</td>
-      <td headers="phoneNumber">{{user['phone_number']}}</td>
+  </div>
+
+  <table class="table">
+
+    <thead>
+      <tr>
+        <th scope="col">Email ID </th>
+        <th scope="col">Name</th>
+        <th scope="col">Age </th>
+        <th scope="col">Gender </th>
+        <th scope="col">Fee</th>
+        <th scope="col">Phone</th>
+        <th scope="col">Actions</th>
+      </tr>
+    </thead>
+    <!-- dummy data -->
+    <tbody>
+      {%for user in profile_details%}
+      <tr>
+        <th scope="row" headers="email_id">{{user['email_id']}}</th>
+        <td headers="name">{{user['name']}}</td>
+        <td headers="age">{{user['age']}}</td>
+        <td headers="gender">{{user['gender']}}</td>
+        <td headers="fee">{{user['fee']}}</td>
+        <td headers="phoneNumber">{{user['phone_number']}}</td>
         <td headers="projects" style="display:none;">
-                  <table class="table">
-                        <thead>
-                          <tr>
-                            <th scope="col">Sr: No</th>
-                            <th scope="col">Event/Project</th>
-                            <th scope="col">Start Date</th>
-                          </tr>
-                        </thead>
-                        <tbody id="profile_table_body">
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">Sr: No</th>
+                <th scope="col">Event/Project</th>
+                <th scope="col">Start Date</th>
+              </tr>
+            </thead>
+            <tbody id="profile_table_body">
 
-                              {% for project in user['projects'] %}
-                                  <tr>
-                                    <th scope="row">{{ loop.index }}</th>
-                                    <td>{{project[0]}}</td>
-                                    <td>{{project[1]}}</td>
-                                  </tr>
-                              {% endfor %}
-                        </tbody>
-                  </table>
+              {% for project in user['projects'] %}
+              <tr>
+                <th scope="row">{{ loop.index }}</th>
+                <td>{{project[0]}}</td>
+                <td>{{project[1]}}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
         </td>
 
         <td headers="beneficiaries" style="display:none;">
-                  <table class="table">
-                        <thead>
-                          <tr>
-                            <th scope="col">Sr: No</th>
-                            <th scope="col">Name</th>
-                            <th scope="col">Aadhar ID</th>
-                          </tr>
-                        </thead>
-                        <tbody id="profile_table_body">
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">Sr: No</th>
+                <th scope="col">Name</th>
+                <th scope="col">Aadhar ID</th>
+              </tr>
+            </thead>
+            <tbody id="profile_table_body">
 
-                              {% for beneficiary in user['beneficiaries'] %}
-                                  <tr>
-                                    <th scope="row">{{ loop.index }}</th>
-                                    <td>{{beneficiary[0]}}</td>
-                                    <td>{{beneficiary[1]}}</td>
-                                  </tr>
-                              {% endfor %}
-                        </tbody>
-                  </table>
+              {% for beneficiary in user['beneficiaries'] %}
+              <tr>
+                <th scope="row">{{ loop.index }}</th>
+                <td>{{beneficiary[0]}}</td>
+                <td>{{beneficiary[1]}}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
         </td>
 
-      <td>
-        <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editModal" onclick="edit(this)">Edit</button>
-        <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#deleteModal" onclick="delete_user(this)">Delete</button>
-        <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#profileModal" onclick="show_details(this)">Show Profile</button>
-      </td>
-    </tr>
-    {%endfor%}
+        <td>
+          <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editModal"
+            onclick="edit(this)">Edit</button>
+          <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#deleteModal"
+            onclick="delete_user(this)">Delete</button>
+          <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#profileModal"
+            onclick="show_details(this)">Show Profile</button>
+        </td>
+      </tr>
+      {%endfor%}
 
-  </tbody>
-</table>
+    </tbody>
+  </table>
 
 
-<!-- edit modal  -->
-<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+  <!-- edit modal  -->
+  <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
@@ -153,72 +172,75 @@
         <div class="modal-body">
           <form name="editedDetails" method="POST">
 
-            <input type="hidden"  value="editUser" name="signal">
+            <input type="hidden" value="editUser" name="signal">
 
             <div class="form-group">
-                <label for="name_edit" >Name:</label>
-                <input type="text" class="form-control" id="name_edit" name="name" required>
-              </div>
-              <div class="form-group">
-                <label for="email_id_edit">Email ID:</label>
-                <input type="text" class="form-control" id="email_id_edit" name="email_id" required readonly>
-              </div>
-              <div class="form-group">
-                <label for="phoneNumber_edit">PhoneNumber</label>
-                <input type="number" class="form-control" id="phoneNumber_edit" name="phoneNumber" min="1000000000" max="9999999999">
-              </div>
-              <div class="form-group">
-                <label for="genderSelect_edit">Gender</label>
-                <select class="form-control" id="genderSelect_edit" name="gender">
-                  <option value="Male">Male</option>
-                  <option value="Female">Female</option>
-                  <option value="other">Other</option>
+              <label for="name_edit">Name:</label>
+              <input type="text" class="form-control" id="name_edit" name="name" required>
+            </div>
+            <div class="form-group">
+              <label for="email_id_edit">Email ID:</label>
+              <input type="text" class="form-control" id="email_id_edit" name="email_id" required readonly>
+            </div>
+            <div class="form-group">
+              <label for="phoneNumber_edit">PhoneNumber</label>
+              <input type="number" class="form-control" id="phoneNumber_edit" name="phoneNumber" min="1000000000"
+                max="9999999999">
+            </div>
+            <div class="form-group">
+              <label for="genderSelect_edit">Gender</label>
+              <select class="form-control" id="genderSelect_edit" name="gender">
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="age_edit">Age:</label>
+              <input type="number" class="form-control" id="age_edit" name="age" max="200">
+            </div>
+
+
+
+            <div class="form-group">
+              <label for="fee_edit">Fee</label>
+              <input type="number" class="form-control" id="fee_edit" name="fee" min="0">
+            </div>
+
+            <div class="form-group">
+              <!-- project and year -->
+              <div class="form-group d-flex flex-row justify-content-between align-items-center" style="width: 100%">
+                <label for="project_name">Project</label>
+                <select class="form-control mx-4" id="project_name" name="project_name" placeholder="Project Name">
+                  {% for project in projects %}
+                  <option value="{{project[0]}}">{{project[0]}}</option>
+                  {% endfor %}
                 </select>
+                <input type="number" class="form-control" id="project_year" name="project_year" placeholder="Year"
+                  min="2008" required />
               </div>
-              <div class="form-group">
-                <label for="age_edit">Age:</label>
-                <input type="number" class="form-control" id="age_edit" name="age" max="200">
-              </div>
+            </div>
 
-
-
-              <div class="form-group">
-                <label for="fee_edit">Fee</label>
-                <input type="number" class="form-control" id="fee_edit" name="fee" min="0">
-              </div>
-
-              <div class="form-group">
-                <!-- project and year -->
-                <div class="form-group d-flex flex-row justify-content-between align-items-center" style="width: 100%">
-                    <label for="project_name">Project</label>
-                    <select class="form-control mx-4" id="project_name" name="project_name" placeholder="Project Name">
-                        {% for project in projects %}
-                        <option value="{{project[0]}}">{{project[0]}}</option>
-                        {% endfor %}
-                    </select>
-                    <input type="number" class="form-control" id="project_year" name="project_year" placeholder="Year" min="2008" required />
-                </div>
-              </div>
-
-              <!-- <div class="form-group">
+            <!-- <div class="form-group">
                 <label for="projectStartDate">ProjectDate:</label>
                 <input type="date" class="form-control" id="projectStartDate" name="projectStartDate">
               </div> -->
 
-              <div class="form-group">
-                <label for="beneficiaryAadharId_edit">Beneficiary AadharID:</label>
-                <input type="number" class="form-control" id="beneficiaryAadharId_edit" name="beneficiaryAadharId" min="100000000000" max="999999999999">
-              </div>
+            <div class="form-group">
+              <label for="beneficiaryAadharId_edit">Beneficiary AadharID:</label>
+              <input type="number" class="form-control" id="beneficiaryAadharId_edit" name="beneficiaryAadharId"
+                min="100000000000" max="999999999999">
+            </div>
 
-              <div class="form-group">
-                <label for="beneficiaryName_edit" >Beneficiary Name:</label>
-                <input type="text" class="form-control" id="beneficiaryName_edit" name="beneficiaryName">
-              </div>
+            <div class="form-group">
+              <label for="beneficiaryName_edit">Beneficiary Name:</label>
+              <input type="text" class="form-control" id="beneficiaryName_edit" name="beneficiaryName">
+            </div>
 
-              <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                <input type="submit" class="btn btn-primary" id="saveChangesButton" value="Save Changes">
-              </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+              <input type="submit" class="btn btn-primary" id="saveChangesButton" value="Save Changes">
+            </div>
           </form>
         </div>
 
@@ -227,96 +249,100 @@
   </div>
 
 
-<!-- add modal -->
+  <!-- add modal -->
 
-<div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="editModalLabel">Add New Trainer</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <form name="addDetails" method="POST">
-          <input type="hidden" name="signal" value="addUser">
-          <div class="form-group">
-            <label for="name_add" >Name:</label>
-            <input type="text" class="form-control" id="name_add" name="name" required>
-          </div>
-          <div class="form-group">
-            <label for="email_id_add">Email ID:</label>
-            <input type="text" class="form-control" id="email_id_add" name="email_id" required>
-          </div>
-          <div class="form-group">
-            <label for="phoneNumber_add">PhoneNumber</label>
-            <input type="number" class="form-control" id="phoneNumber_add" name="phoneNumber" min="1000000000" max="9999999999">
-          </div>
-          <div class="form-group">
-            <label for="genderSelect_add">Gender</label>
-            <select class="form-control" id="genderSelect_add" name="gender">
-              <option value="Male">Male</option>
-              <option value="Female">Female</option>
-              <option value="other">Other</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="age_add">Age:</label>
-            <input type="number" class="form-control" id="age_add" name="age" max="200">
-          </div>
+  <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editModalLabel">Add New Trainer</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form name="addDetails" method="POST">
+            <input type="hidden" name="signal" value="addUser">
+            <div class="form-group">
+              <label for="name_add">Name:</label>
+              <input type="text" class="form-control" id="name_add" name="name" required>
+            </div>
+            <div class="form-group">
+              <label for="email_id_add">Email ID:</label>
+              <input type="text" class="form-control" id="email_id_add" name="email_id" required>
+            </div>
+            <div class="form-group">
+              <label for="phoneNumber_add">PhoneNumber</label>
+              <input type="number" class="form-control" id="phoneNumber_add" name="phoneNumber" min="1000000000"
+                max="9999999999">
+            </div>
+            <div class="form-group">
+              <label for="genderSelect_add">Gender</label>
+              <select class="form-control" id="genderSelect_add" name="gender">
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="age_add">Age:</label>
+              <input type="number" class="form-control" id="age_add" name="age" max="200">
+            </div>
 
-          <div class="form-group">
-            <label for="fee_add">Fee</label>
-            <input type="number" class="form-control" id="fee_add" name="fee" min="0">
-          </div>
+            <div class="form-group">
+              <label for="fee_add">Fee</label>
+              <input type="number" class="form-control" id="fee_add" name="fee" min="0">
+            </div>
 
-          <div class="form-group">
-            <!-- project and year -->
-                <div class="form-group d-flex flex-row justify-content-between align-items-center" style="width: 100%">
-                    <label for="project_name">Project</label>
-                    <select class="form-control mx-4" id="project_name" name="project_name" placeholder="Project Name">
-                        {% for project in projects %}
-                        <option value="{{project[0]}}">{{project[0]}}</option>
-                        {% endfor %}
-                    </select>
-                    <input type="number" class="form-control" id="project_year" name="project_year" placeholder="Year" min="2008" required />
-                </div>
-          </div>
+            <div class="form-group">
+              <!-- project and year -->
+              <div class="form-group d-flex flex-row justify-content-between align-items-center" style="width: 100%">
+                <label for="project_name">Project</label>
+                <select class="form-control mx-4" id="project_name" name="project_name" placeholder="Project Name">
+                  {% for project in projects %}
+                  <option value="{{project[0]}}">{{project[0]}}</option>
+                  {% endfor %}
+                </select>
+                <input type="number" class="form-control" id="project_year" name="project_year" placeholder="Year"
+                  min="2008" required />
+              </div>
+            </div>
 
-          <!-- <div class="form-group">
+            <!-- <div class="form-group">
             <label for="projectStartDate">ProjectDate:</label>
             <input type="date" class="form-control" id="projectStartDate" name="projectStartDate">
           </div> -->
 
-          <div class="form-group">
-            <label for="beneficiaryAadharId_add">Beneficiary AadharID:</label>
-            <input type="number" class="form-control" id="beneficiaryAadharId_add" name="beneficiaryAadharId" min="100000000000" max="999999999999">
-          </div>
+            <div class="form-group">
+              <label for="beneficiaryAadharId_add">Beneficiary AadharID:</label>
+              <input type="number" class="form-control" id="beneficiaryAadharId_add" name="beneficiaryAadharId"
+                min="100000000000" max="999999999999">
+            </div>
 
-          <div class="form-group">
-            <label for="beneficiaryName_add" >Beneficiary Name:</label>
-            <input type="text" class="form-control" id="beneficiaryName_add" name="beneficiaryName">
-          </div>
+            <div class="form-group">
+              <label for="beneficiaryName_add">Beneficiary Name:</label>
+              <input type="text" class="form-control" id="beneficiaryName_add" name="beneficiaryName">
+            </div>
 
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
               <input type="submit" class="btn btn-primary" id="saveChangesButton" value="Add User">
             </div>
 
-        </form>
-      </div>
+          </form>
+        </div>
 
+      </div>
     </div>
   </div>
-</div>
 
 
 
 
-<!-- delete modal  -->
+  <!-- delete modal  -->
 
-<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
@@ -330,22 +356,23 @@
         </div>
         <div class="modal-footer">
           <form name="deleteForm" method="POST">
-                <div class="form-group">
-                    <input type="hidden" name="signal" value="delete">
-                    <label for="email_id">Email ID</label>
-                    <input type="text" class="form-control" id="email_id_edit" name="email_id" readonly>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-danger" id="deleteButton">Delete</button>
-                </div>
-            </form>
+            <div class="form-group">
+              <input type="hidden" name="signal" value="delete">
+              <label for="email_id">Email ID</label>
+              <input type="text" class="form-control" id="email_id_edit" name="email_id" readonly>
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+              <button type="submit" class="btn btn-danger" id="deleteButton">Delete</button>
+            </div>
+          </form>
         </div>
       </div>
     </div>
   </div>
 
-<!-- profile modal -->
+  <!-- profile modal -->
 
-  <div class="modal fade" id="profileModal" tabindex="-1" role="dialog" aria-labelledby="profileModalLabel" aria-hidden="true">
+  <div class="modal fade" id="profileModal" tabindex="-1" role="dialog" aria-labelledby="profileModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
@@ -368,10 +395,10 @@
               <p id="fee">Fee: 134234</p>
 
               <h4>Projects Trained</h4>
-                <div id="profile_projects"></div>
+              <div id="profile_projects"></div>
 
               <h4>Beneficiaries </h4>
-                <div id="profile_beneficiaries"></div>
+              <div id="profile_beneficiaries"></div>
 
             </div>
             <!-- <div class="col-md-4">
@@ -388,52 +415,52 @@
 
 </div>
 <script>
-function edit(e) {
-        let p = e.parentNode.parentNode;
-        let email_id = p.querySelector("th[headers='email_id']").innerHTML;
-        let name = p.querySelector('td[headers="name"]').innerHTML;
-        let age = p.querySelector('td[headers="age"]').innerHTML;
-        let gender = p.querySelector('td[headers="gender"]').innerHTML;
-        let fee = p.querySelector('td[headers="fee"]').innerHTML;
-        let phoneNumber = p.querySelector('td[headers="phoneNumber"]').innerHTML;
+  function edit(e) {
+    let p = e.parentNode.parentNode;
+    let email_id = p.querySelector("th[headers='email_id']").innerHTML;
+    let name = p.querySelector('td[headers="name"]').innerHTML;
+    let age = p.querySelector('td[headers="age"]').innerHTML;
+    let gender = p.querySelector('td[headers="gender"]').innerHTML;
+    let fee = p.querySelector('td[headers="fee"]').innerHTML;
+    let phoneNumber = p.querySelector('td[headers="phoneNumber"]').innerHTML;
 
-        let form = document.querySelector("form[name='editedDetails']");
+    let form = document.querySelector("form[name='editedDetails']");
 
-        form.querySelector("input[name='email_id']").value = email_id;
-        form.querySelector("input[name='name']").value = name;
-        form.querySelector("input[name='age']").value = age;
-        form.querySelector("select[name='gender']").value = gender;
-        form.querySelector("input[name='fee']").value = fee;
-        form.querySelector("input[name='phoneNumber']").value = phoneNumber;
-      }
+    form.querySelector("input[name='email_id']").value = email_id;
+    form.querySelector("input[name='name']").value = name;
+    form.querySelector("input[name='age']").value = age;
+    form.querySelector("select[name='gender']").value = gender;
+    form.querySelector("input[name='fee']").value = fee;
+    form.querySelector("input[name='phoneNumber']").value = phoneNumber;
+  }
 
-      function delete_user(e) {
-        let p = e.parentNode.parentNode;
-        let email_id = p.querySelector('th[headers="email_id"]').innerHTML;
-        let form = document.querySelector("form[name='deleteForm']");
+  function delete_user(e) {
+    let p = e.parentNode.parentNode;
+    let email_id = p.querySelector('th[headers="email_id"]').innerHTML;
+    let form = document.querySelector("form[name='deleteForm']");
 
-        form.querySelector("input[name='email_id']").value = email_id;
-      }
+    form.querySelector("input[name='email_id']").value = email_id;
+  }
 
-    function show_details(e) {
-        let p = e.parentNode.parentNode;
-        let email_id = p.querySelector("th[headers='email_id']").innerHTML;
-        let name = p.querySelector('td[headers="name"]').innerHTML;
-        let age = p.querySelector('td[headers="age"]').innerHTML;
-        let gender = p.querySelector('td[headers="gender"]').innerHTML;
-        let fee = p.querySelector('td[headers="fee"]').innerHTML;
-        let phoneNumber = p.querySelector('td[headers="phoneNumber"]').innerHTML;
-        let projects = p.querySelector('td[headers="projects"]').innerHTML;
-        let beneficiaries = p.querySelector('td[headers="beneficiaries"]').innerHTML;
+  function show_details(e) {
+    let p = e.parentNode.parentNode;
+    let email_id = p.querySelector("th[headers='email_id']").innerHTML;
+    let name = p.querySelector('td[headers="name"]').innerHTML;
+    let age = p.querySelector('td[headers="age"]').innerHTML;
+    let gender = p.querySelector('td[headers="gender"]').innerHTML;
+    let fee = p.querySelector('td[headers="fee"]').innerHTML;
+    let phoneNumber = p.querySelector('td[headers="phoneNumber"]').innerHTML;
+    let projects = p.querySelector('td[headers="projects"]').innerHTML;
+    let beneficiaries = p.querySelector('td[headers="beneficiaries"]').innerHTML;
 
-        document.querySelector("#profile_name").textContent = name;
-        document.querySelector("#profile_email_id").textContent = "Email: " + email_id;
-        document.querySelector("#profile_phoneNumber").textContent = "Phone: " + phoneNumber;
-        document.querySelector("#profile_gender").textContent = "Gender: " + gender;
-        document.querySelector("#profile_age").textContent = "Age: " + age;
-        document.querySelector("#fee").textContent = "Fee: " + fee;
-        document.querySelector("#profile_projects").innerHTML = projects;
-        document.querySelector("#profile_beneficiaries").innerHTML = beneficiaries;
-      }
+    document.querySelector("#profile_name").textContent = name;
+    document.querySelector("#profile_email_id").textContent = "Email: " + email_id;
+    document.querySelector("#profile_phoneNumber").textContent = "Phone: " + phoneNumber;
+    document.querySelector("#profile_gender").textContent = "Gender: " + gender;
+    document.querySelector("#profile_age").textContent = "Age: " + age;
+    document.querySelector("#fee").textContent = "Fee: " + fee;
+    document.querySelector("#profile_projects").innerHTML = projects;
+    document.querySelector("#profile_beneficiaries").innerHTML = beneficiaries;
+  }
 </script>
 {% endblock content %}
